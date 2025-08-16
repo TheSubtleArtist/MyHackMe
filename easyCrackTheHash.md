@@ -26,17 +26,16 @@ Would be appropraitely names Jack of All Trades. John has the ability to perform
 ## Task 1
 ### Hash 1: 48bb6e862e54f2a795ffc4e541caed4d ###
 
-#### Crackstation ####
-![Hash1](/Screenshots/hash1.png)<br>
-This is in crackstation's db, so we get an answer quickly.
+    #### Crackstation ####
+    ![Hash1](/Screenshots/hash1.png)<br>
 
 ### Hash 2: CBFDAC6008F9CAB4083784CBD1874F76618D2A97 
-#### Crackstation ####
-![Hash2](/Screenshots/hash2.png)<br>
+    #### Crackstation ####
+    ![Hash2](/Screenshots/hash2.png)<br>
 
 ### Hash 3: 1C8BFE8F801D79745C4631D09FFF36C82AA37FC4CCE4FC946683D7B336B63032 ###
-#### Crackstation ####
-![Hash3](/Screenshots/hash3.png)<br>
+    #### Crackstation ####
+    ![Hash3](/Screenshots/hash3.png)<br>
 
 ### Hash 4: $2y$12$Dwt1BZj6pcyc3Dy1FWZ5ieeUznr71EeNkJkUlypTsgbX1H68wsRom ###
 

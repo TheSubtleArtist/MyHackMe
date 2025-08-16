@@ -38,18 +38,31 @@ Would be appropraitely names Jack of All Trades. John has the ability to perform
 ![Hash3](/Screenshots/hash3.png)<br>
 
 ### Hash 4: $2y$12$Dwt1BZj6pcyc3Dy1FWZ5ieeUznr71EeNkJkUlypTsgbX1H68wsRom ###
+#### Crackstation ####
+![Hash4](/Screenshots/hash.png)<br>
+Crackstation has not seen this has before.
 
 ### Hash 5: 279412f945939ba78ce0758d3fd83daa ###
+#### Crackstation ####
+![Hash5](/Screenshots/hash5.png)<br>
 
 
 ## Task 2
 
 ### Hash 6: F09EDCB1FCEFC6DFB23DC3505A882655FF77375ED8AA2D1C13F640FCCC2D0C85 ###
+#### Crackstation ####
+![Hash6](/Screenshots/hash6.png)<br>
 
 ### Hash 7: 1DFECA0C002AE40B8619ECF94819CC1B ###
+#### Crackstation ####
+![Hash7](/Screenshots/hash7.png)<br>
 
 ### Hash 8: $6$aReallyHardSalt$6WKUTqzq.UQQmrm0p/T7MPpMbGNnzXPMAXi4bJMl9be.cfi3/qxIf.hsGpS41BqMhSrHVXgMpdjS6xeKZAs02. ###
 ### Salt: aReallyHardSalt ###
+#### Crackstation ####
+![Hash8](/Screenshots/hash8.png)<br>
 
 ### Hash 9: e5d8870e5bdd26602cab8dbe07a942c8669e56d6 ###
 ### Salt: tryhackme ###
+#### Crackstation ####
+![Hash9](/Screenshots/hash9.png)<br>

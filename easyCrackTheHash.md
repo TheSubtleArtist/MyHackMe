@@ -27,7 +27,7 @@ Would be appropraitely names Jack of All Trades. John has the ability to perform
 ### Hash 1: 48bb6e862e54f2a795ffc4e541caed4d ###
 
 First, Crackstation<br>
-![Hash1](/screenshots/hash1.png)<br>
+![Hash1](/Screenshots/hash1.png)<br>
 This is in crackstations db, so we get an answer quickly.
 
 ### Hash 2: CBFDAC6008F9CAB4083784CBD1874F76618D2A97 

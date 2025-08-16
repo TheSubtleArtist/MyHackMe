@@ -6,7 +6,13 @@ The reality is that good definitions rarely give answers. Instead, these definit
 
 ## Confidentiality ##
 McCumber wrote:
-> The primary consideration of confidentiality is not simply keeping information secret from everyone else; it is making it available only to those people who need it, when they need it, and under the appropriate circumstances. 
+> The primary consideration of confidentiality is not simply keeping information secret from everyone else; it is making it available only to those people who need it, when they need it, and under the appropriate circumstances.
+
+I would argue all day that John McCumber birthed Zero-Trust. His definition here does not answer "What is confidentiality". Instead, his definition implores the professional to ask a number of questions that lead to Zero-Trust.
+
+### Who needs access and do the attributes of the subject indicate that access to the object is warrented? ###
+
+
 
 ## Integrity ##
 

@@ -29,10 +29,10 @@ Philip K. Dick, the exceptionally gifted and prolific author lends his wisdom to
 No place can illustrate the ideas of integrity and reality more than the arena of Politics where two people can speak on the exact same topic use symantically and syntactically empty rhetoric, completely misrepresent reality and still incite the strongest of emotional reactions in tens of millions of people who have no idea what they are hearing other than "other guy bad". 
 
 Integrity begs the receiver of information to think sufficiently critically to ask questions such as, 
--"Does this information genuinly represent reality, or ground truth?" 
--"What inconsistencies among the information might indicate decreased levels of integrity?"
--"Do I have sufficient understand of the topic to identify missing or incomplete information?"
--"To what degree is the source of information likely to have some bias?"
+- Does this information genuinly represent reality, or ground truth?
+- What inconsistencies among the information might indicate decreased levels of integrity?
+- Do I have sufficient understand of the topic to identify missing or incomplete information?
+- To what degree is the source of information likely to have some bias?
 - and oh so many more...
 
 Whether people or data, integrity is the only true measure of quality.

@@ -57,6 +57,10 @@ Try again with the standard method<br>
 #### Crackstation ####
 ![Hash3](/Screenshots/hash3.png)<br>
 
+### Hash-Identifier ###
+Users can start the hash-identifer before supply a hash.
+![Hash3 with hash-identifier](/Screenshots/hash3-HI.png)<br>
+
 ### Hash 4: $2y$12$Dwt1BZj6pcyc3Dy1FWZ5ieeUznr71EeNkJkUlypTsgbX1H68wsRom ###
 #### Crackstation ####
 ![Hash4](/Screenshots/hash4.png)<br>

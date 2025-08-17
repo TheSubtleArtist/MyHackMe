@@ -58,7 +58,8 @@ Try again with the standard method<br>
 ![Hash3](/Screenshots/hash3.png)<br>
 
 ### Hash-Identifier ###
-Users can start the hash-identifer before supply a hash.
+Users can start the hash-identifer before supply a hash.<br>
+If there are multple hashes, hash-identifer continuse in an endless loop until it receives a keyboard interrupt.
 ![Hash3 with hash-identifier](/Screenshots/hash3-HI.png)<br>
 
 ### Hash 4: $2y$12$Dwt1BZj6pcyc3Dy1FWZ5ieeUznr71EeNkJkUlypTsgbX1H68wsRom ###

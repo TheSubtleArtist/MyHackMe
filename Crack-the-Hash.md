@@ -18,7 +18,15 @@ A command line utility for identifying a user-supplied hash.
 
 **Hashcat**<br>
 https://hashcat.net/wiki/
-An advanced password recovery tool. The user cannot be afraid to continually reference the wiki and learn about the intricacies of Hashcat. It's capabilities are limited only by the user's curiosity. The
+An advanced password recovery tool. The user cannot be afraid to continually reference the wiki and learn about the intricacies of Hashcat. It's capabilities are limited only by the user's curiosity.<br>
+At the beginning level we are concerned with two hashcat options: Core Attack Mode (-a) and Hash Mode (-m).<br>
+Example hashes (https://hashcat.net/wiki/) show the hash-modes, especially if no other source has identified the hash. Visual identification might be the final resource.<br>
+The basic hashcat command looks like:<br>
+:> ````hashcat -a <attack-mode> -m <hash-mode> <hash> <path-to-wordlist>````<br>
+In the event there is more than than one hash of the same type, they may each be placed on separate lines in a file.<br>
+The basic command changes only slightly:<br>
+:> ````hashcat -a <attack-mode> -m <hash-mode> <path-to-file> <path-to-wordlist>````<br>
+
 
 **John The Ripper**<br>
 https://www.openwall.com/john/<br>
@@ -61,6 +69,7 @@ Try again with the standard method<br>
 Users can start the hash-identifer before supply a hash.<br>
 If there are multple hashes, hash-identifer continuse in an endless loop until it receives a keyboard interrupt.
 ![Hash3 with hash-identifier](/Screenshots/hash3-HI.png)<br>
+Hash-Identifier provides the same result as Crackstation.
 
 ### Hash 4: $2y$12$Dwt1BZj6pcyc3Dy1FWZ5ieeUznr71EeNkJkUlypTsgbX1H68wsRom ###
 #### Crackstation ####
@@ -86,14 +95,23 @@ Also unidentifiable by hash-identifier.
 #### Crackstation ####
 ![Hash6](/Screenshots/hash6.png)<br>
 
+### Hash-Identifier ###
+![Hash6 with hash-identifier](/Screenshots/hash6-HI.png)<br>
+
 ### Hash 7: 1DFECA0C002AE40B8619ECF94819CC1B ###
 #### Crackstation ####
 ![Hash7](/Screenshots/hash7.png)<br>
+
+### Hash-Identifier ###
+![Hash7 with hash-identifier](/Screenshots/hash7-HI.png)<br>
 
 ### Hash 8: $6$aReallyHardSalt$6WKUTqzq.UQQmrm0p/T7MPpMbGNnzXPMAXi4bJMl9be.cfi3/qxIf.hsGpS41BqMhSrHVXgMpdjS6xeKZAs02. ###
 ### Salt: aReallyHardSalt ###
 #### Crackstation ####
 ![Hash8](/Screenshots/hash8.png)<br>
+
+### Hash-Identifier ###
+As the documentation indicates, hash-identifier works only with unsalted hashes.
 
 ### Hash 9: e5d8870e5bdd26602cab8dbe07a942c8669e56d6 ###
 ### Salt: tryhackme ###

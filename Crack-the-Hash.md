@@ -70,7 +70,7 @@ Try again with the standard method<br>
 :>````hash-identifier CBFDAC6008F9CAB4083784CBD1874F76618D2A97````<br>
 ![Hash2 with hash-identifer](/Screenshots/hash2-HI2.png)<br>
 #### Hashcat ####
-The command changes the hash-mode to 100, indicating the sha-1 hash:
+The command changes the hash-mode to 100, indicating the sha-1 hash:<br>
 :>````hashcat -m 100 -a 0 hash2 /usr/share/wordlists/rockyou.txt````<br>
 The result:<br>
 ![Hash2 with Hashcat](/Screenshots/hash2-HC.png)<br>

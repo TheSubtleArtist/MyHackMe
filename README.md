@@ -18,4 +18,23 @@ We have had zero trust for some time, we just didn't recognize it.
 
 ## Integrity ##
 
+Of integrity, McCumber wrote:
+> how accurately and robustly the information reflects reality for a given application.
+
+The question to be answered here is impossible to answer, but simple to state. To what degree must information presented represent reality, absent of perspective, to have integrity.
+
+Philip K. Dick, the exceptionally gifted and prolific author lends his wisdom to this discussion identifing reality as
+>that which, when you stop believing in it, doesn’t go away
+
+No place can illustrate the ideas of integrity and reality more than the arena of Politics where two people can speak on the exact same topic use symantically and syntactically empty rhetoric, completely misrepresent reality and still incite the strongest of emotional reactions in tens of millions of people who have no idea what they are hearing other than "other guy bad". 
+
+Integrity begs the receiver of information to think sufficiently critically to ask questions such as, 
+-"Does this information genuinly represent reality, or ground truth?" 
+-"What inconsistencies among the information might indicate decreased levels of integrity?"
+-"Do I have sufficient understand of the topic to identify missing or incomplete information?"
+-"To what degree is the source of information likely to have some bias?"
+- and oh so many more...
+
+Whether people or data, integrity is the only true measure of quality.
+
 ## Availability ##

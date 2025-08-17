@@ -13,10 +13,18 @@ https://crackstation.net/
 Crackstation is, fundamentally, a library of pre-cracked, unsalted hashes. A great go-to tool for the first step in any attempt to crack a hash.
 
 **hash-identifier**
-https://www.kali.org/tools/hash-identifier/
+https://gitlab.com/kalilinux/packages/hash-identifier/-/blob/kali/master/hash-id.py<br>
+
+Let's interpret the main() of the hash-identifier source code<br>
 
 ````python
+# simply print the value of the logo variable, set in the lower numbered lines of the source code
 print(logo)
+
+# set the value of 'first' by attempting to convert the value of argv[1] to a string
+# If you have not experienced command line functions, they are simply an array where argv[0] is the title or name of the command and argv[1..n] represents options and flags required when the command is called.
+# If the user has supplied a hash at argv[1], then 'first' will assume that value as a string.
+# If the user has supplied no hash, or if the input at argv[1] cannot be converted to a string, then first is set to 'None'
 try:
     first = str(argv[1])
 except:

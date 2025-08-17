@@ -28,6 +28,7 @@ The basic command changes only slightly:<br>
 :> ````hashcat -a <attack-mode> -m <hash-mode> <path-to-file> <path-to-wordlist>````<br>
 
 
+
 **John The Ripper**<br>
 https://www.openwall.com/john/<br>
 Would be appropraitely names Jack of All Trades. John has the ability to perform password security auditing and recovery across operating systems as well as file types, including unix, macOS, Windows, web apps, groupware, zip files, and others. <br>
@@ -49,6 +50,10 @@ The simplest use of hash identifier is as any other linux command.<br>
 :>````hash-identifier 48bb6e862e54f2a795ffc4e541caed4d````<br>
 gives us the same results as Crackstation.<br>
 ![Hash1 with hash-identifier](/Screenshots/hash1-HI.png)<br>
+#### Hashcat #### <br>
+The command:<br>
+:>````hashcat -m 0 -a 0 hash1 /usr/share/wordlists/rockyou.txt````<br>
+![Hash1 with Hashcat](/Screenshots/hash1-HC.png)<br>
 
 
 ### Hash 2: CBFDAC6008F9CAB4083784CBD1874F76618D2A97 

@@ -84,6 +84,12 @@ Users can start the hash-identifer before supply a hash.<br>
 If there are multple hashes, hash-identifer continuse in an endless loop until it receives a keyboard interrupt.
 ![Hash3 with hash-identifier](/Screenshots/hash3-HI.png)<br>
 Hash-Identifier provides the same result as Crackstation.
+#### Hashcat ####
+This one introduces a bit of complexity. Secure Hash Algorithms (SHA) is a family of hash algorithms. The SHA2 family includes 224, 256, 512, and some variations. When searching for the correct hash mode, the user must observe the formats of the various hashes that appear on the hashcat example pages. In this case, the correct mode is not sha-256, but sha2-256.<br>
+:>````hashcat -m 1400 -a 0 hash3 /usr/share/wordlists/rockyou.txt````<br>
+The result:<br>
+![Hash3 with Hashcat](/Screenshots/hash3-HC.png)<br>
+
 
 ### Hash 4: $2y$12$Dwt1BZj6pcyc3Dy1FWZ5ieeUznr71EeNkJkUlypTsgbX1H68wsRom ###
 #### Crackstation ####
@@ -93,6 +99,13 @@ Crackstation has not seen this has before.
 ### Hash-Identifier ###
 ![Hash4 with hash-identifier](/Screenshots/hash4-HI.png)<br>
 Also unidentifiable by hash-identifier.
+
+#### Hashcat ####
+Here is the first one which is unidentified by both Crackstation and Hash-Identifier. We can resort to visual matching on the Hashcat exmaples page. The "$" is a separator. Performing a search for "$2y" yields no results. But if we understand this is still an entry level room, then the hash mode should still have a fairly small number, searching for "$2*" indicates bcrypt.<br>
+Bcrypt begins to get tougher. For this iteration, I chose to perform the operation on my Windows host, rather than the Kali VM. This lets me allow greater gpu and cpu allocation. Nothing realy changes. I simply put the hash into a file called hashes.txt and still use rockyou.txt, both located in the hashcat folder on the C drive. The command changes only slightly:<br>
+:>````.\hashcat.exe -m 3200 -a 0 -w 4 -D 1,2 hashes.txt rockyou.txt````<br>
+The result:<br>
+![Hash4 with Hashcat](/Screenshots/hash4-HC.png)<br>
 
 ### Hash 5: 279412f945939ba78ce0758d3fd83daa ###
 #### Crackstation ####

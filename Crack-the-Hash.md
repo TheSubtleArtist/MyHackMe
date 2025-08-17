@@ -32,8 +32,9 @@ The basic command changes only slightly:<br>
 https://www.openwall.com/john/<br>
 Would be appropraitely names Jack of All Trades. John has the ability to perform password security auditing and recovery across operating systems as well as file types, including unix, macOS, Windows, web apps, groupware, zip files, and others. <br>
 
-** The Wordlist **<br>
-rockyou.txt
+**The Wordlist**<br>
+There are innumerable sources of wordlists. Kali Linux comes with wordlists pre-installed in /usr/share/wordlists/.<br>This includes the most commonly used source 'rockyou.txt' which requires expansion prior to first used.<br>
+In addition, very active Daniel Miessler maintains a considerable number of enriched security lists on Github (https://github.com/danielmiessler/SecLists)<br>
 
 ### Setup Notes <br>
 Because of the potential level of repetition, each hash was placed in its own file in the Kali Linux environment. This facilitates some efficiencies when using the command line.<br>

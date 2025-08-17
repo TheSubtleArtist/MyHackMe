@@ -34,7 +34,7 @@ Because of the potential level of repetition, each hash was placed in its own fi
 ![Hash1](/Screenshots/hash1.png)<br>
 #### Hash Identifier ####
 The simplest use of hash identifier is as any other linux command.<br>
-````bash hash-identifier 48bb6e862e54f2a795ffc4e541caed4d````
+````bash hash-identifier 48bb6e862e54f2a795ffc4e541caed4d````<br>
 ![Hash1 with hash-identifier](/Screenshots/hash1-HI.png)<br>
 
 

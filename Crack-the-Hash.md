@@ -35,6 +35,7 @@ Because of the potential level of repetition, each hash was placed in its own fi
 #### Hash Identifier ####
 The simplest use of hash identifier is as any other linux command.<br>
 ````hash-identifier 48bb6e862e54f2a795ffc4e541caed4d````<br>
+gives us the same results as Crackstation.<br>
 ![Hash1 with hash-identifier](/Screenshots/hash1-HI.png)<br>
 
 

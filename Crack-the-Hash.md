@@ -40,6 +40,7 @@ In addition, very active Daniel Miessler maintains a considerable number of enri
 ### Setup Notes <br>
 Because of the potential level of repetition, each hash was placed in its own file in the Kali Linux environment. This facilitates some efficiencies when using the command line.<br>
 ![Screenshot of hash files inside the Kali Linux fs](/Screenshots/kaliHashfiles.png)<br>
+NOTE: There can be no invisible characters in the file. If there are, Hashcat will quit and indicate a "Token Length" error.<br>
 
 ## Task 1 ##
 ### Hash 1: 48bb6e862e54f2a795ffc4e541caed4d ###
@@ -50,17 +51,16 @@ The simplest use of hash identifier is as any other linux command.<br>
 :>````hash-identifier 48bb6e862e54f2a795ffc4e541caed4d````<br>
 gives us the same results as Crackstation.<br>
 ![Hash1 with hash-identifier](/Screenshots/hash1-HI.png)<br>
-#### Hashcat #### <br>
+#### Hashcat ####
 The command:<br>
 :>````hashcat -m 0 -a 0 hash1 /usr/share/wordlists/rockyou.txt````<br>
+The result:<br>
 ![Hash1 with Hashcat](/Screenshots/hash1-HC.png)<br>
 
 
 ### Hash 2: CBFDAC6008F9CAB4083784CBD1874F76618D2A97 
 #### Crackstation ####
 ![Hash2](/Screenshots/hash2.png)<br>
-
-
 ### Hash-Identifier ###
 Try piping the contents of the hash2 file into the hash-identifer command<br>
 :>````cat hash2 | hash-identifier````<br>
@@ -69,6 +69,11 @@ This does not give a positive result.<br>
 Try again with the standard method<br>
 :>````hash-identifier CBFDAC6008F9CAB4083784CBD1874F76618D2A97````<br>
 ![Hash2 with hash-identifer](/Screenshots/hash2-HI2.png)<br>
+#### Hashcat ####
+The command changes the hash-mode to 100, indicating the sha-1 hash:
+:>````hashcat -m 100 -a 0 hash2 /usr/share/wordlists/rockyou.txt````<br>
+The result:<br>
+![Hash2 with Hashcat](/Screenshots/hash2-HC.png)<br>
 
 ### Hash 3: 1C8BFE8F801D79745C4631D09FFF36C82AA37FC4CCE4FC946683D7B336B63032 ###
 #### Crackstation ####

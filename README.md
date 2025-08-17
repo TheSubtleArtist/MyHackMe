@@ -26,7 +26,7 @@ The question to be answered here is impossible to answer, but simple to state. T
 Philip K. Dick, the exceptionally gifted and prolific author lends his wisdom to this discussion identifing reality as
 >that which, when you stop believing in it, doesn’t go away
 
-No place can illustrate the ideas of integrity and reality more than the arena of Politics where two people can speak on the exact same topic use symantically and syntactically empty rhetoric, completely misrepresent reality and still incite the strongest of emotional reactions in tens of millions of people who have no idea what they are hearing other than "other guy bad". 
+No place can illustrate the ideas of integrity and reality more than the arena of Politics where two people can speak on the exact same topic use semantically and syntactically empty rhetoric, completely misrepresent reality and still incite the strongest of emotional reactions in tens of millions of people who have no idea what they are hearing other than "other guy bad". 
 
 Integrity begs the receiver of information to think sufficiently critically to ask questions such as, 
 - Does this information genuinly represent reality, or ground truth?
@@ -38,3 +38,13 @@ Integrity begs the receiver of information to think sufficiently critically to a
 Whether people or data, integrity is the only true measure of quality.
 
 ## Availability ##
+
+On this topic McCumber asserts that availability is > the ability of stored, transmitted, or processed information to be used for its intended purposes when required. 
+
+In such a short statement, McCumber gave us incident response, backup, business continuity, and disaster recovery. 
+
+#### The Shoulders of Giants ####
+
+I submit that the evolution of technology and science certainly stands on the shoulders of giants. Those people whose blood, sweat, and tears led to hard-won advancements, including the ability to advance faster with much less blood, sweat, and tears. 
+
+While it's necessary to memorize every possible defintion of the CIA triad simply to pass the certification exam of some organization with a self-interested need to beat its own definition of these central ideas into the mind of the burgeoning professional, don't ever think that looking back to the giants is not worth your time. You might find a great deal of future in the past.

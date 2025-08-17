@@ -49,7 +49,7 @@ Try piping the contents of the hash2 file into the hash-identifer command<br>
 :>````cat hash2 | hash-identifier````<br>
 This does not give a positive result.<br>
 ![Hash2 no piping](/Screenshots/hash2-HI1.png)<br>
-Try again with the standard method
+Try again with the standard method<br>
 :>````hash-identifier CBFDAC6008F9CAB4083784CBD1874F76618D2A97````<br>
 ![Hash2 with hash-identifer](/Screenshots/hash2-HI2.png)<br>
 

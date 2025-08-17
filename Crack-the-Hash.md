@@ -8,22 +8,22 @@ In this room, each hash only needs one solution. Maybe we can create some succes
 
 This is the list of tools we will highlight for each hash.. when possible.
 
-**CrackStation**
+**CrackStation**<br>
 https://crackstation.net/
 Crackstation is, fundamentally, a library of pre-cracked, unsalted hashes. A great go-to tool for the first step in any attempt to crack a hash.
 
-**hash-identifier**
+**hash-identifier**<br>
 https://gitlab.com/kalilinux/packages/hash-identifier<br>
 A command line utility for identifying a user-supplied hash.
 
-**Hashcat**
+**Hashcat**<br>
 https://hashcat.net/wiki/
 An advanced password recovery tool. The user cannot be afraid to continually reference the wiki and learn about the intricacies of Hashcat. It's capabilities are limited only by the user's curiosity. The
 
-**John The Ripper**
+**John The Ripper**<br>
 Would be appropraitely names Jack of All Trades. John has the ability to perform password security auditing and recovery across operating systems as well as file types, including unix, macOS, Windows, web apps, groupware, zip files, and others. 
 
-### Setup Notes ###
+### Setup Notes ###<br>
 Because of the potential level of repetition, each hash was placed in its own file in the Kali Linux environment. This facilitates some efficiencies when using the command line.<br>
 ![Screenshot of hash files inside the Kali Linux fs](/Screenshots/kaliHashfiles.png)<br>
 

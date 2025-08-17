@@ -43,8 +43,15 @@ gives us the same results as Crackstation.<br>
 #### Crackstation ####
 ![Hash2](/Screenshots/hash2.png)<br>
 
+
 ### Hash-Identifier ###
 Try piping the contents of the hash2 file into the hash-identifer command<br>
+:>````cat hash2 | hash-identifier````<br>
+This does not give a positive result.<br>
+![Hash2 no piping](/Screenshots/hash2-HI1.png)<br>
+Try again with the standard method
+:>````hash-identifier CBFDAC6008F9CAB4083784CBD1874F76618D2A97````<br>
+![Hash2 with hash-identifer](/Screenshots/hash2-HI2.png)<br>
 
 ### Hash 3: 1C8BFE8F801D79745C4631D09FFF36C82AA37FC4CCE4FC946683D7B336B63032 ###
 #### Crackstation ####

@@ -22,8 +22,13 @@ An advanced password recovery tool (password cracking). The user cannot be afrai
 **John The Ripper**
 Would be appropraitely names Jack of All Trades. John has the ability to perform password security auditing and recovery across operating systems as well as file types, including unix, macOS, Windows, web apps, groupware, zip files, and others. 
 
+### Setup Notes ###
+Because of the potential level of repetition, each hash was placed in its own file in the Kali Linux environment. This facilitates some efficiencies when using the command line.
+![Screenshot of hash files inside the Kali Linux fs](/Screenshots/kaliHashfiles.png)<br>
 
-## Task 1
+
+
+## Task 1 ##
 ### Hash 1: 48bb6e862e54f2a795ffc4e541caed4d ###
 
 
@@ -48,7 +53,7 @@ Crackstation has not seen this has before.
 ![Hash5](/Screenshots/hash5.png)<br>
 
 
-## Task 2
+## Task 2 ##
 
 ### Hash 6: F09EDCB1FCEFC6DFB23DC3505A882655FF77375ED8AA2D1C13F640FCCC2D0C85 ###
 #### Crackstation ####

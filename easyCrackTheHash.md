@@ -26,6 +26,7 @@ Would be appropraitely names Jack of All Trades. John has the ability to perform
 ## Task 1
 ### Hash 1: 48bb6e862e54f2a795ffc4e541caed4d ###
 
+
 #### Crackstation ####
 ![Hash1](/Screenshots/hash1.png)<br>
 

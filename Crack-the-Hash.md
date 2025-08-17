@@ -32,7 +32,7 @@ The basic command changes only slightly:<br>
 https://www.openwall.com/john/<br>
 Would be appropraitely names Jack of All Trades. John has the ability to perform password security auditing and recovery across operating systems as well as file types, including unix, macOS, Windows, web apps, groupware, zip files, and others. 
 
-### Setup Notes ### <br>
+### Setup Notes <br>
 Because of the potential level of repetition, each hash was placed in its own file in the Kali Linux environment. This facilitates some efficiencies when using the command line.<br>
 ![Screenshot of hash files inside the Kali Linux fs](/Screenshots/kaliHashfiles.png)<br>
 

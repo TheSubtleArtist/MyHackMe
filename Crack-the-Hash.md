@@ -67,9 +67,17 @@ If there are multple hashes, hash-identifer continuse in an endless loop until i
 ![Hash4](/Screenshots/hash4.png)<br>
 Crackstation has not seen this has before.
 
+### Hash-Identifier ###
+![Hash4 with hash-identifier](/Screenshots/hash4-HI.png)<br>
+Also unidentifiable by hash-identifier.
+
 ### Hash 5: 279412f945939ba78ce0758d3fd83daa ###
 #### Crackstation ####
 ![Hash5](/Screenshots/hash5.png)<br>
+
+### Hash-Identifier ###
+![Hash5 with hash-identifier](/Screenshots/hash5-HI.png)<br>
+
 
 
 ## Task 2 ##

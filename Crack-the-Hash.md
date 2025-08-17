@@ -21,13 +21,12 @@ https://hashcat.net/wiki/
 An advanced password recovery tool. The user cannot be afraid to continually reference the wiki and learn about the intricacies of Hashcat. It's capabilities are limited only by the user's curiosity. The
 
 **John The Ripper**<br>
+https://www.openwall.com/john/<br>
 Would be appropraitely names Jack of All Trades. John has the ability to perform password security auditing and recovery across operating systems as well as file types, including unix, macOS, Windows, web apps, groupware, zip files, and others. 
 
 ### Setup Notes ###<br>
 Because of the potential level of repetition, each hash was placed in its own file in the Kali Linux environment. This facilitates some efficiencies when using the command line.<br>
 ![Screenshot of hash files inside the Kali Linux fs](/Screenshots/kaliHashfiles.png)<br>
-
-
 
 ## Task 1 ##
 ### Hash 1: 48bb6e862e54f2a795ffc4e541caed4d ###
@@ -35,13 +34,16 @@ Because of the potential level of repetition, each hash was placed in its own fi
 ![Hash1](/Screenshots/hash1.png)<br>
 #### Hash Identifier ####
 The simplest use of hash identifier is as any other linux command.<br>
-:> hash-identifier 48bb6e862e54f2a795ffc4e541caed4d <br>
+````bash hash-identifier 48bb6e862e54f2a795ffc4e541caed4d````
 ![Hash1 with hash-identifier](/Screenshots/hash1-HI.png)<br>
 
 
 ### Hash 2: CBFDAC6008F9CAB4083784CBD1874F76618D2A97 
 #### Crackstation ####
 ![Hash2](/Screenshots/hash2.png)<br>
+
+### Hash-Identifier ###
+Try piping the contents of the hash2 file into the hash-identifer command<br>
 
 ### Hash 3: 1C8BFE8F801D79745C4631D09FFF36C82AA37FC4CCE4FC946683D7B336B63032 ###
 #### Crackstation ####

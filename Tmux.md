@@ -6,3 +6,31 @@ Terminal multiplexer:
 - create multiple windows, resembling tables, within a single session.
 
 ![Tmux Example](/images/tmux.png)<br>
+
+**A Tmux Cheatsheet**
+https://phoenixnap.com/kb/tmux-cheat-sheet
+
+<ins>Key Points</ins>
+- Commands initiating interaction with a session group typically begin with "tmux"
+- Commands interacting with windows and paynes typically begin with "CTRL+b" followed by another character
+- Other interactions have various character combiantions. Refer to the cheatsheet for more comprehsneive lists.
+
+### Sessions and Prefix ###
+
+First, a standard terminal window:<br>
+![Plain Terminal](/images/terminal.png)<br>
+
+<ins>Initiate a basic session</ins>
+
+:>````tmux````<br>
+![Basic Session](/images/basicSession.png)<br>
+Key points:
+- session name appears in lower left corner
+- with no optional input, the default session prefix is "[0]"
+- window names appear in the middle
+- hostname, time, and date on the bottom right.
+
+<ins>Rename a session</ins><br>
+:>````[CTRL + b] + $ ```` (shift + 4)<br>
+
+

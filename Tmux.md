@@ -5,4 +5,4 @@ Terminal multiplexer:
 - Split the terminal into panes, without losing work in another pane
 - create multiple windows, resembling tables, within a single session.
 
-![Tmux Example]("images/tmux.png")
+![Tmux Example](URL "images/tmux.png")

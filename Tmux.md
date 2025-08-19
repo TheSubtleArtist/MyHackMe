@@ -30,7 +30,8 @@ Key points:
 - window names appear in the middle
 - hostname, time, and date on the bottom right.
 
-<ins>Rename a session</ins><br>
+<ins>Rename a session</ins>
 :>````[CTRL + b] ````, then ```` $ ```` (shift + 4)<br>
+![Ready to rename the session](/images/renameSessionStart.png)<br>
 
 

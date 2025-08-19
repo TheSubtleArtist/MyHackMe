@@ -38,5 +38,15 @@ Key points:
 Input the name "new-name" and press enter<br>
 ![Basic Session Renamed](/images/sessionRenamed.png)<br>
 
+Key points:
+- new session name appears in lower left corner
+
+<ins>Spawn a new detached (-d) session with a specific (-s) name</ins>
+
+:>````tmux new -d -s session2````<br>
+![New Detached Session2](/images/newDetachedSession)<br>
+
+
+
 
 

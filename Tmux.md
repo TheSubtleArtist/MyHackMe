@@ -32,7 +32,11 @@ Key points:
 
 
 <ins>Rename a session</ins>
+
 :>````CTRL + b````, then ````$```` (shift + 4)<br>
-![Basic Session](/images/renameSessionStart.png)<br>
+![Basic Session](/images/sessionRename.png)<br>
+Input the name "new-name" and press enter<br>
+![Basic Session Renamed](/images/sessionRenamed.png)<br>
+
 
 

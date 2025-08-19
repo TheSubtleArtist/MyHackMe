@@ -26,12 +26,13 @@ First, a standard terminal window:<br>
 ![Basic Session](/images/basicSession.png)<br>
 Key points:
 - session name appears in lower left corner
-- with no optional input, the default session prefix is "[0]"
+- with no optional input, the default session prefix is `[0]`
 - window names appear in the middle
-- hostname, time, and date on the bottom right.
+- hostname, time, and date on the bottom right
+
 
 <ins>Rename a session</ins>
-:>````[CTRL + b] ````, then ```` $ ```` (shift + 4)<br>
-![Ready to rename the session](/images/renameSessionStart.png)<br>
+:>````CTRL + b````, then ````$```` (shift + 4)<br>
+![Basic Session](/images/renameSessionStart.png)<br>
 
 

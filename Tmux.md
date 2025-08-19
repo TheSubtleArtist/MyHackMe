@@ -31,6 +31,6 @@ Key points:
 - hostname, time, and date on the bottom right.
 
 <ins>Rename a session</ins><br>
-:>````[CTRL + b] + $ ```` (shift + 4)<br>
+:>````[CTRL + b] ````, then ```` $ ```` (shift + 4)<br>
 
 

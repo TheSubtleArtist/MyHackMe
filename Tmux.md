@@ -87,6 +87,25 @@ Key points:
 Key points:
 - any unsaved work in a session will be deleted with the session-kill command
 
+<ins>Swap sessions but skip attach-detach overhead</ins>
+
+First, generate several new sessions.
+:>````tmux new -d -s session3````<br>
+:>````tmux new -d -s session4````<br>
+:>````tmux new -d -s session5````<br>
+:>````tmux new -d -s session6````<br>
+:>````tmux ls````<br>
+![Session switch](/images/sessionSwitchNewSessions.png)<br>
+
+Second, list all sessions in a select mode
+>````CTRL + b````, then ````s````<br>
+![Session select](/images/sessionSelect.png)<br>
+
+
+
+Key points:
+- any unsaved work in a session will be deleted with the session-kill command
+
 
 
 

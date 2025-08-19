@@ -74,7 +74,7 @@ Key points:
 ![Session Attach](/images/sessionAttach.png)<br>
 Verify by listing the sessions again
 :>````tmux ls````<br>
-![Session list](/images/sessionListAfterAttach.png)<br>
+![Session list](/images/sessionListAfterAttached.png)<br>
 
 Key points:
 - name of attached session now appears in the lower left
@@ -85,7 +85,7 @@ Key points:
 ![Session delete](/images/sessionNameKill.png)<br>
 
 Key points:
-- any unsaved work in a session will be deleted with the 
+- any unsaved work in a session will be deleted with the session-kill command
 
 
 

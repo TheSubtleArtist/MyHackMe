@@ -65,7 +65,25 @@ Verify by listing the sessions again
 ![Session list](/images/sessionListAfterExit.png)<br>
 
 Key points:
-- the currently attached session is marked '(attached)'
+- two active sessions are both detached
+- user is unable to interact with either session
+
+<ins>Attach a session</ins>
+
+>````tmux attache -t session2````<br>
+![Session Attach](/images/sessionAttach.png)<br>
+Verify by listing the sessions again
+:>````tmux ls````<br>
+![Session list](/images/sessionListAfterAttach.png)<br>
+
+Key points:
+- name of attached session now appears in the lower left
+
+<ins>Delete a session by [session name]</ins>
+
+:>````tmux ls````<br>
+![Session delete](/images/sessionNameKill.png)<br>
+
 
 
 

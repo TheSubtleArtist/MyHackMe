@@ -70,7 +70,7 @@ Key points:
 
 <ins>Attach a session</ins>
 
->````tmux attache -t session2````<br>
+>````tmux attach -t session2````<br>
 ![Session Attach](/images/sessionAttach.png)<br>
 Verify by listing the sessions again
 :>````tmux ls````<br>
@@ -81,8 +81,11 @@ Key points:
 
 <ins>Delete a session by [session name]</ins>
 
-:>````tmux ls````<br>
+:>````tmux session-kill -t new-name````<br>
 ![Session delete](/images/sessionNameKill.png)<br>
+
+Key points:
+- any unsaved work in a session will be deleted with the 
 
 
 

@@ -100,6 +100,9 @@ First, generate several new sessions.
 Second, list all sessions in a select mode
 >````CTRL + b````, then ````s````<br>
 ![Session select](/images/sessionSelect.png)<br>
+Use the up and down arrows to select a new session (session4) and press enter.
+![Session4 selected](/images/sessionSelect4.png)<br>
+
 
 
 

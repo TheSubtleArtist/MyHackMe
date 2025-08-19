@@ -103,11 +103,17 @@ Second, list all sessions in a select mode
 Use the up and down arrows to select a new session (session4) and press enter.
 ![Session4 selected](/images/sessionSelect4.png)<br>
 
+<ins>Delete multiple sessions</ins>
 
-
+:>````tmux session-kill -a -t session3````<br>
+- delete all (-a) sessions
+- keep (-t) session3
+:>````tmux ls````<br>
+![Session switch](/images/sessionKillMultiple.png)<br>
 
 Key points:
-- any unsaved work in a session will be deleted with the session-kill command
+- If the active session was deleted, it will be exited
+- if the session remaining was detached at the time, it remains detached
 
 
 

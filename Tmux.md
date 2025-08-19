@@ -44,7 +44,7 @@ Key points:
 <ins>Spawn a new detached (-d) session with a specific (-s) name</ins>
 
 :>````tmux new -d -s session2````<br>
-![New Detached Session2](/images/newDetachedSession)<br>
+![New Detached Session2](/images/newDetachedSession.png)<br>
 
 
 

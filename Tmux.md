@@ -119,6 +119,25 @@ Key points:
 
 ### Splitting Windows ###
 
+<ins>Create a new windows</ins>
+
+:>````CTRL + b```` then ````c````<br>
+![new window created](/images/createNewWindow.png)<br>
+Note: There are now two windows (0:bash and 1:bash)
+
+
+<ins>Spawn a new session and new window</ins>
+
+:>````tmux new -s <session name> -n <window name> ```` <br><br>
+:>````tmux new -s session07 -n window07 ```` <br>
+![Session and Window 7](/images/session07.png)<br>
+
+
+
+![Verify Close Current Window](/images/closeCurrentWindow.png)<br>
+
+
+ 
 <ins>Split Horizontally</ins>
 
 :>````CTRL + b````, and ```` " ```` (double quote, not single quote) <br>
@@ -133,8 +152,16 @@ Resizing Windows :>````CTRL + b```` AND [Arrow Key] <br>
 :>````CTRL + b````, then ```` & ```` <br>
 Note that tmux verifies the decision
 ![Verify Close Current Window](/images/closeCurrentWindow.png)<br>
-The user verifies the decision
+The user verifies the decision<br>
 ![Current Window Closed](/images/closeCurrentWindowVerified.png)<br>
+
+
+<ins>Spawn a new session and new window</ins>
+
+:>````tmux new -s <session name> -n <window name> ```` <br>
+
+![Verify Close Current Window](/images/closeCurrentWindow.png)<br>
+
 
 
 

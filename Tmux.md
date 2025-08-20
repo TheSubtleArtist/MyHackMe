@@ -98,7 +98,7 @@ First, generate several new sessions.
 ![Session switch](/images/sessionSwitchNewSessions.png)<br>
 
 Second, list all sessions in a select mode
->````CTRL + b````, then ````s````<br>
+>````CTRL + b```` then ````s````<br>
 ![Session select](/images/sessionSelect.png)<br>
 Use the up and down arrows to select a new session (session4) and press enter.
 ![Session4 selected](/images/sessionSelect4.png)<br>
@@ -119,31 +119,22 @@ Key points:
 
 ### Splitting Windows ###
 
-For the next instructions, we are starting with two basic sesssions<br>
-![Start Splitting](/images/startSplittingScreen.png)<br>
-
 <ins>Split Horizontally</ins>
 
-:>````CTRL + b````, then ```` " ```` <br>
+:>````CTRL + b````, and ```` " ```` (double quote, not single quote) <br>
 ![Split Scrreen Horizontal](/images/splitScreenHorizontal.png)<br>
 
 There are two closely related and easily confused commands: resizing a window and switching windows<br>
-Switching Windows :>````CTRL + b````, THEN [Arrow Key] <br>
-Resizing Windows :>````CTRL + b````, AND [Arrow Key] <br>
+Switching Windows :>````CTRL + b```` THEN [Arrow Key] <br>
+Resizing Windows :>````CTRL + b```` AND [Arrow Key] <br>
 
+<ins>Close Current Windows</ins>
 
-
->````CTRL + b````, then ````bf````<br>
-C-b :splitw -bf
-Places a full length pane at the top of our window with a vertical split.
-
->````CTRL + b````, then ````s````<br>
-C-b :splitw -fh
-Places a full length pane on the right side of our window with a horizontal split.
-
->````CTRL + b````, then ````s````<br>
-C-b :splitw -bfh
-Places a full length pane on the left side of our window with a horizontal split.
+:>````CTRL + b````, then ```` & ```` <br>
+Note that tmux verifies the decision
+![Verify Close Current Window](/images/closeCurrentWindow.png)<br>
+The user verifies the decision
+![Current Window Closed](/images/closeCurrentWindowVerified.png)<br>
 
 
 

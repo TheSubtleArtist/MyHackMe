@@ -129,6 +129,7 @@ Note: There are now two windows (0:bash and 1:bash)
 
 :>````CTRL + b```` then ````,````<br>
 ![new window created](/images/windowRenaming.png)<br>
+The window waits for the new name as input.<br>
 ![Window Renamed](/images/windowRenamed.png)<br>
 Note: Window 1 was the most recently created and active window, and was renamed.
 

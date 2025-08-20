@@ -127,6 +127,11 @@ For the next instructions, we are starting with two basic sesssions<br>
 :>````CTRL + b````, then ```` " ```` <br>
 ![Split Scrreen Horizontal](/images/splitScreenHorizontal.png)<br>
 
+There are two closely related and easily confused commands: resizing a window and switching windows<br>
+Switching Windows :>````CTRL + b````, THEN [Arrow Key] <br>
+Resizing Windows :>````CTRL + b````, AND [Arrow Key] <br>
+
+
 
 >````CTRL + b````, then ````bf````<br>
 C-b :splitw -bf

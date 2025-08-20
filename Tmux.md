@@ -125,6 +125,15 @@ Key points:
 ![new window created](/images/createNewWindow.png)<br>
 Note: There are now two windows (0:bash and 1:bash)
 
+<ins>Rename the Current Window</ins>
+
+:>````CTRL + b```` then ````,````<br>
+![new window created](/images/windowRenaming.png)<br>
+![new window created](/images/windowRenamed.png)<br>
+Note: Window 1 was the most recently created and active window, and was renamed.
+
+
+
 
 <ins>Spawn a new session and new window</ins>
 

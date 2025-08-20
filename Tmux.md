@@ -18,7 +18,7 @@ https://phoenixnap.com/kb/tmux-cheat-sheet
 - Commands interacting with windows and paynes typically begin with "CTRL+b" followed by another character
 - Other interactions have various character combiantions. Refer to the cheatsheet for more comprehsneive lists.
 
-### Sessions and Prefix ###
+## Sessions and Prefix
 
 First, a standard terminal window:<br>
 ![Plain Terminal](/images/terminal.png)<br>
@@ -28,6 +28,7 @@ First, a standard terminal window:<br>
 :>````tmux````<br>
 ![Basic Session](/images/basicSession.png)<br>
 Key points:
+
 - session name appears in lower left corner
 - with no optional input, the default session prefix is `[0]`
 - window names appear in the middle
@@ -49,6 +50,7 @@ Key points:
 :>````tmux new -d -s session2````<br>
 ![New Detached Session2](/images/newDetachedSession.png)<br>
 Key points:
+
 - new session is created
 - new session is detached, meaning not visible
 
@@ -57,6 +59,7 @@ Key points:
 :>````tmux ls````<br>
 ![Session list](/images/sessionList.png)<br>
 Key points:
+
 - the currently attached session is marked '(attached)'
 
 <ins>Exit an attched sessions</ins>
@@ -68,6 +71,7 @@ Verify by listing the sessions again
 ![Session list](/images/sessionListAfterExit.png)<br>
 
 Key points:
+
 - two active sessions are both detached
 - user is unable to interact with either session
 
@@ -80,6 +84,7 @@ Verify by listing the sessions again
 ![Session list](/images/sessionListAfterAttached.png)<br>
 
 Key points:
+
 - name of attached session now appears in the lower left
 
 <ins>Delete a session by [session name]</ins>
@@ -88,6 +93,7 @@ Key points:
 ![Session delete](/images/sessionNameKill.png)<br>
 
 Key points:
+
 - any unsaved work in a session will be deleted with the session-kill command
 
 <ins>Swap sessions but skip attach-detach overhead</ins>
@@ -109,18 +115,18 @@ Use the up and down arrows to select a new session (session4) and press enter.
 <ins>Delete multiple sessions</ins>
 
 :>````tmux session-kill -a -t session3````<br>
+
 - delete all (-a) sessions
 - keep (-t) session3
 :>````tmux ls````<br>
 ![Session switch](/images/sessionKillMultiple.png)<br>
 
 Key points:
+
 - If the active session was deleted, it will be exited
 - if the session remaining was detached at the time, it remains detached
 
-
-
-### Splitting Windows ###
+## Splitting Windows
 
 <ins>Create a new windows</ins>
 

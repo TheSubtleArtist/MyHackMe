@@ -117,15 +117,16 @@ Key points:
 
 
 
-##### Splitting Windows  #####
+### Splitting Windows ###
 
 For the next instructions, we are starting with two basic sesssions<br>
 ![Start Splitting](/images/startSplittingScreen.png)<br>
 
-<ins> </ins>
+<ins>Split Horizontally</ins>
+
 :>````CTRL + b````, then ```` " ```` <br>
-C-b :splitw -f
-Places a full width pane on the bottom of our window with a vertical split.
+![Split Scrreen Horizontal](/images/splitScreensHorizontal.png<br>
+
 
 >````CTRL + b````, then ````bf````<br>
 C-b :splitw -bf

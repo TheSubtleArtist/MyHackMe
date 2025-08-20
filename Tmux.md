@@ -125,7 +125,7 @@ For the next instructions, we are starting with two basic sesssions<br>
 <ins>Split Horizontally</ins>
 
 :>````CTRL + b````, then ```` " ```` <br>
-![Split Scrreen Horizontal](/images/splitScreensHorizontal.png<br>
+![Split Scrreen Horizontal](/images/splitScreensHorizontal.png)<br>
 
 
 >````CTRL + b````, then ````bf````<br>

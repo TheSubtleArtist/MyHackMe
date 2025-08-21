@@ -146,6 +146,11 @@ Previous Window :>````CTRL + b```` then ````p````
 Switch to window 0:bash  
 ![Switch to 0:bash](/images/nextPreviousWindow.png)  
 
+### Close Current Window
+
+Next Window :>````CTRL + b```` then ````&````  
+![Verify Close Current Window](/images/verifyCloseCurrent.png)  
+![Current Window Closed](/images/currentWindowsClosed.png)  
 
 ### Spawn a new session and new window
 

@@ -113,7 +113,7 @@ Use the up and down arrows to select a new session (session4) and press enter.
 
 ### Delete multiple sessions
 
-Kill all (-a) sessions, except the specified session (-t) 
+Kill all (-a) sessions, except the specified session (-t)  
 :>````tmux session-kill -a -t session3````  
 :>````tmux ls````  
 ![Session switch](/images/sessionKillMultiple.png)  
@@ -133,11 +133,19 @@ Note: There are now two windows (0:bash and 1:bash)
 
 ### Rename the Current Window
 
-:>````CTRL + b```` then ````,````
-![new window created](/images/windowRenaming.png)
-The window waits for the new name as input.
-![Window Renamed](/images/windowRenamed.png)
-Note: Window 1 was the most recently created and active window, and was renamed.
+:>````CTRL + b```` then ````,````  
+![new window created](/images/windowRenaming.png)  
+The window waits for the new name as input.  
+![Window Renamed](/images/windowRenamed.png)  
+Note: Window 1 was the most recently created and active window, and was renamed.  
+
+### Next and Previous Window
+
+Next Window :>````CTRL + b```` then ````n````  
+Previous Window :>````CTRL + b```` then ````p````  
+Switch to window 0:bash  
+![Switch to 0:bash](/images/nextPreviousWindow.png)  
+
 
 ### Spawn a new session and new window
 

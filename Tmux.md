@@ -113,13 +113,10 @@ Use the up and down arrows to select a new session (session4) and press enter.
 
 ### Delete multiple sessions
 
-Kill all sessions, except the specified session  
+Kill all (-a) sessions, except the specified session (-t) 
 :>````tmux session-kill -a -t session3````  
-
-- delete all (-a) sessions
-- keep (-t) session3
-:>````tmux ls````
-![Session switch](/images/sessionKillMultiple.png)
+:>````tmux ls````  
+![Session switch](/images/sessionKillMultiple.png)  
 
 Key points:
 

@@ -97,23 +97,24 @@ Key points:
 
 ### Swap sessions but skip attach-detach overhead
 
-First, generate several new sessions.
-:>````tmux new -d -s session3````
-:>````tmux new -d -s session4````
-:>````tmux new -d -s session5````
-:>````tmux new -d -s session6````
-:>````tmux ls````
-![Session switch](/images/sessionSwitchNewSessions.png)
+First, generate several new sessions.  
+:>````tmux new -d -s session3````  
+:>````tmux new -d -s session4````  
+:>````tmux new -d -s session5````  
+:>````tmux new -d -s session6````  
+:>````tmux ls````  
+![Session switch](/images/sessionSwitchNewSessions.png)  
 
 Second, list all sessions in a select mode
->````CTRL + b```` then ````s````
-![Session select](/images/sessionSelect.png)
-Use the up and down arrows to select a new session (session4) and press enter.
-![Session4 selected](/images/sessionSelect4.png)
+>````CTRL + b```` then ````s````  
+![Session select](/images/sessionSelect.png)  
+Use the up and down arrows to select a new session (session4) and press enter.  
+![Session4 selected](/images/sessionSelect4.png)  
 
 ### Delete multiple sessions
 
-:>````tmux session-kill -a -t session3````
+Kill all sessions, except the specified session  
+:>````tmux session-kill -a -t session3````  
 
 - delete all (-a) sessions
 - keep (-t) session3

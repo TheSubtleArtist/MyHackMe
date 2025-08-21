@@ -24,8 +24,8 @@ First, a standard terminal window:
 
 ### Initiate a basic session
 
-:>````tmux````
-![Basic Session](/images/basicSession.png)
+:>````tmux````  
+![Basic Session](/images/basicSession.png)  
 Key points:
 
 - session name appears in lower left corner
@@ -35,9 +35,9 @@ Key points:
 
 ### Rename a session
 
-:>````CTRL + b````, then ````$```` (shift + 4)
-![Basic Session](/images/sessionRename.png)
-Input the name "new-name" and press enter
+:>````CTRL + b````, then ````$```` (shift + 4)  
+![Basic Session](/images/sessionRename.png)  
+Input the name "new-name" and press enter  
 ![Basic Session Renamed](/images/sessionRenamed.png)
 
 Key points:

@@ -46,8 +46,8 @@ Key points:
 
 ### Spawn a new detached (-d) session with a specific (-s) name
 
-:>````tmux new -d -s session2````
-![New Detached Session2](/images/newDetachedSession.png)
+:>````tmux new -d -s session2````  
+![New Detached Session2](/images/newDetachedSession.png)  
 Key points:
 
 - new session is created
@@ -55,18 +55,18 @@ Key points:
 
 ### List active sessions
 
-:>````tmux ls````
-![Session list](/images/sessionList.png)
+:>````tmux ls````  
+![Session list](/images/sessionList.png)  
 Key points:
 
 - the currently attached session is marked '(attached)'
 
 ### Exit an attched sessions
 
->````CTRL + b````, then ````d````
-![Session Exit](/images/sessionExit.png)
+>````CTRL + b````, then ````d````  
+![Session Exit](/images/sessionExit.png)  
 Verify by listing the sessions again
-:>````tmux ls````
+:>````tmux ls````  
 ![Session list](/images/sessionListAfterExit.png)
 
 Key points:

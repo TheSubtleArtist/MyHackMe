@@ -9,10 +9,9 @@ Terminal multiplexer:
 
 ![Tmux Example](/images/tmux.png)
 
-**[A Tmux Cheatsheet](https://phoenixnap.com/kb/tmux-cheat-sheet)**
+**[The PhoenixNap Tmux Cheatsheet](https://phoenixnap.com/kb/tmux-cheat-sheet)**
 
-
-Key PointsL
+Key Points:
 
 - Commands initiating interaction with a session group typically begin with "tmux"
 - Commands interacting with windows and paynes typically begin with "CTRL+b" followed by another character
@@ -34,7 +33,6 @@ Key points:
 - window names appear in the middle
 - hostname, time, and date on the bottom right
 
-
 ### Rename a session
 
 :>````CTRL + b````, then ````$```` (shift + 4)
@@ -43,6 +41,7 @@ Input the name "new-name" and press enter
 ![Basic Session Renamed](/images/sessionRenamed.png)
 
 Key points:
+
 - new session name appears in lower left corner
 
 ### Spawn a new detached (-d) session with a specific (-s) name
@@ -126,7 +125,7 @@ Key points:
 - If the active session was deleted, it will be exited
 - if the session remaining was detached at the time, it remains detached
 
-## Splitting Windows
+## Manipulating Windows
 
 ### Create a new windows
 
@@ -142,49 +141,19 @@ The window waits for the new name as input.
 ![Window Renamed](/images/windowRenamed.png)
 Note: Window 1 was the most recently created and active window, and was renamed.
 
-
-
-
 ### Spawn a new session and new window
 
-:>````tmux new -s <session name> -n <window name> ```` 
-:>````tmux new -s session07 -n window07 ```` 
+:>````tmux new -s <session name> -n <window name>````
+:>````tmux new -s session07 -n window07````
 ![Session and Window 7](/images/session07.png)
-
-
 
 ![Verify Close Current Window](/images/closeCurrentWindow.png)
 
-
- 
 ### Split Horizontally
 
 :>````CTRL + b````, and ```` " ```` (double quote, not single quote) 
 ![Split Scrreen Horizontal](/images/splitScreenHorizontal.png)
 
 There are two closely related and easily confused commands: resizing a window and switching windows
-Switching Windows :>````CTRL + b```` THEN [Arrow Key] 
-Resizing Windows :>````CTRL + b```` AND [Arrow Key] 
-
-### Close Current Windows
-
-:>````CTRL + b````, then ```` & ```` 
-Note that tmux verifies the decision
-![Verify Close Current Window](/images/closeCurrentWindow.png)
-The user verifies the decision
-![Current Window Closed](/images/closeCurrentWindowVerified.png)
-
-
-### Spawn a new session and new window
-
-:>````tmux new -s <session name> -n <window name> ```` 
-
-![Verify Close Current Window](/images/closeCurrentWindow.png)
-
-
-
-
-
-
-
-
+Switching Windows :>````CTRL + b```` THEN [Arrow Key]
+Resizing Windows :>````CTRL + b```` AND [Arrow Key]

@@ -149,7 +149,7 @@ Switch to window 0:bash
 ### Close Current Window
 
 Next Window :>````CTRL + b```` then ````&````  
-![Verify Close Current Window](/images/verifyCloseCurrent.png)  
+![Verify Close Current Window](/images/verifyCloseCurrentWindow.png)  
 ![Current Window Closed](/images/currentWindowsClosed.png)  
 
 ### Spawn a new session and new window

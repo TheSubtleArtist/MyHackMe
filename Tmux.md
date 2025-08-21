@@ -76,11 +76,11 @@ Key points:
 
 ### Attach a session
 
->````tmux attach -t session2````
-![Session Attach](/images/sessionAttach.png)
-Verify by listing the sessions again
-:>````tmux ls````
-![Session list](/images/sessionListAfterAttached.png)
+>````tmux attach -t session2````  
+![Session Attach](/images/sessionAttach.png)  
+Verify by listing the sessions again  
+:>````tmux ls````  
+![Session list](/images/sessionListAfterAttached.png)  
 
 Key points:
 
@@ -88,8 +88,8 @@ Key points:
 
 ### Delete a session by [session name]
 
-:>````tmux session-kill -t new-name````
-![Session delete](/images/sessionNameKill.png)
+:>````tmux session-kill -t new-name````  
+![Session delete](/images/sessionNameKill.png)  
 
 Key points:
 

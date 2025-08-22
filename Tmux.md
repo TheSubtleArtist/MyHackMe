@@ -177,7 +177,7 @@ Resizing Windows :>````CTRL + b```` AND [Arrow Key]
 Starting from the top window  
 
 ![Vertical Split Starting Point](/images/vertSplitStart.png)  
-:>````CTRL + b````, and ```` % ````
+:>````CTRL + b````, then ```` % ````
 ![Vertical Split Top](/images/vertSplitOne.png)  
 Move to the bottom window and create a split
 ![Vertical Split Top](/images/vertSplitTwo.png)
@@ -188,7 +188,7 @@ Move to the bottom window and create a split
 
 When the current pane becomes unresponsive 
 From the top left pane
-:>````CTRL + b````, and ```` % ```` then ````y````
+:>````CTRL + b````, then ```` % ```` then ````y````
 ![Force Kill Pane 1](/images/forceKillPane1.png)
 ![Force Kill Pane 2](/images/forceKillPane2.png)
 
@@ -196,11 +196,25 @@ From the top left pane
 
 Add some text to the panes to start  
 ![Before Rotate](/images/rotate0.png)  
-:>````CTRL + b````, and ```` } ````  
+:>````CTRL + b````, then ```` } ````  
 ![Rotate 1](/images/rotate1.png)  
-again :>````CTRL + b````, and ```` } ````  
+again :>````CTRL + b````, then ```` } ````  
 ![Rotate 2](/images/rotate2.png)  
 
 ### Rotate the Currently Selected Pane Counter-Clockwise 1 Position
 
-:>````CTRL + b````, and ```` { ````
+:>````CTRL + b````, then ```` { ````
+![Rotate 3](/images/rotate3.png)  
+
+### Manage Panes with Built-in Layouts
+
+Uses the standard prefix follow by escape and a number [1..4]
+The change depends on the number of windows currently open, experinces will vary. 
+:>````CTRL + b````, then ```` esc AND 1 ````
+![Layout 1](/images/layout1.png)
+:>````CTRL + b````, then ```` esc AND 2 ````
+![Layout 2](/images/layout2.png)
+:>````CTRL + b````, then ```` esc AND 3 ````
+![Layout 3](/images/layout3.png)
+:>````CTRL + b````, then ```` esc AND 4 ````
+![Layout 4](/images/layout4.png)

@@ -194,9 +194,13 @@ From the top left pane
 
 ### Rotate the Currently Selected Pane Clockwise 1 Position
 
-Add some text to the panes to start
-![Before Rotate](/images/rotate0.png)
-:>````CTRL + b````, and ```` } ````
-![Rotate 1](/images/rotate1.png)
-again :>````CTRL + b````, and ```` } ````
-![Rotate 2](/images/rotate2.png)
+Add some text to the panes to start  
+![Before Rotate](/images/rotate0.png)  
+:>````CTRL + b````, and ```` } ````  
+![Rotate 1](/images/rotate1.png)  
+again :>````CTRL + b````, and ```` } ````  
+![Rotate 2](/images/rotate2.png)  
+
+### Rotate the Currently Selected Pane Counter-Clockwise 1 Position
+
+:>````CTRL + b````, and ```` { ````

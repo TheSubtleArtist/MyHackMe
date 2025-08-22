@@ -148,7 +148,7 @@ Switch to window 0:bash
 
 ### Close Current Window
 
-Next Window :>````CTRL + b```` then ````&````  
+:>````CTRL + b```` then ````&````  
 ![Verify Close Current Window](/images/verifyCloseCurrentWindow.png)  
 ![Current Window Closed](/images/currentWindowsClosed.png)  
 

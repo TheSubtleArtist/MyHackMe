@@ -114,9 +114,11 @@ Use the up and down arrows to select a new session (session4) and press enter.
 ### Delete multiple sessions
 
 Kill all (-a) sessions, except the specified session (-t)  
-:>````tmux session-kill -a -t session3````  
+:>````tmux kill-session -a -t session3````  
 :>````tmux ls````  
 ![Session switch](/images/sessionKillMultiple.png)  
+
+Finally, switch to session3
 
 Key points:
 
@@ -150,21 +152,51 @@ Switch to window 0:bash
 
 :>````CTRL + b```` then ````&````  
 ![Verify Close Current Window](/images/verifyCloseCurrentWindow.png)  
-![Current Window Closed](/images/currentWindowsClosed.png)  
+![Current Window Closed](/images/currentWindowClosed.png)  
 
 ### Spawn a new session and new window
 
 :>````tmux new -s <session name> -n <window name>````
-:>````tmux new -s session07 -n window07````
-![Session and Window 7](/images/session07.png)
-
-![Verify Close Current Window](/images/closeCurrentWindow.png)
+:>````tmux new -s session7 -n window7````
+If you have an active session and window, you will receive the nested session warning.
+![Nested Window Warning](/images/nestedWarning.png)
+Close the current window and start rom the bash command line
+![Session and Window 7](/images/session7.png)
 
 ### Split Horizontally
 
-:>````CTRL + b````, and ```` " ```` (double quote, not single quote) 
+:>````CTRL + b````, and ```` " ```` (double quote, not single quote)  
 ![Split Scrreen Horizontal](/images/splitScreenHorizontal.png)
 
 There are two closely related and easily confused commands: resizing a window and switching windows
 Switching Windows :>````CTRL + b```` THEN [Arrow Key]
 Resizing Windows :>````CTRL + b```` AND [Arrow Key]
+
+### Split Vertically
+
+Starting from the top window  
+
+![Vertical Split Starting Point](/images/vertSplitStart.png)  
+:>````CTRL + b````, and ```` % ````
+![Vertical Split Top](/images/vertSplitOne.png)  
+Move to the bottom window and create a split
+![Vertical Split Top](/images/vertSplitTwo.png)
+
+## Manipulating WiPanes  
+
+### Force Kill the Current Pane
+
+When the current pane becomes unresponsive 
+From the top left pane
+:>````CTRL + b````, and ```` % ```` then ````y````
+![Force Kill Pane 1](/images/forceKillPane1.png)
+![Force Kill Pane 2](/images/forceKillPane2.png)
+
+### Rotate the Currently Selected Pane Clockwise 1 Position
+
+Add some text to the panes to start
+![Before Rotate](/images/rotate0.png)
+:>````CTRL + b````, and ```` } ````
+![Rotate 1](/images/rotate1.png)
+again :>````CTRL + b````, and ```` } ````
+![Rotate 2](/images/rotate2.png)

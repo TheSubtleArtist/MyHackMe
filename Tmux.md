@@ -182,7 +182,7 @@ Starting from the top window
 Move to the bottom window and create a split
 ![Vertical Split Top](/images/vertSplitTwo.png)
 
-## Manipulating WiPanes  
+## Manipulating Panes  
 
 ### Force Kill the Current Pane
 
@@ -218,3 +218,12 @@ The change depends on the number of windows currently open, experinces will vary
 ![Layout 3](/images/layout3.png)
 :>````CTRL + b````, then ```` esc AND 4 ````
 ![Layout 4](/images/layout4.png)
+
+To rotate through the built-in layouts:
+:>````CTRL + b````, then ```` spacebar ````
+
+
+### Identify and Swap Pane Positions
+
+![Before the Swap](/images/startSwap.png)
+

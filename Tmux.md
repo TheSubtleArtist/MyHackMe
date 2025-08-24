@@ -246,3 +246,53 @@ then  ```` join-pane -s <source-window-name> -t <target-window-name````
 then  ```` join-pane -s window-two -t window-one````  
 ![Reattach Panes Command](/images/reattachCommand.png)
 ![Reattach Panes Result](/images/reattachResult.png)
+
+## Copy Mode
+
+In the event text is larger than the length of the pane, , copy mode allows the user to scroll up and down the page.
+
+Starting in a new session  
+![Copy Mode 0](/images/cp-md00.png)  
+Split Horizontally  
+:>````CTRL + b````, then ```` : ````  
+![Copy Mode 01](/images/cp-md01.png)
+Generate some example text  and display  
+![Copy Mode 02](/images/cp-md02.png)  
+
+### Enter Copy Mode
+
+:>````CTRL + b````, then ```` [ ````
+There is a new window/pane identifier in the upper right corner
+Use the arrows to scroll up and down the page  
+![Enter Copy Mode](/images/cp-md04.png)  
+
+### Search
+
+:>````CTRL + r```` to search "up" the page  
+![Enter Search Mode](/images/cp-md05.png)
+Enter the search string  
+![String Search](/images/cp-md06.png)  
+
+Use :>````CTRL + r```` to jump to the next result
+![Jump Results](/images/cp-md07.png)  
+
+Conversely, use :>````CTRL + s```` to search  and jump "down" the page  
+
+Exit the search mode by pressing and up or down arrow key then the return key  
+
+### Copy and Paste
+
+:>```` # ````
+Using arrow keys, move to the start of the text to be copied
+
+Enable highlight with :>````CTRL + spacebar````  
+Use the arrow keys to highlight the desired text
+![Copy Highlight](/images/cp-md08.png)  
+
+Copy the text to the tmux clipboard with :>````alt + w````  
+The highlight disappears  
+![Copy Text](/images/cp-md09.png)  
+Choose the destination file  
+Paste the text with :>````CTRL + b````, then ````]````
+![Paste Text](/images/cp-md10.png)  
+![Paste Text 2](/images/cp-md11.png)  

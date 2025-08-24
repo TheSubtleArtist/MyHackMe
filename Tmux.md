@@ -156,9 +156,9 @@ Switch to window 0:bash
 
 ### Spawn a new session and new window
 
-:>````tmux new -s <session name> -n <window name>````
-:>````tmux new -s session7 -n window7````
-If you have an active session and window, you will receive the nested session warning.
+:>````tmux new -s <session name> -n <window name>````  
+:>````tmux new -s session7 -n window7````  
+If you have an active session and window, you will receive the nested session warning.  
 ![Nested Window Warning](/images/nestedWarning.png)
 Close the current window and start rom the bash command line
 ![Session and Window 7](/images/session7.png)
@@ -210,13 +210,13 @@ again :>````CTRL + b````, then ```` } ````
 
 Uses the standard prefix follow by escape and a number [1..4]  
 The change depends on the number of windows currently open, experinces will vary.  
-:>````CTRL + b````, then ```` esc AND 1 ````
+:>````CTRL + b````, then ```` esc AND 1 ````  
 ![Layout 1](/images/layout1.png)
-:>````CTRL + b````, then ```` esc AND 2 ````
+:>````CTRL + b````, then ```` esc AND 2 ````    
 ![Layout 2](/images/layout2.png)
-:>````CTRL + b````, then ```` esc AND 3 ````
+:>````CTRL + b````, then ```` esc AND 3 ````    
 ![Layout 3](/images/layout3.png)
-:>````CTRL + b````, then ```` esc AND 4 ````
+:>````CTRL + b````, then ```` esc AND 4 ````    
 ![Layout 4](/images/layout4.png)
 
 To rotate through the built-in layouts:
@@ -224,9 +224,13 @@ To rotate through the built-in layouts:
 
 ### Detach a pane into its own window
 
-![Four Pane Reset](/images/fourPanelayout.png)
+When one pane contains too much data to be read  
+![Four Pane Reset](/images/fourPaneLayout.png)
 
 From pane "FOUR" execute the command:  
 
-:>````CTRL + b````, then ```` spacebar ````  
-![Four Pane Reset](/images/paneFourBreakout.png)
+:>````CTRL + b````, then ```` ! ````  
+![Four Pane Reset](/images/paneFourBreakout.png)  
+
+rotate to the "next" or "previous" window  
+![Four Pane Rotate](/images/breakoutRotate.png) 

@@ -241,7 +241,7 @@ Start by renaming the windows to ensure there is clear difference
 ![Reattach Panes Reset](/images/reattachPanes.png)
 
 :>````CTRL + b````, then ```` : ````  
-then  ```` join-pane -s <source-window-name> -t <target-window-name````
+then  ```` join-pane -s <source-window-name> -t <target-window-name````  
 :>````CTRL + b````, then ```` : ````  
 then  ```` join-pane -s window-two -t window-one````  
 ![Reattach Panes Command](/images/reattachCommand.png)

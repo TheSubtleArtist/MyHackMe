@@ -203,13 +203,13 @@ again :>````CTRL + b````, then ```` } ````
 
 ### Rotate the Currently Selected Pane Counter-Clockwise 1 Position
 
-:>````CTRL + b````, then ```` { ````
+:>````CTRL + b````, then ```` { ````  
 ![Rotate 3](/images/rotate3.png)  
 
 ### Manage Panes with Built-in Layouts
 
-Uses the standard prefix follow by escape and a number [1..4]
-The change depends on the number of windows currently open, experinces will vary. 
+Uses the standard prefix follow by escape and a number [1..4]  
+The change depends on the number of windows currently open, experinces will vary.  
 :>````CTRL + b````, then ```` esc AND 1 ````
 ![Layout 1](/images/layout1.png)
 :>````CTRL + b````, then ```` esc AND 2 ````
@@ -222,8 +222,11 @@ The change depends on the number of windows currently open, experinces will vary
 To rotate through the built-in layouts:
 :>````CTRL + b````, then ```` spacebar ````
 
+### Detach a pane into its own window
 
-### Identify and Swap Pane Positions
+![Four Pane Reset](/images/fourPanelayout.png)
 
-![Before the Swap](/images/startSwap.png)
+From pane "FOUR" execute the command:  
 
+:>````CTRL + b````, then ```` spacebar ````  
+![Four Pane Reset](/images/paneFourBreakout.png)

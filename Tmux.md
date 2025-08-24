@@ -159,8 +159,8 @@ Switch to window 0:bash
 :>````tmux new -s <session name> -n <window name>````  
 :>````tmux new -s session7 -n window7````  
 If you have an active session and window, you will receive the nested session warning.  
-![Nested Window Warning](/images/nestedWarning.png)
-Close the current window and start rom the bash command line
+![Nested Window Warning](/images/nestedWarning.png)  
+Close the current window and start rom the bash command line  
 ![Session and Window 7](/images/session7.png)
 
 ### Split Horizontally
@@ -212,11 +212,11 @@ Uses the standard prefix follow by escape and a number [1..4]
 The change depends on the number of windows currently open, experinces will vary.  
 :>````CTRL + b````, then ```` esc AND 1 ````  
 ![Layout 1](/images/layout1.png)
-:>````CTRL + b````, then ```` esc AND 2 ````    
+:>````CTRL + b````, then ```` esc AND 2 ````  
 ![Layout 2](/images/layout2.png)
-:>````CTRL + b````, then ```` esc AND 3 ````    
+:>````CTRL + b````, then ```` esc AND 3 ````  
 ![Layout 3](/images/layout3.png)
-:>````CTRL + b````, then ```` esc AND 4 ````    
+:>````CTRL + b````, then ```` esc AND 4 ````  
 ![Layout 4](/images/layout4.png)
 
 To rotate through the built-in layouts:

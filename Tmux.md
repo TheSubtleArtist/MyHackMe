@@ -240,7 +240,9 @@ rotate to the "next" or "previous" window
 Start by renaming the windows to ensure there is clear difference
 ![Reattach Panes Reset](/images/reattachPanes.png)
 
-:>````CTRL + b````, then ```` : ```` then  ```` join-pane -s <source-window-name> -t <target-window-name````
-:>````CTRL + b````, then ```` : ```` then  ```` join-pane -s window-two -t window-one```` 
+:>````CTRL + b````, then ```` : ````  
+then  ```` join-pane -s <source-window-name> -t <target-window-name````
+:>````CTRL + b````, then ```` : ````  
+then  ```` join-pane -s window-two -t window-one````  
 ![Reattach Panes Command](/images/reattachCommand.png)
 ![Reattach Panes Result](/images/reattachResult.png)

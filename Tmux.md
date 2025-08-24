@@ -255,13 +255,13 @@ Starting in a new session
 ![Copy Mode 0](/images/cp-md00.png)  
 Split Horizontally  
 :>````CTRL + b````, then ```` : ````  
-![Copy Mode 01](/images/cp-md01.png)
+![Copy Mode 01](/images/cp-md01.png)  
 Generate some example text  and display  
 ![Copy Mode 02](/images/cp-md02.png)  
 
 ### Enter Copy Mode
 
-:>````CTRL + b````, then ```` [ ````
+:>````CTRL + b````, then ```` [ ````  
 There is a new window/pane identifier in the upper right corner
 Use the arrows to scroll up and down the page  
 ![Enter Copy Mode](/images/cp-md04.png)  
@@ -269,7 +269,7 @@ Use the arrows to scroll up and down the page
 ### Search
 
 :>````CTRL + r```` to search "up" the page  
-![Enter Search Mode](/images/cp-md05.png)
+![Enter Search Mode](/images/cp-md05.png)  
 Enter the search string  
 ![String Search](/images/cp-md06.png)  
 
@@ -296,3 +296,11 @@ Choose the destination file
 Paste the text with :>````CTRL + b````, then ````]````
 ![Paste Text](/images/cp-md10.png)  
 ![Paste Text 2](/images/cp-md11.png)  
+
+### Exit Search Mode
+
+:>```` esc ````
+
+### Exit Copy Mode
+
+:>```` q ````

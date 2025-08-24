@@ -211,13 +211,13 @@ again :>````CTRL + b````, then ```` } ````
 Uses the standard prefix follow by escape and a number [1..4]  
 The change depends on the number of windows currently open, experinces will vary.  
 :>````CTRL + b````, then ```` esc AND 1 ````  
-![Layout 1](/images/layout1.png)
+![Layout 1](/images/layout1.png)  
 :>````CTRL + b````, then ```` esc AND 2 ````  
-![Layout 2](/images/layout2.png)
+![Layout 2](/images/layout2.png)  
 :>````CTRL + b````, then ```` esc AND 3 ````  
-![Layout 3](/images/layout3.png)
+![Layout 3](/images/layout3.png)  
 :>````CTRL + b````, then ```` esc AND 4 ````  
-![Layout 4](/images/layout4.png)
+![Layout 4](/images/layout4.png)  
 
 To rotate through the built-in layouts:
 :>````CTRL + b````, then ```` spacebar ````

@@ -381,9 +381,9 @@ set: overwrites default hotkeys with values in the custom configuration file
 Horizontal :>````bind-key | split-window -h -c "#{pane_current_path}"````  
 Vertical :>````bind-key - split-window -v -c "#{pane_current_path}"````
 
-#### Left status bar changes
+### Left and right status bar changes
 
-Set character limit to 15 :>````set-option -g status-lef-length 15```` 
+Set character limit to 15 :>````set-option -g status-left-length 15```` 
 Add a text label:>````set -g status-left "#[fg="purple,bold"]#(whoami)"```` 
 
 ![More Configs](/images/config08.png)
@@ -391,4 +391,25 @@ Add a text label:>````set -g status-left "#[fg="purple,bold"]#(whoami)"````
 
 Reload the Config file :>````CTRL + x````, then ````:source-file ~/.tmux.conf```` 
 ![More Configs](/images/config09.png)
+
+Left status bar now shows the result of the whoami command
+![More Configs](/images/config10.png)
+
+Window Splits  
+![More Configs](/images/config12.png)
+
+### Start command history logging in the current pane
+:>````CTRL + x````, then ````P````
+
+
+
+### Reset Tmux
+:>````tmux kill-server````
+
+![Reset](/images/config13.png)
+![Reset](/images/config14.png)
+![Reset](/images/config15.png)
+
+
+
 

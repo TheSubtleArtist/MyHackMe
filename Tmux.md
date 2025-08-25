@@ -335,7 +335,7 @@ Generate a new file at the correct location
 
 ### Add highlights in the currently selected windows
 
-:>````setw -g window-status-current-style bg='#0000ff', fg='#ff00ff'````
+:>````setw -g window-status-current-style bg='#0000ff'cjfjffg='#ff00ff'````
 
 ### Change the prefix key from CTRL <b> to CTRL<x>
 
@@ -345,9 +345,49 @@ bind C-x send-prefix
 
 ### Increase the history limit from the standard 2000 to 100000
 
-Allows copyig of greater quantities of characters
+Allows copying greater quantities of characters
 
 :>````set -g history-limit 10000````  
 
 ![New Customer Configuration File](/images/config04.png)
+
+### Load the new config file
+
+Exit Tmux and start a new session and window
+
+:>````tmux new -s ses02 -n win02````  
+![New Config File Loaded](/images/config05.png)  
+
+### Test the new prefix
+
+Rename the window to win02a :>````CTRL + x````, then ````,````  
+![New Config New Window](/images/config06.png)
+![New Config New Window](/images/config07.png)
+
+
+### Binding additional keys
+
+Bind or bind-key: adding hotkeys without overwriting default hotkeys
+set: overwrites default hotkeys with values in the custom configuration file
+
+#### Multiple Commands
+
+"\;" separates multiple commands in a single key binding  
+
+:>````bind t new-window \; display-message "new window opened````  
+
+#### Split Window
+
+Horizontal :>````bind-key | split-window -h -c "#{pane_current_path}"````  
+Vertical :>````bind-key - split-window -v -c "#{pane_current_path}"````
+
+#### Left status bar changes
+
+Set character limit to 15 :>````set-option -g status-lef-length 15```` 
+Add a text label:>````set -g status-left "#[fg="purple,bold"]#(whoami)"```` 
+
+![More Configs](/images/config08.png)
+
+
+Reload the Config file :>````CTRL + x````, then ````:source-file ~/.tmux.conf```` 
 

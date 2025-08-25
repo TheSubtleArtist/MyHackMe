@@ -303,4 +303,48 @@ Paste the text with :>````CTRL + b````, then ````]````
 
 ### Exit Copy Mode
 
-:>```` q ````
+:>```` q ````  
+
+## Tmux Configurations
+
+![Standard Session and Windows](/images/config00.png)  
+
+## View Tmux Configuration
+
+:>````tmux show -g````
+Enter copy mode to allow for scrolling
+![Standard Session and Windows](/images/config01.png) 
+
+## Generate a customer configuration file
+
+Exit copy mode
+
+Generate a new file at the correct location
+
+:>````nano /home/<username>/.tmux.conf````
+
+![New Customer Configuration File](/images/config03.png)
+
+### Allow reloading of the configration file with a bound key
+
+:>````bind m source-file ~/.tmux.conf````
+
+### Modify the status bar colors
+
+:>````set -g status-style bg='#0080ff',fg='#0000ff'````
+
+### Add highlights in the currently selected windows
+
+:>````setw -g window-status-current-style bg='#0000ff', fg='#ff00ff'````
+
+### Change the prefix key from CTRL <b> to CTRL<x>
+
+set -g prefix C-x
+unbind C-b
+bind C-x send-prefix
+
+### Increase the history limit from the standard 2000 to 100000
+
+Allows copyig of greater quantities of characters
+
+:>````set -g history-limit 10000````  

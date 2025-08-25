@@ -327,7 +327,7 @@ Generate a new file at the correct location
 
 ### Allow reloading of the configration file with a bound key
 
-:>````bind m source-file ~/.tmux.conf````
+:>````bind r source-file ~/.tmux.conf````
 
 ### Modify the status bar colors
 
@@ -348,3 +348,6 @@ bind C-x send-prefix
 Allows copyig of greater quantities of characters
 
 :>````set -g history-limit 10000````  
+
+![New Customer Configuration File](/images/config04.png)
+

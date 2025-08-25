@@ -390,4 +390,5 @@ Add a text label:>````set -g status-left "#[fg="purple,bold"]#(whoami)"````
 
 
 Reload the Config file :>````CTRL + x````, then ````:source-file ~/.tmux.conf```` 
+![More Configs](/images/config09.png)
 

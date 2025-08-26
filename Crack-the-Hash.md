@@ -6,43 +6,47 @@ In this room, each hash only needs one solution. Maybe we can create some succes
 
 This is the list of tools we will highlight for each hash.. when possible.
 
-**[CrackStation]** (https://crackstation.net/)  
-Crackstation is, fundamentally, a library of pre-cracked, unsalted hashes. A great go-to tool for the first step in any attempt to crack a hash.
+**[CrackStation]**  
+[Crackstation](https://crackstation.net/)  is, fundamentally, a library of pre-cracked, unsalted hashes. A great go-to tool for the first step in any attempt to crack a hash.
 
-**[Hash-Identifier]**(https://gitlab.com/kalilinux/packages/hash-identifier)  
-A command line utility for identifying a user-supplied hash.
+**Hash-Identifier**
+[Hash-Identifier](https://gitlab.com/kalilinux/packages/hash-identifier) is a command line utility for identifying a user-supplied hash. There will be much more on this near the end.
 
-**Hashcat**<br>
-https://hashcat.net/wiki/
-An advanced password recovery t* ool. The user cannot be afraid to continually reference the wiki and learn about the intricacies of Hashcat. It's capabilities are limited only by the user's curiosity.<br>
-At the beginning level we are concerned with two hashcat options: Core Attack Mode (-a) and Hash Mode (-m).<br>
-Example hashes (https://hashcat.net/wiki/) show the hash-modes, especially if no other source has identified the hash. Visual identification might be the final resource.<br>
-The basic hashcat command looks like:<br>
-:> ````hashcat -a <attack-mode> -m <hash-mode> <hash> <path-to-wordlist>````<br>
-In the event there is more than than one hash of the same type, they may each be placed on separate lines in a file.<br>
-The basic command changes only slightly:<br>
-:> ````hashcat -a <attack-mode> -m <hash-mode> <path-to-file> <path-to-wordlist>````<br>
+**Hashcat**
+[Hashcat](https://hashcat.net/wiki/) is an advanced password recovery tool. The user cannot be afraid to continually reference the wiki and learn about the intricacies of Hashcat. It's capabilities are limited only by the user's curiosity. At the beginning level we are concerned with two hashcat options: Core Attack Mode (-a) and Hash Mode (-m). [Example hashes](https://hashcat.net/wiki/doku.php?id=example_hashes) show the hash-modes, especially if no other source has identified the hash. Visual identification might be the final resource.  
+The basic hashcat command looks like:  
+:> ````hashcat -a <attack-mode> -m <hash-mode> <hash> <path-to-wordlist>````  
+In the event there is more than than one hash of the same type, they may each be placed on separate lines in a file.
+![File With Multiple Hashes](/assets/hashcat01.png)  
+The basic command changes only slightly:
+:> ````hashcat -a <attack-mode> -m <hash-mode> <path-to-file> <path-to-wordlist>````  
 
+**John The Ripper**  
 
+[John the Ripper](https://www.openwall.com/john/) is an open-source password auditing tool with a list of features, from their website  
 
-**John The Ripper**<br>
-https://www.openwall.com/john/<br>
-Would be appropraitely names Jack of All Trades. John has the ability to perform password security auditing and recovery across operating systems as well as file types, including unix, macOS, Windows, web apps, groupware, zip files, and others. <br>
+- fully configurable for your particular needs
+- available for several different platforms
 
-**The Wordlist**<br>
-There are innumerable sources of wordlists. Kali Linux comes with wordlists pre-installed in /usr/share/wordlists/.<br>This includes the most commonly used source 'rockyou.txt' which requires expansion prior to first used.<br>
-In addition, very active Daniel Miessler maintains a considerable number of enriched security lists on Github (https://github.com/danielmiessler/SecLists)<br>
+**The Wordlist**
+There are innumerable sources of wordlists. Kali Linux comes with wordlists pre-installed in /usr/share/wordlists/. This includes the most commonly used source 'rockyou.txt' which requires expansion prior to first used.  
+In addition, very active Daniel Miessler maintains a considerable number of enriched security lists on Github [SecLists](https://github.com/danielmiessler/SecLists)
 
 ### Setup Notes <br>
-Because of the potential level of repetition, each hash was placed in its own file in the Kali Linux environment. This facilitates some efficiencies when using the command line.<br>
-![Screenshot of hash files inside the Kali Linux fs](/Screenshots/kaliHashfiles.png)<br>
+Because of the potential level of repetition, each hash was placed in its own file in the Kali Linux environment. This facilitates some efficiencies when using the command line.  
+![Screenshot of hash files inside the Kali Linux fs](/assets/kaliHashfiles.png)<br>
 NOTE: There can be no invisible characters in the file. If there are, Hashcat will quit and indicate a "Token Length" error.<br>
 
 ## Task 1 ##
+
 ### Hash 1: 48bb6e862e54f2a795ffc4e541caed4d ###
+
 #### Crackstation ####
-![Hash1](/Screenshots/hash1.png)<br>
+
+![Hash1](/Screenshots/hash1.png)
+
 #### Hash Identifier ####
+
 The simplest use of hash identifier is as any other linux command.<br>
 :>````hash-identifier 48bb6e862e54f2a795ffc4e541caed4d````<br>
 gives us the same results as Crackstation.<br>

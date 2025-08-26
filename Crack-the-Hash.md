@@ -1,6 +1,4 @@
-# Crack The Hash
-
-https://tryhackme.com/room/crackthehash
+# [Crack The Hash](https://tryhackme.com/room/crackthehash)
 
 This is the ultimate in beginner rooms. Hash cracking is a great way to start because there are plenty of online resources to help. Cracking hashes is deterministic. There is really only one correct answer and it helps to have some immediate success when you are new to the craft.
 

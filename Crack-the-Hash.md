@@ -43,55 +43,55 @@ NOTE: There can be no invisible characters in the file. If there are, Hashcat wi
 
 #### Crackstation
 
-![Hash1](/ assets/hash1.png)
+![Hash1](/assets/hash1.png)
 
 #### Hash Identifier
 
 The simplest use of hash identifier is as any other linux command.  
 :>````hash-identifier 48bb6e862e54f2a795ffc4e541caed4d````  
 gives us the same results as Crackstation.  
-![Hash1 with hash-identifier](/ assets/hash1-HI.png)  
+![Hash1 with hash-identifier](/assets/hash1-HI.png)  
 #### Hashcat
 
 The command:
 :>````hashcat -m 0 -a 0 hash1 /usr/share/wordlists/rockyou.txt````
 The result:
-![Hash1 with Hashcat](/ assets/hash1-HC.png)
+![Hash1 with Hashcat](/assets/hash1-HC.png)
 
 ### Hash 2: CBFDAC6008F9CAB4083784CBD1874F76618D2A97  
 
 #### Crackstation
 
-![Hash2](/ assets/hash2.png)
+![Hash2](/assets/hash2.png)
 
 ### Hash-Identifier
 
 Try piping the contents of the hash2 file into the hash-identifer command
 :>````cat hash2 | hash-identifier````
 This does not give a positive result.
-![Hash2 no piping](/ assets/hash2-HI1.png)
+![Hash2 no piping](/assets/hash2-HI1.png)
 Try again with the standard method
 :>````hash-identifier CBFDAC6008F9CAB4083784CBD1874F76618D2A97````
-![Hash2 with hash-identifer](/ assets/hash2-HI2.png)  
+![Hash2 with hash-identifer](/assets/hash2-HI2.png)  
 
 #### Hashcat
 
 The command changes the hash-mode to 100, indicating the sha-1 hash:
 :>````hashcat -m 100 -a 0 hash2 /usr/share/wordlists/rockyou.txt````
 The result:
-![Hash2 with Hashcat](/ assets/hash2-HC.png)
+![Hash2 with Hashcat](/assets/hash2-HC.png)
 
 ### Hash 3: 1C8BFE8F801D79745C4631D09FFF36C82AA37FC4CCE4FC946683D7B336B63032
 
 #### Crackstation
 
-![Hash3](/ assets/hash3.png)
+![Hash3](/assets/hash3.png)
 
 ### Hash-Identifier
 
 Users can start the hash-identifer before supply a hash.
 If there are multple hashes, hash-identifer continuse in an endless loop until it receives a keyboard interrupt.
-![Hash3 with hash-identifier](/ assets/hash3-HI.png)
+![Hash3 with hash-identifier](/assets/hash3-HI.png)
 Hash-Identifier provides the same result as Crackstation.
 
 #### Hashcat
@@ -99,19 +99,19 @@ Hash-Identifier provides the same result as Crackstation.
 This one introduces a bit of complexity. Secure Hash Algorithms (SHA) is a family of hash algorithms. The SHA2 family includes 224, 256, 512, and some variations. When searching for the correct hash mode, the user must observe the formats of the various hashes that appear on the hashcat example pages. In this case, the correct mode is not sha-256, but sha2-256.
 :>````hashcat -m 1400 -a 0 hash3 /usr/share/wordlists/rockyou.txt````
 The result:
-![Hash3 with Hashcat](/ assets/hash3-HC.png)
+![Hash3 with Hashcat](/assets/hash3-HC.png)
 
 
 ### Hash 4: $2y$12$Dwt1BZj6pcyc3Dy1FWZ5ieeUznr71EeNkJkUlypTsgbX1H68wsRom
 
 #### Crackstation
 
-![Hash4](/ assets/hash4.png)
+![Hash4](/assets/hash4.png)
 Crackstation has not seen this has before.
 
 ### Hash-Identifier
 
-![Hash4 with hash-identifier](/ assets/hash4-HI.png)
+![Hash4 with hash-identifier](/assets/hash4-HI.png)
 Also unidentifiable by hash-identifier.
 
 #### Hashcat
@@ -120,37 +120,37 @@ Here is the first one which is unidentified by both Crackstation and Hash-Identi
 Bcrypt begins to get tougher. For this iteration, I chose to perform the operation on my Windows host, rather than the Kali VM. This lets me allow greater gpu and cpu allocation. Nothing realy changes. I simply put the hash into a file called hashes.txt and still use rockyou.txt, both located in the hashcat folder on the C drive. The command changes only slightly:
 :>````.\hashcat.exe -m 3200 -a 0 -w 4 -D 1,2 hashes.txt rockyou.txt````
 The result:
-![Hash4 with Hashcat](/ assets/hash4-HC.png)
+![Hash4 with Hashcat](/assets/hash4-HC.png)
 
 ### Hash 5: 279412f945939ba78ce0758d3fd83daa
 
 #### Crackstation
 
-![Hash5](/ assets/hash5.png)
+![Hash5](/assets/hash5.png)
 
 ### Hash-Identifier
-![Hash5 with hash-identifier](/ assets/hash5-HI.png)
+![Hash5 with hash-identifier](/assets/hash5-HI.png)
 
 ## Task 2
 
 ### Hash 6: F09EDCB1FCEFC6DFB23DC3505A882655FF77375ED8AA2D1C13F640FCCC2D0C85
 #### Crackstation
-![Hash6](/ assets/hash6.png)
+![Hash6](/assets/hash6.png)
 
 ### Hash-Identifier
-![Hash6 with hash-identifier](/ assets/hash6-HI.png)
+![Hash6 with hash-identifier](/assets/hash6-HI.png)
 
 ### Hash 7: 1DFECA0C002AE40B8619ECF94819CC1B
 #### Crackstation
-![Hash7](/ assets/hash7.png)
+![Hash7](/assets/hash7.png)
 
 ### Hash-Identifier ###
-![Hash7 with hash-identifier](/ assets/hash7-HI.png)
+![Hash7 with hash-identifier](/assets/hash7-HI.png)
 
 ### Hash 8: $6$aReallyHardSalt$6WKUTqzq.UQQmrm0p/T7MPpMbGNnzXPMAXi4bJMl9be.cfi3/qxIf.hsGpS41BqMhSrHVXgMpdjS6xeKZAs02.
 ### Salt: aReallyHardSalt
 #### Crackstation
-![Hash8](/ assets/hash8.png)
+![Hash8](/assets/hash8.png)
 
 ### Hash-Identifier
 As the documentation indicates, hash-identifier works only with unsalted hashes.
@@ -158,4 +158,4 @@ As the documentation indicates, hash-identifier works only with unsalted hashes.
 ### Hash 9: e5d8870e5bdd26602cab8dbe07a942c8669e56d6
 ### Salt: tryhackme
 #### Crackstation
-![Hash9](/ assets/hash9.png)
+![Hash9](/assets/hash9.png)

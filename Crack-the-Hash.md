@@ -6,17 +6,15 @@ In this room, each hash only needs one solution. Maybe we can create some succes
 
 This is the list of tools we will highlight for each hash.. when possible.
 
-**CrackStation**<br>
-https://crackstation.net/
+**[CrackStation]** (https://crackstation.net/)  
 Crackstation is, fundamentally, a library of pre-cracked, unsalted hashes. A great go-to tool for the first step in any attempt to crack a hash.
 
-**hash-identifier**<br>
-https://gitlab.com/kalilinux/packages/hash-identifier<br>
+**[Hash-Identifier]**(https://gitlab.com/kalilinux/packages/hash-identifier)  
 A command line utility for identifying a user-supplied hash.
 
 **Hashcat**<br>
 https://hashcat.net/wiki/
-An advanced password recovery tool. The user cannot be afraid to continually reference the wiki and learn about the intricacies of Hashcat. It's capabilities are limited only by the user's curiosity.<br>
+An advanced password recovery t* ool. The user cannot be afraid to continually reference the wiki and learn about the intricacies of Hashcat. It's capabilities are limited only by the user's curiosity.<br>
 At the beginning level we are concerned with two hashcat options: Core Attack Mode (-a) and Hash Mode (-m).<br>
 Example hashes (https://hashcat.net/wiki/) show the hash-modes, especially if no other source has identified the hash. Visual identification might be the final resource.<br>
 The basic hashcat command looks like:<br>

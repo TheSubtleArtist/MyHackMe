@@ -51,6 +51,7 @@ The simplest use of hash identifier is as any other linux command.
 :>````hash-identifier 48bb6e862e54f2a795ffc4e541caed4d````  
 gives us the same results as Crackstation.  
 ![Hash1 with hash-identifier](/assets/hash1-HI.png)  
+
 #### Hashcat
 
 The command:
@@ -58,13 +59,15 @@ The command:
 The result:
 ![Hash1 with Hashcat](/assets/hash1-HC.png)
 
+#### John the Ripper
+
 ### Hash 2: CBFDAC6008F9CAB4083784CBD1874F76618D2A97  
 
 #### Crackstation
 
 ![Hash2](/assets/hash2.png)
 
-### Hash-Identifier
+#### Hash-Identifier
 
 Try piping the contents of the hash2 file into the hash-identifer command
 :>````cat hash2 | hash-identifier````
@@ -81,13 +84,15 @@ The command changes the hash-mode to 100, indicating the sha-1 hash:
 The result:
 ![Hash2 with Hashcat](/assets/hash2-HC.png)
 
+#### John the Ripper
+
 ### Hash 3: 1C8BFE8F801D79745C4631D09FFF36C82AA37FC4CCE4FC946683D7B336B63032
 
 #### Crackstation
 
 ![Hash3](/assets/hash3.png)
 
-### Hash-Identifier
+#### Hash-Identifier
 
 Users can start the hash-identifer before supply a hash.
 If there are multple hashes, hash-identifer continuse in an endless loop until it receives a keyboard interrupt.
@@ -101,6 +106,7 @@ This one introduces a bit of complexity. Secure Hash Algorithms (SHA) is a famil
 The result:
 ![Hash3 with Hashcat](/assets/hash3-HC.png)
 
+#### John the Ripper
 
 ### Hash 4: $2y$12$Dwt1BZj6pcyc3Dy1FWZ5ieeUznr71EeNkJkUlypTsgbX1H68wsRom
 
@@ -109,7 +115,7 @@ The result:
 ![Hash4](/assets/hash4.png)
 Crackstation has not seen this has before.
 
-### Hash-Identifier
+#### Hash-Identifier
 
 ![Hash4 with hash-identifier](/assets/hash4-HI.png)
 Also unidentifiable by hash-identifier.
@@ -122,40 +128,70 @@ Bcrypt begins to get tougher. For this iteration, I chose to perform the operati
 The result:
 ![Hash4 with Hashcat](/assets/hash4-HC.png)
 
+#### John the Ripper
+
 ### Hash 5: 279412f945939ba78ce0758d3fd83daa
 
 #### Crackstation
 
 ![Hash5](/assets/hash5.png)
 
-### Hash-Identifier
+#### Hash-Identifier
 ![Hash5 with hash-identifier](/assets/hash5-HI.png)
+
+#### Hashcat
+
+#### John the Ripper
 
 ## Task 2
 
 ### Hash 6: F09EDCB1FCEFC6DFB23DC3505A882655FF77375ED8AA2D1C13F640FCCC2D0C85
+
 #### Crackstation
 ![Hash6](/assets/hash6.png)
 
-### Hash-Identifier
+#### Hash-Identifier
 ![Hash6 with hash-identifier](/assets/hash6-HI.png)
+
+#### Hashcat
+
+#### John the Ripper
 
 ### Hash 7: 1DFECA0C002AE40B8619ECF94819CC1B
 #### Crackstation
 ![Hash7](/assets/hash7.png)
 
-### Hash-Identifier ###
+#### Hash-Identifier
 ![Hash7 with hash-identifier](/assets/hash7-HI.png)
 
+
+#### Hashcat
+
+#### John the Ripper
+
 ### Hash 8: $6$aReallyHardSalt$6WKUTqzq.UQQmrm0p/T7MPpMbGNnzXPMAXi4bJMl9be.cfi3/qxIf.hsGpS41BqMhSrHVXgMpdjS6xeKZAs02.
-### Salt: aReallyHardSalt
+#### Salt: aReallyHardSalt
+
 #### Crackstation
 ![Hash8](/assets/hash8.png)
 
-### Hash-Identifier
+#### Hash-Identifier
 As the documentation indicates, hash-identifier works only with unsalted hashes.
 
+#### Hashcat
+
+#### John the Ripper
+
+
 ### Hash 9: e5d8870e5bdd26602cab8dbe07a942c8669e56d6
-### Salt: tryhackme
+#### Salt: tryhackme
+
 #### Crackstation
 ![Hash9](/assets/hash9.png)
+
+#### Hash-Identifier
+
+#### Hashcat
+
+
+#### John the Ripper

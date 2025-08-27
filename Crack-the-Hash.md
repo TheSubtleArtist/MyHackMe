@@ -142,6 +142,13 @@ The result:
 #### Hashcat
 
 ````hashcat -m 900 -a 0 hash5 /usr/share/wordlist/rockyou.txt````
+In this instance, and for some unexplained reason, hashcat is unable to crack this one.  
+![Hash5 MD4 Unsolved](/assets/hash5-HC-MD4.png)
+
+Trying another of the recommendations, Radmin v2:
+````hashcat -m 9900 -a 0 hash5 /usr/share/wordlist/rockyou.txt````
+![Hash5 Radmin Unsolved](/assets/hash5-HC-Radmin.png)
+
 
 #### John the Ripper
 

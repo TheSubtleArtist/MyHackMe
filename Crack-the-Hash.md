@@ -69,20 +69,20 @@ The result:
 
 #### Hash-Identifier
 
-Try piping the contents of the hash2 file into the hash-identifer command
-:>````cat hash2 | hash-identifier````
-This does not give a positive result.
-![Hash2 no piping](/assets/hash2-HI1.png)
-Try again with the standard method
-:>````hash-identifier CBFDAC6008F9CAB4083784CBD1874F76618D2A97````
+Try piping the contents of the hash2 file into the hash-identifer command.  
+:>````cat hash2 | hash-identifier````  
+This does not give a positive result.  
+![Hash2 no piping](/assets/hash2-HI1.png)  
+Try again with the standard method  
+:>````hash-identifier CBFDAC6008F9CAB4083784CBD1874F76618D2A97````  
 ![Hash2 with hash-identifer](/assets/hash2-HI2.png)  
 
 #### Hashcat
 
-The command changes the hash-mode to 100, indicating the sha-1 hash:
-:>````hashcat -m 100 -a 0 hash2 /usr/share/wordlists/rockyou.txt````
-The result:
-![Hash2 with Hashcat](/assets/hash2-HC.png)
+The command changes the hash-mode to 100, indicating the sha-1 hash:  
+:>````hashcat -m 100 -a 0 hash2 /usr/share/wordlists/rockyou.txt````  
+The result:  
+![Hash2 with Hashcat](/assets/hash2-HC.png)  
 
 #### John the Ripper
 
@@ -94,17 +94,17 @@ The result:
 
 #### Hash-Identifier
 
-Users can start the hash-identifer before supply a hash.
-If there are multple hashes, hash-identifer continuse in an endless loop until it receives a keyboard interrupt.
-![Hash3 with hash-identifier](/assets/hash3-HI.png)
+Users can start the hash-identifer before supply a hash.  
+If there are multple hashes, hash-identifer continuse in an endless loop until it receives a keyboard interrupt.  
+![Hash3 with hash-identifier](/assets/hash3-HI.png)  
 Hash-Identifier provides the same result as Crackstation.
 
 #### Hashcat
 
-This one introduces a bit of complexity. Secure Hash Algorithms (SHA) is a family of hash algorithms. The SHA2 family includes 224, 256, 512, and some variations. When searching for the correct hash mode, the user must observe the formats of the various hashes that appear on the hashcat example pages. In this case, the correct mode is not sha-256, but sha2-256.
-:>````hashcat -m 1400 -a 0 hash3 /usr/share/wordlists/rockyou.txt````
-The result:
-![Hash3 with Hashcat](/assets/hash3-HC.png)
+This one introduces a bit of complexity. Secure Hash Algorithms (SHA) is a family of hash algorithms. The SHA2 family includes 224, 256, 512, and some variations. When searching for the correct hash mode, the user must observe the formats of the various hashes that appear on the hashcat example pages. In this case, the correct mode is not sha-256, but sha2-256.  
+:>````hashcat -m 1400 -a 0 hash3 /usr/share/wordlists/rockyou.txt````  
+The result:  
+![Hash3 with Hashcat](/assets/hash3-HC.png)  
 
 #### John the Ripper
 
@@ -117,15 +117,15 @@ Crackstation has not seen this has before.
 
 #### Hash-Identifier
 
-![Hash4 with hash-identifier](/assets/hash4-HI.png)
+![Hash4 with hash-identifier](/assets/hash4-HI.png)  
 Also unidentifiable by hash-identifier.
 
 #### Hashcat
 
 Here is the first one which is unidentified by both Crackstation and Hash-Identifier. We can resort to visual matching on the Hashcat exmaples page. The "$" is a separator. Performing a search for "$2y" yields no results. But if we understand this is still an entry level room, then the hash mode should still have a fairly small number, searching for "$2*" indicates bcrypt.
-Bcrypt begins to get tougher. For this iteration, I chose to perform the operation on my Windows host, rather than the Kali VM. This lets me allow greater gpu and cpu allocation. Nothing realy changes. I simply put the hash into a file called hashes.txt and still use rockyou.txt, both located in the hashcat folder on the C drive. The command changes only slightly:
-:>````.\hashcat.exe -m 3200 -a 0 -w 4 -D 1,2 hashes.txt rockyou.txt````
-The result:
+Bcrypt begins to get tougher. For this iteration, I chose to perform the operation on my Windows host, rather than the Kali VM. This lets me allow greater gpu and cpu allocation. Nothing realy changes. I simply put the hash into a file called hashes.txt and still use rockyou.txt, both located in the hashcat folder on the C drive. The command changes only slightly:  
+:>````.\hashcat.exe -m 3200 -a 0 -w 4 -D 1,2 hashes.txt rockyou.txt````  
+The result:  
 ![Hash4 with Hashcat](/assets/hash4-HC.png)
 
 #### John the Ripper
@@ -140,6 +140,8 @@ The result:
 ![Hash5 with hash-identifier](/assets/hash5-HI.png)
 
 #### Hashcat
+
+````hashcat -m 900 -a 0 hash5 /usr/share/wordlist/rockyou.txt````
 
 #### John the Ripper
 

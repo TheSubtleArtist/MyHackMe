@@ -141,7 +141,8 @@ The result:
 
 #### Hashcat
 
-````hashcat -m 900 -a 0 hash5 /usr/share/wordlist/rockyou.txt````
+Attempt the MD4 as recommended.  
+````hashcat -m 900 -a 0 hash5 /usr/share/wordlist/rockyou.txt````  
 In this instance, and for some unexplained reason, hashcat is unable to crack this one.  
 ![Hash5 MD4 Unsolved](/assets/hash5-HC-MD4.png)
 
@@ -164,6 +165,12 @@ Trying another of the recommendations, Radmin v2:
 
 #### Hashcat
 
+With this hash, both Crackstation and Hash-Identifier identify this as SHA-256. Reviewing the example hashes in the Hashcat Wiki, there are a number of potential options beginning at mode 1400.
+  
+````hashcat -m 1400 -a 0 hash6 /usr/share/wordlist/rockyou.txt````  
+![Hash6 with hashcat](/assets/hash6-HC.png)
+
+
 #### John the Ripper
 
 ### Hash 7: 1DFECA0C002AE40B8619ECF94819CC1B
@@ -173,8 +180,13 @@ Trying another of the recommendations, Radmin v2:
 #### Hash-Identifier
 ![Hash7 with hash-identifier](/assets/hash7-HI.png)
 
-
 #### Hashcat
+
+Here is an instance where Crackstation and Hash-Identifer provide two different potential hash modes.
+````hashcat -m 1000 -a 0 hash7 /usr/share/wordlist/rockyou.txt````  
+Hashcat is able to crack the hash using the NTLM mode
+![Hash 7 with hashcat](/assets/hash7-HC.png)
+
 
 #### John the Ripper
 
@@ -189,6 +201,15 @@ As the documentation indicates, hash-identifier works only with unsalted hashes.
 
 #### Hashcat
 
+With no previous identification, it's time to rely on key indicators:  
+"$6$" and where it falls in the hash supports visual identification usingg the hashcat example hashes wiki.
+The character space includes both forward slash ("/") and full-stop ("."). The presence of these two characters can further indicate potential hash modes if they are present in the example hashes.
+
+sha512crypt has "$6$ in the correct location and a forward slash at the end. It is missing the full-stop.
+````hashcat -m 1800 -a 0 hash8 /usr/share/wordlist/rockyou.txt````  
+Hashcat accurately extracts the salt from the hash:  
+![Hash 8 with hashcat mode 1800](/assets/hash8-HC01.png)
+
 #### John the Ripper
 
 
@@ -199,8 +220,16 @@ As the documentation indicates, hash-identifier works only with unsalted hashes.
 ![Hash9](/assets/hash9.png)
 
 #### Hash-Identifier
+As the documentation indicates, hash-identifier works only with unsalted hashes.
 
 #### Hashcat
+
+This hash has a much more limited characterspace than the previous exercise.  
+With the file set up correctly, find out just how many characters are in the hash:  
+````cut -d ":" -f1 hash9 | wc -c````  
+Indicates there are forty-one characters in the hash.  
+The most likely candidates for forty-one character hases are modes are 110-160.
+````hashcat -m 160 -a 0 hash9 /usr/share/wordlist/rockyou.txt````
 
 
 #### John the Ripper

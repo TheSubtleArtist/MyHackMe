@@ -146,10 +146,9 @@ Attempt the MD4 as recommended.
 In this instance, and for some unexplained reason, hashcat is unable to crack this one.  
 ![Hash5 MD4 Unsolved](/assets/hash5-HC-MD4.png)
 
-Trying another of the recommendations, Radmin v2:
+Trying another of the recommendations, Radmin v2:  
 ````hashcat -m 9900 -a 0 hash5 /usr/share/wordlist/rockyou.txt````
 ![Hash5 Radmin Unsolved](/assets/hash5-HC-Radmin.png)
-
 
 #### John the Ripper
 
@@ -230,6 +229,7 @@ With the file set up correctly, find out just how many characters are in the has
 Indicates there are forty-one characters in the hash.  
 The most likely candidates for forty-one character hases are modes are 110-160.
 ````hashcat -m 160 -a 0 hash9 /usr/share/wordlist/rockyou.txt````
+![Hash9-Hashcat](/assets/hash9-HC.png)
 
 
 #### John the Ripper

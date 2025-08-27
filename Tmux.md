@@ -383,13 +383,13 @@ Vertical :>````bind-key - split-window -v -c "#{pane_current_path}"````
 
 ### Left and right status bar changes
 
-Set character limit to 15 :>````set-option -g status-left-length 15```` 
-Add a text label:>````set -g status-left "#[fg="purple,bold"]#(whoami)"```` 
+Set character limit to 15 :>````set-option -g status-left-length 15````  
+Add a text label:>````set -g status-left "#[fg="purple,bold"]#(whoami)"````  
 
 ![More Configs](/images/config08.png)
 
 
-Reload the Config file :>````CTRL + x````, then ````:source-file ~/.tmux.conf```` 
+Reload the Config file :>````CTRL + x````, then ````:source-file ~/.tmux.conf````  
 ![More Configs](/images/config09.png)
 
 Left status bar now shows the result of the whoami command
@@ -398,18 +398,14 @@ Left status bar now shows the result of the whoami command
 Window Splits  
 ![More Configs](/images/config12.png)
 
-### Start command history logging in the current pane
+### Start command history logging in the current pane  
+
 :>````CTRL + x````, then ````P````
 
-
-
 ### Reset Tmux
+
 :>````tmux kill-server````
 
 ![Reset](/images/config13.png)
 ![Reset](/images/config14.png)
 ![Reset](/images/config15.png)
-
-
-
-

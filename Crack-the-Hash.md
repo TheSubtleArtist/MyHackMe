@@ -21,13 +21,6 @@ In the event there is more than than one hash of the same type, they may each be
 The basic command changes only slightly:  
 :> ````hashcat -a <attack-mode> -m <hash-mode> <path-to-file> <path-to-wordlist>````  
 
-**John The Ripper**  
-
-[John the Ripper](https://www.openwall.com/john/) is an open-source password auditing tool with a list of features, from their website  
-
-- fully configurable for your particular needs
-- available for several different platforms
-
 **The Wordlist**
 There are innumerable sources of wordlists. Kali Linux comes with wordlists pre-installed in /usr/share/wordlists/. This includes the most commonly used source 'rockyou.txt' which requires expansion prior to first used. In addition, very active Daniel Miessler maintains a considerable number of enriched security lists on Github [SecLists](https://github.com/danielmiessler/SecLists)
 
@@ -50,6 +43,7 @@ NOTE: There can be no invisible characters in the file. If there are, Hashcat wi
 The simplest use of hash identifier is as any other linux command.  
 :>````hash-identifier 48bb6e862e54f2a795ffc4e541caed4d````  
 gives us the same results as Crackstation.  
+
 ![Hash1 with hash-identifier](/assets/hash1-HI.png)  
 
 #### Hashcat
@@ -58,8 +52,6 @@ The command:
 :>````hashcat -m 0 -a 0 hash1 /usr/share/wordlists/rockyou.txt````
 The result:
 ![Hash1 with Hashcat](/assets/hash1-HC.png)
-
-#### John the Ripper
 
 ### Hash 2: CBFDAC6008F9CAB4083784CBD1874F76618D2A97  
 
@@ -84,8 +76,6 @@ The command changes the hash-mode to 100, indicating the sha-1 hash:
 The result:  
 ![Hash2 with Hashcat](/assets/hash2-HC.png)  
 
-#### John the Ripper
-
 ### Hash 3: 1C8BFE8F801D79745C4631D09FFF36C82AA37FC4CCE4FC946683D7B336B63032
 
 #### Crackstation
@@ -105,8 +95,6 @@ This one introduces a bit of complexity. Secure Hash Algorithms (SHA) is a famil
 :>````hashcat -m 1400 -a 0 hash3 /usr/share/wordlists/rockyou.txt````  
 The result:  
 ![Hash3 with Hashcat](/assets/hash3-HC.png)  
-
-#### John the Ripper
 
 ### Hash 4: $2y$12$Dwt1BZj6pcyc3Dy1FWZ5ieeUznr71EeNkJkUlypTsgbX1H68wsRom
 
@@ -128,8 +116,6 @@ Bcrypt begins to get tougher. For this iteration, I chose to perform the operati
 The result:  
 ![Hash4 with Hashcat](/assets/hash4-HC.png)
 
-#### John the Ripper
-
 ### Hash 5: 279412f945939ba78ce0758d3fd83daa
 
 #### Crackstation
@@ -137,6 +123,7 @@ The result:
 ![Hash5](/assets/hash5.png)
 
 #### Hash-Identifier
+
 ![Hash5 with hash-identifier](/assets/hash5-HI.png)
 
 #### Hashcat
@@ -150,13 +137,12 @@ Trying another of the recommendations, Radmin v2:
 ````hashcat -m 9900 -a 0 hash5 /usr/share/wordlist/rockyou.txt````
 ![Hash5 Radmin Unsolved](/assets/hash5-HC-Radmin.png)
 
-#### John the Ripper
-
 ## Task 2
 
 ### Hash 6: F09EDCB1FCEFC6DFB23DC3505A882655FF77375ED8AA2D1C13F640FCCC2D0C85
 
 #### Crackstation
+
 ![Hash6](/assets/hash6.png)
 
 #### Hash-Identifier
@@ -169,11 +155,10 @@ With this hash, both Crackstation and Hash-Identifier identify this as SHA-256. 
 ````hashcat -m 1400 -a 0 hash6 /usr/share/wordlist/rockyou.txt````  
 ![Hash6 with hashcat](/assets/hash6-HC.png)
 
-
-#### John the Ripper
-
 ### Hash 7: 1DFECA0C002AE40B8619ECF94819CC1B
+
 #### Crackstation
+
 ![Hash7](/assets/hash7.png)
 
 #### Hash-Identifier
@@ -185,9 +170,6 @@ Here is an instance where Crackstation and Hash-Identifer provide two different 
 ````hashcat -m 1000 -a 0 hash7 /usr/share/wordlist/rockyou.txt````  
 Hashcat is able to crack the hash using the NTLM mode
 ![Hash 7 with hashcat](/assets/hash7-HC.png)
-
-
-#### John the Ripper
 
 ### Hash 8: $6$aReallyHardSalt$6WKUTqzq.UQQmrm0p/T7MPpMbGNnzXPMAXi4bJMl9be.cfi3/qxIf.hsGpS41BqMhSrHVXgMpdjS6xeKZAs02.
 #### Salt: aReallyHardSalt
@@ -208,9 +190,8 @@ sha512crypt has "$6$ in the correct location and a forward slash at the end. It 
 ````hashcat -m 1800 -a 0 hash8 /usr/share/wordlist/rockyou.txt````  
 Hashcat accurately extracts the salt from the hash:  
 ![Hash 8 with hashcat mode 1800](/assets/hash8-HC01.png)
-
-#### John the Ripper
-
+and is able to decipher the hash.  
+![Hash 8 with hashcat mode 1800](/assets/hash8-HC02.png)
 
 ### Hash 9: e5d8870e5bdd26602cab8dbe07a942c8669e56d6
 #### Salt: tryhackme
@@ -230,6 +211,3 @@ Indicates there are forty-one characters in the hash.
 The most likely candidates for forty-one character hases are modes are 110-160.
 ````hashcat -m 160 -a 0 hash9 /usr/share/wordlist/rockyou.txt````
 ![Hash9-Hashcat](/assets/hash9-HC.png)
-
-
-#### John the Ripper

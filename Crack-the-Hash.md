@@ -1,16 +1,16 @@
 # [Crack The Hash](https://tryhackme.com/room/crackthehash)
 
-[Task 1](#Task 1)
-[Hash 1: MD5](#Hash 1)
-[Hash 2: SHA-1](#Hash 2)
-[Hash 3: SHA-256](#Hash 3)
-[Hash 4: Bcrypt](#Hash 4)
-[Hash 5: MD4](#Hash 5)
-[Task 2](#Task 2)
-[Hash 6: SHA-256](#Hash 6)
-[Hash 7: NTLM](#Hash 7)
-[Hash 8: SHA-512-Ccrypt](#Hash 8)
-[Hash 9: HMAC-SHA1](#Hash 9)
+[Task 1](#Task 1)  
+[Hash 1: MD5](#Hash 1)  
+[Hash 2: SHA-1](#Hash 2)  
+[Hash 3: SHA-256](#Hash 3)  
+[Hash 4: Bcrypt](#Hash 4)  
+[Hash 5: MD4](#Hash 5)  
+[Task 2](#Task 2)  
+[Hash 6: SHA-256](#Hash 6)  
+[Hash 7: NTLM](#Hash 7)  
+[Hash 8: SHA-512-Ccrypt](#Hash 8)  
+[Hash 9: HMAC-SHA1](#Hash 9)  
 
 This is the ultimate in beginner rooms. Hash cracking is a great way to start because there are plenty of online resources to help. Cracking hashes is deterministic. There is really only one correct answer and it helps to have some immediate success when you are new to the craft.
 

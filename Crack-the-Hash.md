@@ -1,16 +1,16 @@
 # [Crack The Hash](https://tryhackme.com/room/crackthehash)
 
 [Task 1](#task-1)  
-[Hash 1: MD5](#hash-1-48bb6e862e54f2a795ffc4e541caed4d)  
-[Hash 2: SHA-1](#hash-2-cbfdac6008f9cab4083784cbd1874f76618d2a97)  
-[Hash 3: SHA-256](#hash-3-1c8bfe8f801d79745c4631d09fff36c82aa37fc4cce4fc946683d7b336b63032)  
-[Hash 4: Bcrypt](#hash-4-2y12dwt1bzj6pcyc3dy1fwz5ieeuznr71eenkjkulyptsgbx1h68wsrom)  
-[Hash 5: MD4](#crackstation-5)  
+[--Hash 1: MD5](#hash-1-48bb6e862e54f2a795ffc4e541caed4d)  
+[--Hash 2: SHA-1](#hash-2-cbfdac6008f9cab4083784cbd1874f76618d2a97)  
+[--Hash 3: SHA-256](#hash-3-1c8bfe8f801d79745c4631d09fff36c82aa37fc4cce4fc946683d7b336b63032)  
+[--Hash 4: Bcrypt](#hash-4-2y12dwt1bzj6pcyc3dy1fwz5ieeuznr71eenkjkulyptsgbx1h68wsrom)  
+[--Hash 5: MD4](#crackstation-5)  
 [Task 2](#task-2)  
-[Hash 6: SHA-256](#hash-6-f09edcb1fcefc6dfb23dc3505a882655ff77375ed8aa2d1c13f640fccc2d0c85)  
-[Hash 7: NTLM](#hash-7-1dfeca0c002ae40b8619ecf94819cc1b)  
-[Hash 8: SHA-512-Ccrypt](#crackstation-8)  
-[Hash 9: HMAC-SHA1](#hash-9-e5d8870e5bdd26602cab8dbe07a942c8669e56d6)  
+[--Hash 6: SHA-256](#hash-6-f09edcb1fcefc6dfb23dc3505a882655ff77375ed8aa2d1c13f640fccc2d0c85)  
+[--Hash 7: NTLM](#hash-7-1dfeca0c002ae40b8619ecf94819cc1b)  
+[--Hash 8: SHA-512-Ccrypt](#crackstation-8)  
+[--Hash 9: HMAC-SHA1](#hash-9-e5d8870e5bdd26602cab8dbe07a942c8669e56d6)  
 
 This is the ultimate in beginner rooms. Hash cracking is a great way to start because there are plenty of online resources to help. Cracking hashes is deterministic. There is really only one correct answer and it helps to have some immediate success when you are new to the craft.
 

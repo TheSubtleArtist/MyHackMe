@@ -1,12 +1,24 @@
 # [Crack The Hash](https://tryhackme.com/room/crackthehash)
 
+[Task 1](#URL)
+[Hash 1](#URL)
+[Hash 1](#URL)
+[Hash 1](#URL)
+[Hash 1](#URL)
+[Hash 1](#URL)
+[Task 2](#URL)
+[Hash 1](#URL)
+[Hash 1](#URL)
+[Hash 1](#URL)
+[Hash 1](#URL)
+
 This is the ultimate in beginner rooms. Hash cracking is a great way to start because there are plenty of online resources to help. Cracking hashes is deterministic. There is really only one correct answer and it helps to have some immediate success when you are new to the craft.
 
 In this room, each hash only needs one solution. Maybe we can create some success for people by exploring the multiple tools available to perform the cracking.
 
 This is the list of tools we will highlight for each hash.. when possible.
 
-**[CrackStation]**  
+**CrackStation**  
 [Crackstation](https://crackstation.net/)  is, fundamentally, a library of pre-cracked, unsalted hashes. A great go-to tool for the first step in any attempt to crack a hash.
 
 **Hash-Identifier**  
@@ -21,7 +33,7 @@ In the event there is more than than one hash of the same type, they may each be
 The basic command changes only slightly:  
 :> ````hashcat -a <attack-mode> -m <hash-mode> <path-to-file> <path-to-wordlist>````  
 
-**The Wordlist**
+**The Wordlist**  
 There are innumerable sources of wordlists. Kali Linux comes with wordlists pre-installed in /usr/share/wordlists/. This includes the most commonly used source 'rockyou.txt' which requires expansion prior to first used. In addition, very active Daniel Miessler maintains a considerable number of enriched security lists on Github [SecLists](https://github.com/danielmiessler/SecLists)
 
 ## Setup Notes  

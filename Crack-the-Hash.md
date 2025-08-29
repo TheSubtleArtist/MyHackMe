@@ -208,7 +208,7 @@ The character space includes both forward slash ("/") and full-stop ("."). The p
 sha512crypt has "$6$ in the correct location and a forward slash at the end. It is missing the full-stop.
 ````hashcat -m 1800 -a 0 hash8 /usr/share/wordlist/rockyou.txt````  
 Hashcat accurately extracts the salt from the hash:  
-![Hash 8 with hashcat mode 1800](/assets/hash8-HC01.png)
+![Hash 8 with hashcat mode 1800](/assets/hash8-HC01.png)  
 and is able to decipher the hash.  
 ![Hash 8 with hashcat mode 1800](/assets/hash8-HC02.png)
 
@@ -227,7 +227,7 @@ This hash has a much more limited characterspace than the previous exercise.
 With the file set up correctly, find out just how many characters are in the hash:  
 ````cut -d ":" -f1 hash9 | wc -c````  
 Indicates there are forty-one characters in the hash.  
-The most likely candidates for forty-one character hases are modes are 110-160.
+The most likely candidates for forty-one character hases are modes are 110-160.  
 ````hashcat -m 160 -a 0 hash9 /usr/share/wordlist/rockyou.txt````
 ![Hash9-Hashcat](/assets/hash9-HC.png)
 
@@ -238,7 +238,7 @@ Working in a profession means relying on tools avaialble to speed and automate w
 
 ### Tracking identified hashes
 
-Hashes that have been identified need a c onssitent method by which the program indexes them. In this case, each hash type is associated with a string of numbers.
+Hashes that have been identified need a c onssitent method by which the program indexes them. In this case, each hash type is associated with a string of numbers (significantly shortened, here).
 
 ````python
 algorithms={"102020":"ADLER-32", "102040":"CRC-32", "SHA-512(HMAC)", "122040":"Whirlpool", "122080":"Whirlpool(HMAC)"}

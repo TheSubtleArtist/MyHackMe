@@ -17,7 +17,7 @@
 [Hash 8: SHA-512-Ccrypt](#crackstation-8)  
 [Hash 9: HMAC-SHA1](#hash-9-e5d8870e5bdd26602cab8dbe07a942c8669e56d6)  
 
-### [Code Review-Identifying Hashes](#identifying-hashes)
+### [Code Review - Identifying Hashes](#identifying-hashes)
 
 This is the ultimate in beginner rooms. Hash cracking is a great way to start because there are plenty of online resources to help. Cracking hashes is deterministic. There is really only one correct answer and it helps to have some immediate success when you are new to the craft.
 
@@ -307,8 +307,16 @@ while True:
             h = input(" HASH: ")
 
         ADLER32(h); CRC16(h); CRC16CCITT(h); CRC32(h); CRC32B(h); DESUnix(h); DomainCachedCredentials(h); FCS16(h); GHash323(h); GHash325(h); GOSTR341194(h); Haval128(h); Haval128HMAC(h); Haval160(h); Haval160HMAC(h); Haval192(h); Haval192HMAC(h); Haval224(h); Haval224HMAC(h); Haval256(h); Haval256HMAC(h); LineageIIC4(h); MD2(h); MD2HMAC(h); MD4(h); MD4HMAC(h); MD5(h); MD5APR(h); MD5HMAC(h); MD5HMACWordpress(h); MD5phpBB3(h); MD5Unix(h); MD5Wordpress(h); MD5Half(h); MD5Middle(h); MD5passsaltjoomla1(h); MD5passsaltjoomla2(h); MySQL(h); MySQL5(h); MySQL160bit(h); NTLM(h); RAdminv2x(h); RipeMD128(h); RipeMD128HMAC(h); RipeMD160(h); RipeMD160HMAC(h); RipeMD256(h); RipeMD256HMAC(h); RipeMD320(h); RipeMD320HMAC(h); SAM(h); SHA1(h); SHA1Django(h); SHA1HMAC(h); SHA1MaNGOS(h); SHA1MaNGOS2(h); SHA224(h); SHA224HMAC(h); SHA256(h); SHA256s(h); SHA256Django(h); SHA256HMAC(h); SHA256md5pass(h); SHA256sha1pass(h); SHA384(h); SHA384Django(h); SHA384HMAC(h); SHA512(h); SHA512HMAC(h); SNEFRU128(h); SNEFRU128HMAC(h); SNEFRU256(h); SNEFRU256HMAC(h); Tiger128(h); Tiger128HMAC(h); Tiger160(h); Tiger160HMAC(h); Tiger192(h); Tiger192HMAC(h); Whirlpool(h); WhirlpoolHMAC(h); XOR32(h); md5passsalt(h); md5saltmd5pass(h); md5saltpass(h); md5saltpasssalt(h); md5saltpassusername(h); md5saltmd5pass(h); md5saltmd5passsalt(h); md5saltmd5passsalt(h); md5saltmd5saltpass(h); md5saltmd5md5passsalt(h); md5username0pass(h); md5usernameLFpass(h); md5usernamemd5passsalt(h); md5md5pass(h); md5md5passsalt(h); md5md5passmd5salt(h); md5md5saltpass(h); md5md5saltmd5pass(h); md5md5usernamepasssalt(h); md5md5md5pass(h); md5md5md5md5pass(h); md5md5md5md5md5pass(h); md5sha1pass(h); md5sha1md5pass(h); md5sha1md5sha1pass(h); md5strtouppermd5pass(h); sha1passsalt(h); sha1saltpass(h); sha1saltmd5pass(h); sha1saltmd5passsalt(h); sha1saltsha1pass(h); sha1saltsha1saltsha1pass(h); sha1usernamepass(h); sha1usernamepasssalt(h); sha1md5pass(h); sha1md5passsalt(h); sha1md5sha1pass(h); sha1sha1pass(h); sha1sha1passsalt(h); sha1sha1passsubstrpass03(h); sha1sha1saltpass(h); sha1sha1sha1pass(h); sha1strtolowerusernamepass(h)
-        ````
+````
 
+### Producing Results
+
+If the length of the jerar array is zero, the application has failed to identify any hash. Simple enough.
+If there are one or two identification strings in 'jerar' the "else" statement sorts the identification strings, and prints the name of each hash in the "algorithm" dictionary assoicated with the identification string at position 'a' in the 'jerar' list. Since this is the "else" statement, the length of 'jerar' can be only 1 or 2.
+
+The 'elif' statement provides the most robust feedback. Understanding the sorting and output requires understanding of how operating systems sort strings. In the case of hash-identifer, lower "value" strings are assigned to the most commonly used versions of hash types. For example, if hash-identifer appends the string values associated with RipeMD-128 (106180) and RipeMD-128(HMAC) (106185), the sort method will result in the string associated with RipeMD-128 being sorted to the front of the 'jerar' list. Since RipeMD-128 is, presumably, more frequently employed "in the wild" it is more likely a submitted hash will be RipeMD-128 than RipeMD-128(HMAC).
+
+The least-likely hashes begins printing the hash names at position jerar[2] and beyond. It's not that these are not possible, they simply aren't as likely as the hash types at positions jerar[0] and jerar[1].
 
 ````python
         if len(jerar)==0:
@@ -331,4 +339,6 @@ while True:
         first = None
     except KeyboardInterrupt:
         print("\n\n\tBye!")
-        exit()````
+        exit()
+````
+more to follow...

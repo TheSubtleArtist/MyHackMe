@@ -17,6 +17,8 @@
 [Hash 8: SHA-512-Ccrypt](#crackstation-8)  
 [Hash 9: HMAC-SHA1](#hash-9-e5d8870e5bdd26602cab8dbe07a942c8669e56d6)  
 
+### [Identifying Hashes](#identifying-hashes)
+
 This is the ultimate in beginner rooms. Hash cracking is a great way to start because there are plenty of online resources to help. Cracking hashes is deterministic. There is really only one correct answer and it helps to have some immediate success when you are new to the craft.
 
 In this room, each hash only needs one solution. Maybe we can create some success for people by exploring the multiple tools available to perform the cracking.

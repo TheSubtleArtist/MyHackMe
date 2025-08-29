@@ -337,8 +337,16 @@ The least-likely hashes begins printing the hash names at position jerar[2] and 
                 print("[+] "+str(algorithms[jerar[a]]))
 
         first = None
+````
+
+### El Fin
+
+The only way to end the application is keyboard interrupt. Simple and complete.  
+
+````python
     except KeyboardInterrupt:
         print("\n\n\tBye!")
         exit()
 ````
+
 more to follow...

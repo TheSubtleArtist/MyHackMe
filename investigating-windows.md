@@ -49,10 +49,15 @@ There is some manual searching involved. Note the third item in the list has an 
 
 ### GUI
 
-
+Keep filters for the Security log as they were for the prvious question.  
 ![Security Event](assets/investigate-windows-08.png)  
+  
+Since there is a request for a specific name, it is possible to use the "Find..." button to search for "John".  
+  
 ![Security Event](assets/investigate-windows-09.png)  
+  
 ![Security Event](assets/investigate-windows-10.png)  
+  
 ![Security Event](assets/investigate-windows-11.png)  
 
 ### Powershell

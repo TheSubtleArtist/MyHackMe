@@ -52,13 +52,15 @@ this room is not so great because it relies on local functions, which are quickl
   ### GUI
 
   Keep filters for the Security log as they were for the prvious question.  
+
   ![Security Event](assets/investigate-windows-08.png)  
   
   Since there is a request for a specific name, it is possible to use the "Find..." button to search for "John".  
   
   ![Security Event](assets/investigate-windows-09.png)  
   
-  The question asks for the last (or latest) logon which indicates more than one logon and the "Find Next" button will help identify the latest logon.  
+  The question asks for the last (or latest) logon which indicates more than one logon and the "Find Next" button will help identify the latest logon.
+
   ![Security Event](assets/investigate-windows-10.png)  
   
   ### Powershell
@@ -66,6 +68,7 @@ this room is not so great because it relies on local functions, which are quickl
   Conversely, the powershell query in the previous question already answered this query.  
   
   `:> Get-LocalUser | Where-Object { $_.LastLogon -ne $null} | Select-Object Name, LastLogon`  
+
   ![Security Event Powershell](assets/investigate-windows-07.png)  
 
   ### NET Commands
@@ -143,17 +146,43 @@ this room is not so great because it relies on local functions, which are quickl
 ## 7. What file was the task trying to run daily?
   
   Just answered..  
+
   ![actions properties](assets/investigate-windows-21.png)  
 
 ## 8. What port did this file listen locally for?
 
   Just answered..  
+
   ![actions properties](assets/investigate-windows-21.png)  
 
 ## 9. When did Jenny last logon?
   
+  As previously done..  
+
+  `:> net user Jenny`  
+
+   ![Jenny](assets/investigate-windows-22.png)  
 
 ## 10. At what date did the compromise take place?
+
+  If it is assumed the creation of the Jenny account is the date when the compromise takes place, the question is already answered.  
+  `:> net user Jenny`  
+
+  ![Jenny](assets/investigate-windows-22.png)  
+
+  If creation of accounts is a strong indicator of compromise, then identifying the date on which all user accounts were created might reveal a different date. This presents an opportunity to dig into the details of a powershell script.
+  
+  For this, the Powershell Integrated Scripting Environment becomes useful.  
+
+  `:> Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4720}`
+  
+  ![ISE 1](assets/investigate-windows-23.png)  
+
+  In this instance, there is insufficient information. It is necessary to begin identifying the deeper information required.
+
+
+
+
 
 ## 11. During the compromise, at what time did Windows first assign special privileges to a new logon?
 

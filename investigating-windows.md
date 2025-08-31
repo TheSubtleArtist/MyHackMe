@@ -106,6 +106,21 @@ Second, `:> net user Jenny`
 
 
 ## 6. Whats the name of the scheduled task that is malicous.
+  
+Assume there is a powershell method for listing schedule tasks and their commands.  
+  
+First is to request powershell help: `:> Get-Command *-*scheduled*`  
+  
+![Get-Command help](assets/investigate-windows-17.png)  
+  
+Second, Get a list of scheduled tasks which are ready to run.  
+  
+  `:> Get-ScheduleTask | Where-Object State -eq 'Ready'`  
+
+   Most schedule tasks are inside the OS area. Only a few are in the root area  
+   ![Ready Scripts](assets/investigate-windows-17.png)  
+   
+
 
 ## 7. What file was the task trying to run daily?
 

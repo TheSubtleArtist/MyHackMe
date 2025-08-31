@@ -1,12 +1,29 @@
-# Investigating The Windows Operating System 
+# Investigating The Windows Operating System  
+A windows machine has been hacked, its your job to go investigate this windows machine and find clues to what the hacker might have done.
 
-**Whats the version and year of the windows machine?**
+This room is great because you can explore different ways to accomplish a task.
+this room is not so great because it relies on local functions, which are quickly dying.
+
+**Whats the version and year of the windows machine?**  
+![Selecting Properties](/assets/investigate-windows-00)
+![System Information Window](/assets/investigate-windows-01)  
+`Get-ComputerInfo`
+![Powershell Computer Info](/assets/investigate-windows-02) 
 `Get-ComputerInfo | Select-Object WindowsProductName`
+![Powershell Computer Info](/assets/investigate-windows-03) 
 
 **Which user logged in last?**
+![Security Logs](/assets/investigate-windows-04)
+![Security Log Filter](/assets/investigate-windows-05)
+![Security Event](/assets/investigate-windows-06)
+`Get-LocalUser | Where-Object { $_.LastLogon -ne $null} | Select-Object Name, LastLogon`
+![Security Event Powershell](/assets/investigate-windows-07)
+
 
 **When did John log onto the system last?**
 *Answer format: MM/DD/YYYY H:MM:SS AM/PM*
+
+
 
 **What IP does the system connect to when it first starts?**
 

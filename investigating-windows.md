@@ -6,15 +6,15 @@ this room is not so great because it relies on local functions, which are quickl
 
 ## Whats the version and year of the windows machine?
 
-### With the GUI
+### GUI
 ![Selecting Properties](/assets/investigate-windows-00)  
 ![System Information Window](/assets/investigate-windows-01)  
 
 ### Powershell
 
-`Get-ComputerInfo`  
+`:> Get-ComputerInfo`  
 ![Powershell Computer Info](/assets/investigate-windows-02)  
-`Get-ComputerInfo | Select-Object WindowsProductName`  
+`:> Get-ComputerInfo | Select-Object WindowsProductName`  
 ![Powershell Computer Info](/assets/investigate-windows-03)  
   
 ## Which user logged in last?

@@ -79,8 +79,31 @@ The "net user' command allows administrators to add, modify, and delete user acc
 
 
 ## 4. What IP does the system connect to when it first starts?
+  
+If we assume the first IP address will be contacted during the startup, the System Information > Startup Programs panel is the likely source of information. In this case, the writer of the challenge provided a script that reaches out to the IP address relevant to the answer.  
+  
+![Startup Programs](assets/investigate-windows-13.png)
 
 ## 5. What two accounts had administrative privileges (other than the Administrator user)?
+  
+The first question asked must be, "What accounts are there?"  
+For this use `:> net user`  
+  
+![User Accounts](assets/investigate-windows-14.png)  
+  
+As done prevously, quickly check the groups to which accounts are assigned.
+  
+First, `:> net user Guest`  
+  
+![Guest Account](assets/investigate-windows-15.png)  
+  
+An attacker has attempted to obfuscate malicious activities by adding a built-in account to the administrator group. 
+  
+
+Second, `:> net user Jenny`
+  
+  ![Jenny Account](assets/investigate-windows-16.png)  
+
 
 ## 6. Whats the name of the scheduled task that is malicous.
 

@@ -226,6 +226,8 @@ this room is not so great because it relies on local functions, which are quickl
         } | Sort-Object PrivilegedlogonTime -Descending
   ````
 
+  ![Privileged Logon](assets/investigate-windows-27.png)  
+
 ## 12. What tool was used to get Windows passwords?
 
 ## 13. What was the attackers external control and command servers IP?

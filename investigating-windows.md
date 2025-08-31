@@ -7,13 +7,18 @@ this room is not so great because it relies on local functions, which are quickl
 ## Whats the version and year of the windows machine?
 
 ### GUI
+
+Systme information is quickly and easily available through the properties window of "This PC'.  
 ![Selecting Properties](assets/investigate-windows-00.png)  
 ![System Information Window](assets/investigate-windows-01.png)  
 
 ### Powershell
 
+A basic powershell query reveals significant information. A visual search can reveal the information.
 `:> Get-ComputerInfo`  
 ![Powershell Computer Info](assets/investigate-windows-02.png)  
+  
+Users can add "Select-Object" and the name of the field to quickly refine the search to something more useful. 
 `:> Get-ComputerInfo | Select-Object WindowsProductName`  
 ![Powershell Computer Info](assets/investigate-windows-03.png)  
   

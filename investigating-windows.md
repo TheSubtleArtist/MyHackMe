@@ -14,20 +14,22 @@ Systme information is quickly and easily available through the properties window
 
 ### Powershell
 
-A basic powershell query reveals significant information. A visual search can reveal the information.
+A basic powershell query reveals significant information. A visual search can reveal the information.  
 `:> Get-ComputerInfo`  
 ![Powershell Computer Info](assets/investigate-windows-02.png)  
   
-Users can add "Select-Object" and the name of the field to quickly refine the search to something more useful. 
-`:> Get-ComputerInfo | Select-Object WindowsProductName`  
+Users can add "Select-Object" and the name of the field to quickly refine the search to something more useful.  
+`:> Get-ComputerInfo | Select-Object WindowsProductName` 
+  
 ![Powershell Computer Info](assets/investigate-windows-03.png)  
   
 ## Which user logged in last?
 
 ### GUI
 
-![Security Logs](assets/investigate-windows-05.png)
-![Security Log Filter](assets/investigate-windows-04.png)
+
+![Security Logs](assets/investigate-windows-04.png)
+![Security Log Filter](assets/investigate-windows-05.png)
 ![Security Event](assets/investigate-windows-06.png)
 
 ### Powershell

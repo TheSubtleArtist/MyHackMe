@@ -180,9 +180,29 @@ this room is not so great because it relies on local functions, which are quickl
 
   In this instance, there is insufficient information. It is necessary to begin identifying the deeper information required.
 
+  `:> Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4720} | Select-Object -Property *`
+  
+  ![ISE 2](assets/investigate-windows-24.png)  
+  ![ISE 3](assets/investigate-windows-25.png)  
 
+  This allows us to see much more information, including target information (Sam Account Name and TimeCreated) for each account created.  
 
+  Use a much more challenging script to extract the key pieces of information needed to verify the timeframe for the creation of all accounts potentially usable for malicious purposes.
 
+  ```` Powershell
+    Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4720} |
+      ForEach-Object {
+        $message = $_.Message
+        $samAccountName = ($message -split "`n") | Where-Object {$_ -match 'Sam Account Name'} |
+                          ForEach-Object { ($_ -split ':')[1].Trim() }
+        [PSCustomObject]@{
+          AccountCreatedOn = $_.TimeCreated
+          SamAccountName   = $samAccountName
+      }
+  }
+  ````  
+
+  ![ISE 4](assets/investigate-windows-26.png)  
 
 ## 11. During the compromise, at what time did Windows first assign special privileges to a new logon?
 

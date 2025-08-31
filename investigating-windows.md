@@ -117,19 +117,23 @@ There are two possibilities: Get-ScheduledTask and Get-ScheduledTaskinfo. The se
   
 Second, Get a list of scheduled tasks. Each schedule tasks has multiple possible States denoting is ability / readiness to run. Filter the list of tasks "Ready" to run.  
   
-  `:> Get-ScheduleTask | Where-Object State -eq 'Ready'`  
+  `:> Get-ScheduleTask | Where-Object { $_.Status -eq 'Ready'}`
 
    Most schedule tasks are inside the OS area. Only a few are in the root area  
-   ![Ready Scripts](assets/investigate-windows-18.png)  
-
-  `:> Get-ScheduleTask | Where-Object State -eq 'Ready' | Where-Object TaskPath -eq '\'`  
-   ![Taskpath Scripts](assets/investigate-windows-19.png)  
-
-  Determing which has potential for malicous activity requires seeing the task's "Actions".  
-    
-`:> (Get-ScheduleTask | Where-Object State -eq 'Ready' | Where-Object TaskPath -eq '\').actions`  
   
-   ![Task Actions](assets/investigate-windows-20.png)  
+   ![Ready Scripts](assets/investigate-windows-18a.png)  
+  
+  `:> Get-ScheduleTask | Where-Object { $_.Status -eq 'Ready' -and $_.TaskPath -eq '\' }`
+  
+   ![Taskpath Scripts](assets/investigate-windows-19a.png)  
+  
+  Determing which has potential for malicous activity requires seeing the task's "Actions".  
+  
+  `:> Get-ScheduleTask | Where-Object { $_.Status -eq 'Ready' -and $_.TaskPath -eq '\' } | Select-Object TaskName, Actions`  
+  
+   ![Task Actions](assets/investigate-windows-20.png)
+
+
 ## 7. What file was the task trying to run daily?
 
 ## 8. What port did this file listen locally for?

@@ -7,28 +7,28 @@ this room is not so great because it relies on local functions, which are quickl
 ## Whats the version and year of the windows machine?
 
 ### GUI
-![Selecting Properties](assets/investigate-windows-00)  
-![System Information Window](assets/investigate-windows-01)  
+![Selecting Properties](assets/investigate-windows-00.png)  
+![System Information Window](assets/investigate-windows-01.png)  
 
 ### Powershell
 
 `:> Get-ComputerInfo`  
-![Powershell Computer Info](assets/investigate-windows-02)  
+![Powershell Computer Info](assets/investigate-windows-02.png)  
 `:> Get-ComputerInfo | Select-Object WindowsProductName`  
-![Powershell Computer Info](assets/investigate-windows-03)  
+![Powershell Computer Info](assets/investigate-windows-03.png)  
   
 ## Which user logged in last?
 
 ### GUI
 
-![Security Logs](assets/investigate-windows-04)
-![Security Log Filter](assets/investigate-windows-05)
-![Security Event](assets/investigate-windows-06)
+![Security Logs](assets/investigate-windows-04.png)
+![Security Log Filter](assets/investigate-windows-05.png)
+![Security Event](assets/investigate-windows-06.png)
 
 ### Powershell
 
 `Get-LocalUser | Where-Object { $_.LastLogon -ne $null} | Select-Object Name, LastLogon`
-![Security Event Powershell](assets/investigate-windows-07)
+![Security Event Powershell](assets/investigate-windows-07.png)
 
 ## When did John log onto the system last?
 

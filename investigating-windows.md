@@ -31,19 +31,24 @@ Remaining in the EventViewer Security logs..
   
 ![Security Logs](assets/investigate-windows-04.png)  
 
+Filter for event ID 4624, which is a successful login as well as the "Audit Success" Keyword.  
+  
 ![Security Log Filter](assets/investigate-windows-05a.png)
+  
+There is some manual searching involved. Note the third item in the list has an Account Name as well as a Logon Type of "10". This type of logon is "RemoteInteractive". This indicates that some protocol such as RDP or powershell has been used.  
+  
 ![Security Event](assets/investigate-windows-06.png)
 
 ### Powershell
 
-`Get-LocalUser | Where-Object { $_.LastLogon -ne $null} | Select-Object Name, LastLogon`
+`:> Get-LocalUser | Where-Object { $_.LastLogon -ne $null} | Select-Object Name, LastLogon`
+  
 ![Security Event Powershell](assets/investigate-windows-07.png)
 
 ## When did John log onto the system last?
 
 ### GUI
 
-![Security Event](assets/investigate-windows-07.png)
 ![Security Event](assets/investigate-windows-08.png)
 ![Security Event](assets/investigate-windows-09.png)
 ![Security Event](assets/investigate-windows-10.png)
@@ -51,12 +56,15 @@ Remaining in the EventViewer Security logs..
 
 ### Powershell
 
-`Get-LocalUser | Where-Object { $_.LastLogon -ne $null} | Select-Object Name, LastLogon`
+`:> Get-LocalUser | Where-Object { $_.LastLogon -ne $null} | Select-Object Name, LastLogon`
 ![Security Event Powershell](assets/investigate-windows-07.png)
 
+### NET Commands
 
-### Answer format: MM/DD/YYYY H:MM:SS AM/PM
-
+Still a third method of identifyin John's last login is the Net commands.
+  
+`:> net user John`
+![Net User Command](assets/investigate-windows-12.png)
 
 
 ## What IP does the system connect to when it first starts?

@@ -230,6 +230,19 @@ this room is not so great because it relies on local functions, which are quickl
 
 ## 12. What tool was used to get Windows passwords?
 
+  Question 6 is the first time this query happened.  
+
+  ![actions properties](assets/investigate-windows-21.png)  
+
+  `C:\TMP\mim.exe` indicates from where the application runs and the arguments provide "LogonPasswords" as well as the output file.  
+
+  `Set-Location C:\TMP` to move into the directory
+
+  `gci` to list the artifacts in the directory
+
+  ![TMP Directory](assets/investigate-windows-28.png)  
+
+
 ## 13. What was the attackers external control and command servers IP?
 
 ## 14. What was the extension name of the shell uploaded via the servers website?

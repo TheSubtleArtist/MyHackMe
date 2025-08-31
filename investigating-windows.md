@@ -27,9 +27,11 @@ Users can add "Select-Object" and the name of the field to quickly refine the se
 
 ### GUI
 
+Remaining in the EventViewer Security logs..  
+  
+![Security Logs](assets/investigate-windows-04.png)  
 
-![Security Logs](assets/investigate-windows-04.png)
-![Security Log Filter](assets/investigate-windows-05.png)
+![Security Log Filter](assets/investigate-windows-05a.png)
 ![Security Event](assets/investigate-windows-06.png)
 
 ### Powershell

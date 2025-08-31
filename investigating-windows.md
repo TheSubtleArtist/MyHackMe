@@ -113,15 +113,23 @@ First is to request powershell help: `:> Get-Command *-*scheduled*`
   
 ![Get-Command help](assets/investigate-windows-17.png)  
   
-Second, Get a list of scheduled tasks which are ready to run.  
+There are two possibilities: Get-ScheduledTask and Get-ScheduledTaskinfo. The second command most likely requires a parameter specifying the name of the task. Get-ScheduledTask is the most likely best choice.  
+  
+Second, Get a list of scheduled tasks. Each schedule tasks has multiple possible States denoting is ability / readiness to run. Filter the list of tasks "Ready" to run.  
   
   `:> Get-ScheduleTask | Where-Object State -eq 'Ready'`  
 
    Most schedule tasks are inside the OS area. Only a few are in the root area  
-   ![Ready Scripts](assets/investigate-windows-17.png)  
-   
+   ![Ready Scripts](assets/investigate-windows-18.png)  
 
+  `:> Get-ScheduleTask | Where-Object State -eq 'Ready' | Where-Object TaskPath -eq '\'`  
+   ![Taskpath Scripts](assets/investigate-windows-19.png)  
 
+  Determing which has potential for malicous activity requires seeing the task's "Actions".  
+    
+`:> (Get-ScheduleTask | Where-Object State -eq 'Ready' | Where-Object TaskPath -eq '\').actions`  
+  
+   ![Task Actions](assets/investigate-windows-20.png)  
 ## 7. What file was the task trying to run daily?
 
 ## 8. What port did this file listen locally for?

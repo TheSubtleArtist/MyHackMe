@@ -21,8 +21,8 @@ this room is not so great because it relies on local functions, which are quickl
 
 ### GUI
 
-![Security Logs](assets/investigate-windows-04.png)
-![Security Log Filter](assets/investigate-windows-05.png)
+![Security Logs](assets/investigate-windows-05.png)
+![Security Log Filter](assets/investigate-windows-04.png)
 ![Security Event](assets/investigate-windows-06.png)
 
 ### Powershell
@@ -31,6 +31,20 @@ this room is not so great because it relies on local functions, which are quickl
 ![Security Event Powershell](assets/investigate-windows-07.png)
 
 ## When did John log onto the system last?
+
+### GUI
+
+![Security Event](assets/investigate-windows-07.png)
+![Security Event](assets/investigate-windows-08.png)
+![Security Event](assets/investigate-windows-09.png)
+![Security Event](assets/investigate-windows-10.png)
+![Security Event](assets/investigate-windows-11.png)
+
+### Powershell
+
+`Get-LocalUser | Where-Object { $_.LastLogon -ne $null} | Select-Object Name, LastLogon`
+![Security Event Powershell](assets/investigate-windows-07.png)
+
 
 ### Answer format: MM/DD/YYYY H:MM:SS AM/PM
 

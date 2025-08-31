@@ -127,14 +127,25 @@ Second, Get a list of scheduled tasks. Each schedule tasks has multiple possible
   
    ![Taskpath Scripts](assets/investigate-windows-19a.png)  
   
-  Determing which has potential for malicous activity requires seeing the task's "Actions".  
+  Determing which has potential for malicous activity requires seeing the task's "Actions". Extending the current query doesn't actually work.  
   
   `:> Get-ScheduleTask | Where-Object { $_.Status -eq 'Ready' -and $_.TaskPath -eq '\' } | Select-Object TaskName, Actions`  
   
-   ![Task Actions](assets/investigate-windows-20.png)
+   ![Task Actions](assets/investigate-windows-20a.png)
+  
+  There is another method to extract more specific detials. This includes listing the actions specifically  
+  
+  `:> (Get-ScheduleTask | Where-Object { $_.Status -eq 'Ready' -and $_.TaskPath -eq '\' }.actions` 
+  
+  This shows a particular command which sets up a shell and is likely the most malicious of activities. There are certainly simpler ways of reviewing this information in the GUI, but powershell is the most powerfull of Windows security tools. There are certainly even better Powershell commands for querying such information, but that is not introductory information. It can be found using your favorite LLM.
+
+   ![actions properties](assets/investigate-windows-21.png)  
 
 
 ## 7. What file was the task trying to run daily?
+  
+  Just answered..
+   ![actions properties](assets/investigate-windows-21.png)  
 
 ## 8. What port did this file listen locally for?
 

@@ -4,7 +4,7 @@ A windows machine has been hacked, its your job to go investigate this windows m
 This room is great because you can explore different ways to accomplish a task.
 this room is not so great because it relies on local functions, which are quickly dying.
 
-## Whats the version and year of the windows machine?
+## 1. Whats the version and year of the windows machine?
 
 ### GUI
 
@@ -23,7 +23,7 @@ Users can add "Select-Object" and the name of the field to quickly refine the se
   
 ![Powershell Computer Info](assets/investigate-windows-03.png)  
   
-## Which user logged in last?
+## 2. Which user logged in last?
 
 ### GUI
 
@@ -45,7 +45,7 @@ There is some manual searching involved. Note the third item in the list has an 
   
 ![Security Event Powershell](assets/investigate-windows-07.png)
 
-## When did John log onto the system last?
+## 3. When did John log onto the system last?
 
 ### GUI
 
@@ -56,49 +56,50 @@ Since there is a request for a specific name, it is possible to use the "Find...
   
 ![Security Event](assets/investigate-windows-09.png)  
   
+The question asks for the last (or latest) logon which indicates more than one logon and the "Find Next" button will help identify the latest logon.  
 ![Security Event](assets/investigate-windows-10.png)  
   
-![Security Event](assets/investigate-windows-11.png)  
 
 ### Powershell
 
+Conversely, the powershell query in the previous question already answered this query.  
+  
 `:> Get-LocalUser | Where-Object { $_.LastLogon -ne $null} | Select-Object Name, LastLogon`  
 ![Security Event Powershell](assets/investigate-windows-07.png)  
 
 ### NET Commands
 
-Still a third method of identifyin John's last login is the Net commands.  
+Finally, there is a third method by which the information may be revealed
+  
 `:> net user John`  
+  
+The "net user' command allows administrators to add, modify, and delete user accounts in addition to displaying detailed information.  
   
 ![Net User Command](assets/investigate-windows-12.png)
 
 
-## What IP does the system connect to when it first starts?
+## 4. What IP does the system connect to when it first starts?
 
-## What two accounts had administrative privileges (other than the Administrator user)?
+## 5. What two accounts had administrative privileges (other than the Administrator user)?
 
-## Whats the name of the scheduled task that is malicous.
+## 6. Whats the name of the scheduled task that is malicous.
 
-## What file was the task trying to run daily?
+## 7. What file was the task trying to run daily?
 
-## What port did this file listen locally for?
+## 8. What port did this file listen locally for?
 
-## When did Jenny last logon?
+## 9. When did Jenny last logon?
 
-## At what date did the compromise take place?
+## 10. At what date did the compromise take place?
 
-### Answer format: MM/DD/YYYY
+## 11. During the compromise, at what time did Windows first assign special privileges to a new logon?
 
-## During the compromise, at what time did Windows first assign special privileges to a new logon?
+## 12. What tool was used to get Windows passwords?
 
-### Answer format: MM/DD/YYYY HH:MM:SS AM/PM*
+## 13. What was the attackers external control and command servers IP?
 
-## What tool was used to get Windows passwords?
+## 14. What was the extension name of the shell uploaded via the servers website?
 
-## What was the attackers external control and command servers IP?
+## 15. What was the last port the attacker opened?
 
-## What was the extension name of the shell uploaded via the servers website?
-
-## What was the last port the attacker opened?
-
-## Check for DNS poisoning, what site was targeted?
+## 16. Check for DNS poisoning, what site was targeted?

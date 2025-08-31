@@ -204,7 +204,27 @@ this room is not so great because it relies on local functions, which are quickl
 
   ![ISE 4](assets/investigate-windows-26.png)  
 
+  All accounts were created on the same day, validating the original assumption that 3/2/2019 is the correct answer.  
+
 ## 11. During the compromise, at what time did Windows first assign special privileges to a new logon?
+
+  There doesn't seem to be any differentiation for the time that answers this question and the otehr events which perform the same actions. What is important is that this event hapens before the creation of the "Jenny" account.
+
+  ```` Powershell
+      $startDate=Get-DAte "03/02/2019"
+      $endDate=$startDAte.AddDays(1)
+
+      Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4720; StartTime=$sgtartDate; EndTime=$endDate } |
+        ForEach-Object {
+          $message = $_.Message
+          $accountName = ($message -split "`n") | Where-Object {$_ -match 'Account Name'} |
+                          Select-Object -First 1 |
+                          ForEach-Object { ($_ -split ':')[1].Trim() }
+          [PSCustomObject]@{
+            PrivilegedLogonTime = $_.TimeCreated
+            AccountName   = $accountName
+        } | Sort-Object PrivilegedlogonTime -Descending
+  ````
 
 ## 12. What tool was used to get Windows passwords?
 

@@ -49,21 +49,22 @@ There is some manual searching involved. Note the third item in the list has an 
 
 ### GUI
 
-![Security Event](assets/investigate-windows-08.png)
-![Security Event](assets/investigate-windows-09.png)
-![Security Event](assets/investigate-windows-10.png)
-![Security Event](assets/investigate-windows-11.png)
+
+![Security Event](assets/investigate-windows-08.png)  
+![Security Event](assets/investigate-windows-09.png)  
+![Security Event](assets/investigate-windows-10.png)  
+![Security Event](assets/investigate-windows-11.png)  
 
 ### Powershell
 
-`:> Get-LocalUser | Where-Object { $_.LastLogon -ne $null} | Select-Object Name, LastLogon`
-![Security Event Powershell](assets/investigate-windows-07.png)
+`:> Get-LocalUser | Where-Object { $_.LastLogon -ne $null} | Select-Object Name, LastLogon`  
+![Security Event Powershell](assets/investigate-windows-07.png)  
 
 ### NET Commands
 
-Still a third method of identifyin John's last login is the Net commands.
+Still a third method of identifyin John's last login is the Net commands.  
+`:> net user John`  
   
-`:> net user John`
 ![Net User Command](assets/investigate-windows-12.png)
 
 

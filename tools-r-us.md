@@ -10,7 +10,7 @@
 
  `:> nmap $server`  
 
- ![Nmap 1](tools-01.png)
+ ![Nmap 1](assets/tools-01.png)
 
 ## 2. Whose name can you find from this directory?
 

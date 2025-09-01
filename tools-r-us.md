@@ -2,13 +2,13 @@
 
 ## 1. What directory can you find, that begins with a "g"?
 
-    First set up an environment variable to type commands more quickly.  
+ First set up an environment variable to type commands more quickly.  
 
-   `:> export server='10.201.71.243`
+ `:> export server='10.201.71.243`
 
-   Second, what targets are available  
+ Second, what targets are available  
 
-   `:> nmap $server`  
+ `:> nmap $server`  
 
  ![Nmap 1](tools-01.png)
 

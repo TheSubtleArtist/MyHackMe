@@ -47,6 +47,9 @@
 
 ## 4. What is bob's password to the protected part of the website?
 
+ `:> hydra -l "bob" -P /usr/share/wordlists/rockyou.txt 10.201.71.243 http-get /protected -f -o output.txt`  
+
+![Authentication Directory](assets/tools-06.png)
 
 ## 5. What other port that serves a webs service is open on the machine?
 
@@ -56,13 +59,19 @@
 
  Simply visit the server on the correct port from question 5.  
 
-## 7. Use Nikto with the credentials you have found and scan the /manager/html directory on the port found above.
+## 7. Use Nikto with the credentials you have found and scan the /manager/html directory on the port found above. How many documentation files did Nikto identify?
 
-### How many docume0
+Not all the vulnerabilities are named in the same format.
+
+![Nikto Scan](assets/tools-07.png)
 
 ## 8. What is the server version?
 
+ Previously Discovered
+
 ## 9. What version of Apache-Coyote is this service using?
+
+ Already Discovered  
 
 ## 10. Use Metasploit to exploit the service and get a shell on the system.
 

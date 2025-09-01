@@ -47,9 +47,14 @@
 
 ## 4. What is bob's password to the protected part of the website?
 
+
 ## 5. What other port that serves a webs service is open on the machine?
 
+ Previously Discovered  
+
 ## 6. What is the name and version of the software running on the port from question 5?
+
+ Simply visit the server on the correct port from question 5.  
 
 ## 7. Use Nikto with the credentials you have found and scan the /manager/html directory on the port found above.
 

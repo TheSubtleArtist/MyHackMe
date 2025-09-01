@@ -28,13 +28,13 @@
 
  Download and see what is received.  
 
- `:> wget http://$server/guidlines/`  
+ `:> wget http://$server/<answer-to-previous-queestion>/`  
 
  ![WGET](assets/tools-04.png)  
 
  Check the contents  
 
- `:> cat guidelines`  
+ `:> cat <answer-to-previous-question>`  
 
  ![Guidelines Contents](assets/tools-05.png)  
 

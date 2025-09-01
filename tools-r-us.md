@@ -41,6 +41,10 @@
 
 ## 3. What directory has basic authentication?
 
+ Previously answered  
+
+ ![Authentication Directory](assets/tools-03.png)
+
 ## 4. What is bob's password to the protected part of the website?
 
 ## 5. What other port that serves a webs service is open on the machine?

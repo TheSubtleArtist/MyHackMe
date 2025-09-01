@@ -236,17 +236,44 @@ this room is not so great because it relies on local functions, which are quickl
 
   `C:\TMP\mim.exe` indicates from where the application runs and the arguments provide "LogonPasswords" as well as the output file.  
 
-  `Set-Location C:\TMP` to move into the directory
+  `:> Set-Location C:\TMP` to move into the directory
 
-  `gci` to list the artifacts in the directory
+  `:> gci` to list the artifacts in the directory
 
   ![TMP Directory](assets/investigate-windows-28.png)  
 
+  `:> Get-Content mim-out.txt`  
+
+  ![mimikatz](assets/investigate-windows-29.png)  
 
 ## 13. What was the attackers external control and command servers IP?
 
+  Connecting to a server means editing the hosts file. Read the content of the file.  
+  
+  `:> Get-Content C:\Windows\System32\drivers\etc\hosts`
+
+  ![hosts file](assets/investigate-windows-30.png)
+
 ## 14. What was the extension name of the shell uploaded via the servers website?
+
+  Items related to internet activities would be located in `C:\inetpub\`  
+
+  `:> gci C:\inetpub\wwwroot\`  
+
+  All file extension are '.jsp'
+
+  ![inetpub file](assets/investigate-windows-31.png)
 
 ## 15. What was the last port the attacker opened?
 
+  "Leet" is the most obvious choice.  
+
+  ![firewall windows](assets/investigate-windows-32.png)
+
 ## 16. Check for DNS poisoning, what site was targeted?
+
+  Recall the two entries for Google in the hosts file.  
+
+  `:> Get-Content C:\Windows\System32\drivers\etc\hosts`
+
+  ![hosts file](assets/investigate-windows-30.png)

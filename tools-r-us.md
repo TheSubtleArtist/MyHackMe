@@ -12,6 +12,14 @@
 
  ![Nmap 1](assets/tools-01.png)
 
+ What runs on the identified ports.  
+
+ `:> nmap $server -sV`
+
+ ![Nmap 2](assets/tools-02.png)
+
+
+
 ## 2. Whose name can you find from this directory?
 
 ## 3. What directory has basic authentication?

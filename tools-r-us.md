@@ -18,9 +18,26 @@
 
  ![Nmap 2](assets/tools-02.png)
 
+ Start with port 80  
 
+ `:> dirb http://$server /usr/share/wordlists/dirb/big.txt`
+
+ ![Nmap 2](assets/tools-03.png)
 
 ## 2. Whose name can you find from this directory?
+
+ Download and see what is received.  
+
+ `:> wget http://$server/guidlines/`  
+
+ ![WGET](assets/tools-04.png)  
+
+ Check the contents  
+
+ `:> cat guidelines`  
+
+ ![Guidelines Contents](assets/tools-05.png)  
+
 
 ## 3. What directory has basic authentication?
 

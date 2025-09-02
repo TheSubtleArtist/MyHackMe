@@ -85,7 +85,7 @@ For additional detail, the exploit is an authenticated upload code execution tha
 
  Once the exploit is loaded, `show options` and begin editing the parameters with known information.
  ```` bash
- set HttpPassword bubbles
+ set HttpPassword ????
  set HttpUsername bob
  set RHOSTS 10.201.108.97 # Victim machine
  set RPORT ????

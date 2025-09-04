@@ -39,20 +39,37 @@
 
  Alternatively, identify the exploit within kali linux
 
- `:> searchsploit heartbleed` 
+ `:> searchsploit heartbleed`  
 
-### Establish the heartbeed
+  ![Searchsploit](assets/heartbleed-06.png)  
+
+
+
+### Establish the heartbeat
 
  Open a web browser and establish the TLS connection
 
  ![Static Web Page](assets/heartbleed-05.png)  
 
-
-
-
 ## Initial Access  
 
  use of various entry vectors to gain initial foothold within a network
+
+ Use one of the options identified by the searchsploit command to initiate the attack
+
+ Copy the exploit from its home location to a working directory. I prefer to never work with an original.  
+
+ `:> cp /usr/share/exploitdb/exploits/multiple/remote/32745.py ~/Documents`
+
+ Execute the exploit, observe the feedback and see the site is vulnerable.
+
+ `:> python2 32745.py`
+ 
+  ![top results](assets/heartbleed-07.png)  
+  ![bottom results](assets/heartbleed-08.png)  
+
+ Finding the flag can be slightly easier by outputting the results to a text file.  
+  `:> python2 32745.py > output.txt`
 
 ## Execution  
 

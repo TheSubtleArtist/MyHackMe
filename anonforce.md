@@ -43,39 +43,39 @@ This directory contains two files.
 
 Use `:> mget .` to retrieve all (both) files.
 
-![mget the files](assets/anonforce-07-root-02.png)
+![mget the files](assets/anonforce-09-root-02.png)
 
 Exit the ftp
 locate the downloaded files and place them into their own directly, for ease of use.
 
-![notread directory](assets/anonforce-07-root-03a.png)
+![notread directory](assets/anonforce-10-root-03a.png)
 
 
 Convert the private key to something which can be further exploited. The most common tool for this is John the Ripper.
 
 `gpg2john private.asc > privateOut`
 
-![privateout](assets/anonforce-07-root-04.png)
+![privateout](assets/anonforce-11-root-04.png)
 
 Use John the Ripper to identify teh password
 
 `john privateOut --wordlist=/usr/share/wordlist/rockyou.txt`
 
-![cracked](assets/anonforce-07-root-05.png)
+![cracked](assets/anonforce-12-root-05.png)
 
 Import the private key with the discovered password
 
 `gpg --import private.asc`
 
-![key import](assets/anonforce-07-root-05.png)
+![key import](assets/anonforce-13-root-06.png)
 
-![key import result](assets/anonforce-07-root-06.png)
+![key import result](assets/anonforce-14-root-07.png)
 
 Decrypt the backup file
 
 `gpg --decrypt backup.pgp > plainbackup.txt`
 
-![plaintext backup](assets/anonforce-07-root-06.png)
+![plaintext backup](assets/anonforce-15-root-08.png)
 
 
 

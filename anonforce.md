@@ -3,7 +3,7 @@ boot2root machine for FIT and bsides guatemala CTF
 
 10.201.110.177
 
-
+## User Flag
 
 `:> nmap 10.201.110.177`
 
@@ -31,4 +31,51 @@ Downloaded nine files
 
 Move into the downloaded directories and simultaneously realize why the ftp commands didn't work correctly :shrug:
 
-![User.txt](assets/anonforce-06-user-txt-.png)
+![User.txt](assets/anonforce-06-user-txt.png)
+
+
+## Root Flag
+
+Clearly the "notread" directly is a target.  
+This directory contains two files. 
+
+![notread directory](assets/anonforce-07-root-01.png)
+
+Use `:> mget .` to retrieve all (both) files.
+
+![mget the files](assets/anonforce-07-root-02.png)
+
+Exit the ftp
+locate the downloaded files and place them into their own directly, for ease of use.
+
+![notread directory](assets/anonforce-07-root-03a.png)
+
+
+Convert the private key to something which can be further exploited. The most common tool for this is John the Ripper.
+
+`gpg2john private.asc > privateOut`
+
+![privateout](assets/anonforce-07-root-04.png)
+
+Use John the Ripper to identify teh password
+
+`john privateOut --wordlist=/usr/share/wordlist/rockyou.txt`
+
+![cracked](assets/anonforce-07-root-05.png)
+
+Import the private key with the discovered password
+
+`gpg --import private.asc`
+
+![key import](assets/anonforce-07-root-05.png)
+
+![key import result](assets/anonforce-07-root-06.png)
+
+Decrypt the backup file
+
+`gpg --decrypt backup.pgp > plainbackup.txt`
+
+![plaintext backup](assets/anonforce-07-root-06.png)
+
+
+

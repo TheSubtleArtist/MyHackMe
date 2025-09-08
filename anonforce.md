@@ -11,7 +11,7 @@ boot2root machine for FIT and bsides guatemala CTF
 
  Perform anonymous login  
 
- ![ftp 1](assets/anonforce-02-ftp-01.png) 
+ ![ftp 1](assets/anonforce-02-ftp-01.png)  
 
  Attempt to download the file via the ftp but fails.
 
@@ -33,11 +33,10 @@ Move into the downloaded directories and simultaneously realize why the ftp comm
 
 ![User.txt](assets/anonforce-06-user-txt.png)
 
-
 ## Root Flag
 
 Clearly the "notread" directly is a target.  
-This directory contains two files. 
+This directory contains two files.  
 
 ![notread directory](assets/anonforce-07-root-01.png)
 
@@ -49,7 +48,6 @@ Exit the ftp
 locate the downloaded files and place them into their own directly, for ease of use.
 
 ![notread directory](assets/anonforce-10-root-03a.png)
-
 
 Convert the private key to something which can be further exploited. The most common tool for this is John the Ripper.
 
@@ -77,21 +75,18 @@ Decrypt the backup file
 
 ![plaintext backup](assets/anonforce-15-root-08.png)
 
-
 Isolate the root hash
 
-`:> grep root plainbackup.txt > root.txt`
-`:> cat root.txt`
-`:> cut -d ':' -f 2 root.txt > roothash.txt`
-`:> cat roothash.txt`
+`:> grep root plainbackup.txt > root.txt`  
+`:> cat root.txt`  
+`:> cut -d ':' -f 2 root.txt > roothash.txt`  
+`:> cat roothash.txt`  
 
 ![Isolated hash](assets/anonforce-16-root-09.png)
-
 
 Attempt to quickly idenitfy the hash.  Hash-ID is not installed on the machine
 
 ![Hash identify](assets/anonforce-17-root-10.png)
-
 
 Let John the Ripper figure it out
 
@@ -102,4 +97,3 @@ Let John the Ripper figure it out
 Login and find the flag.
 
 ![hash cracked](assets/anonforce-19-root-12.png)
-

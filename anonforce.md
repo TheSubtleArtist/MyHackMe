@@ -53,19 +53,19 @@ locate the downloaded files and place them into their own directly, for ease of 
 
 Convert the private key to something which can be further exploited. The most common tool for this is John the Ripper.
 
-`gpg2john private.asc > privateOut`
+`:> gpg2john private.asc > privateOut`
 
 ![privateout](assets/anonforce-11-root-04.png)
 
 Use John the Ripper to identify teh password
 
-`john privateOut --wordlist=/usr/share/wordlist/rockyou.txt`
+`:> john privateOut --wordlist=/usr/share/wordlist/rockyou.txt`
 
 ![cracked](assets/anonforce-12-root-05.png)
 
 Import the private key with the discovered password
 
-`gpg --import private.asc`
+`:> gpg --import private.asc`
 
 ![key import](assets/anonforce-13-root-06.png)
 
@@ -73,9 +73,33 @@ Import the private key with the discovered password
 
 Decrypt the backup file
 
-`gpg --decrypt backup.pgp > plainbackup.txt`
+`:> gpg --decrypt backup.pgp > plainbackup.txt`
 
 ![plaintext backup](assets/anonforce-15-root-08.png)
 
 
+Isolate the root hash
+
+`:> grep root plainbackup.txt > root.txt`
+`:> cat root.txt`
+`:> cut -d ':' -f 2 root.txt > roothash.txt`
+`:> cat roothash.txt`
+
+![Isolated hash](assets/anonforce-16-root-09.png)
+
+
+Attempt to quickly idenitfy the hash.  Hash-ID is not installed on the machine
+
+![Hash identify](assets/anonforce-17-root-10.png)
+
+
+Let John the Ripper figure it out
+
+`:> john --wordlist=/usr/share/wordlists/rockyou.txt`
+
+![hash cracked](assets/anonforce-18-root-11.png)
+
+Login and find the flag.
+
+![hash cracked](assets/anonforce-19-root-12.png)
 

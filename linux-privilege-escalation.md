@@ -85,7 +85,7 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 `:> find . -name flag1.txt` : find the files in the current directory with the name "flag1.txt”  
 `:> find /home -name flag1.txt` : find the files in the /home directory with the name “flag1.txt”  
 `:> find / -type d -name config` : recursively search from the root directory to find the directory named config  
-`:> find / -type f -perm 777` : recursively search from the root directory and list all files with the 777 permissions (files readable, writable, and executable by all users)  
+`:> find / -type f -perm 777` : recursively search from the root directory and list files readable, writable, and executable by all users  
 `:> find / -perm a=x` : recursively search from the root directory and list all executable files  
 `:> find /home -user frank` : recursively search from the /home directory and list all files for user “frank”  
 `:> find / -mtime 10` : recursively search from the root directory and list all files modified in the last 10 days  

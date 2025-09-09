@@ -4,25 +4,31 @@
 
 ### Query the System
 
-Query the hostname: `:> hostname`  
+`:> hostname` : Query the hostname  
 
-Identify system users: `:> cat /etc/passwd`  
+`:> uname -a`  : Query Kernel information  
 
-Identify potentially useful shells on the system: `:> cat /etc/shells`
+`:> cat /etc/passwd`  :  Identify system users  
 
-List cron jobs: `:> cat /etc/crontab`
+`:> cat /etc/shells` : Identify potentially useful shells on the system
+
+`:> cat /etc/crontab` : List cron jobs
+
+`:> cat /proc/version` : Specifics about the kern verion and the GCC compilers use to build the kernel  
+
+`:> cat /etc/issue` : Contains the pre-login prompt and can be changed
+
+
 
 ### LinEnum.sh to Exfiltrate the system information
 
-[Get Linenum](!https://github.com/rebootuser/LinEnum/blob/master/LinEnum.sh)  
-
-Onto the attacking device
+Get LinEnum.sh onto the attacking device
 
 `:> wget -O LinEnum.sh https://raw.githubusercontent.com/rebootuser/LinEnum/refs/heads/master/LinEnum.sh`
 
 Gain access to the target machine
 
-![Logged In](asset/Linux-PrivEsc-01-LinEnum-01.png)
+![Logged In](assets/Linux-PrivEsc-01-LinEnum-01.png)
 
 Open a simple server on the attacking device in the directory from where LinEnum can be transported.
 

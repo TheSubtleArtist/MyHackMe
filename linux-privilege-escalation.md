@@ -98,14 +98,27 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 `:> find / -perm -o w -type d 2>/dev/null` : recursively search from the root directory and list all world-writeable directories  
 `:> find / -perm -o x -type d 2>/dev/null` : recursively search from the root directory and list all world-executable directories  
 `:> find / -name perl* OR python* OR gcc*` : recursively search from the root directory and list development tools / supported languages  
-`:> find / -perm /1000` : recursively search from the root directory and list objects wsith the sticky bit set  
-`:> find / -perm /2000` : recursively search from the root directory and list objects wsith the SGID bit set  
-`:> find / -perm /4000` : recursively search from the root directory and list objects wsith the SUID bit set  
+`:> find / -perm -u=s -type f 2>/dev/null` : recursively search from the root directory and list all files where special privileges are set for everyone.  
+`:> find / -perm /1000` : recursively search from the root directory and list objects with the sticky bit set  
+`:> find / -perm /2000` : recursively search from the root directory and list objects with the SGID bit set  
+`:> find / -perm /4000` : recursively search from the root directory and list objects with the SUID bit set  
   
-## SUID/GUID 
+## Authentication Bypass  
 
-## Writeable /etc/passwd files
+### SUID/GUID 
 
+### Writeable /etc/passwd files  
+
+#### Entry format  
+
+[username] : [password] : [userID] : [groupID] : [Info] : [home-directory] : [path-to-shell]
+
+#### Generate compliant password hash
+
+
+`:> openssl-passwd -1 -salt [salt] [password]`  
+
+``
 ## Escaping the Vi editor
 
 ## Exploit Crontab

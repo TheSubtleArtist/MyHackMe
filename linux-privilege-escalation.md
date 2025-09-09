@@ -1,5 +1,14 @@
 # Linux Privilege Escalation
 
+
+## Initial checklist
+
+1. Determining the kernel of the machine (kernel exploitation such as Dirtyc0w)
+2. Locating other services running or applications installed that may be abusable (SUID & out of date software)
+3. Looking for automated scripts like backup scripts (exploiting crontabs)
+4. Credentials (user accounts, application config files..)
+5. Mis-configured file and directory permissions  
+
 ## Enumeration
 
 ### Query the System
@@ -82,3 +91,13 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 ## Exploit Crontab
 
 ## Exploiting the PATH variable
+
+## Other References
+
+!(https://medium.com/@JAlblas/tryhackme-common-linux-privesc-walkthrough-296e8babe42f)
+!(https://github.com/netbiosX/Checklists/blob/master/Linux-Privilege-Escalation.md)
+!(https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Linux%20-%20Privilege%20Escalation.md)
+!(https://sushant747.gitbooks.io/total-oscp-guide/privilege_escalation_-_linux.html)
+!(https://payatu.com/guide-linux-privilege-escalation)
+!(https://david-varghese.medium.com/tryhackme-linux-privesc-9ea2cfac3b76)
+!(https://dev.to/christinec_dev/try-hack-me-linux-privesc-complete-write-up-20fg)

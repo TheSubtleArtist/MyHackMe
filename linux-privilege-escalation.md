@@ -7,7 +7,7 @@
 [Query The System](#query-the-system)  
 [Use LinEnum.sh to exfiltrate system information](#linenumsh-to-exfiltrate-the-system-information)  
 [use FIND to enumerate potential exploits](#use-find-to-identify-useful-file-properties-and-attributes)  
-[Identify Exploitable Commands](#identify-exploitable-commands)
+[Identify Exploitable Commands](#identify-exploitable-commands)  
 [Identify Network Activity](#identify-network-activity)  
 
 ### Authentication Bypass  
@@ -123,15 +123,15 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 
 ### Identify Network Activity  
 
-`:> netstat` : list existing communications
-`:> netstat -a` : show all listening ports and established connections
-`:> netstat -at` or `-au` : lists TCP or UDP protocols
-`:> netstat -l` : lists "listening" ports open to incoming communciations
-`:> netstat -lt` : lists listening TCP ports
-`:> netstat -s` : lists useage statics by protocol can be also used with "-t" or "-u"
-`:> netstat -tp` : connections with the service name and PID information; add "l" to get listening ports
-`:> netstat -i` : interface statistics
-`:> netstat -ano` : "a" display all sockets; 'n' do not resolve names; "o" display timers
+`:> netstat` : list existing communications  
+`:> netstat -a` : show all listening ports and established connections  
+`:> netstat -at` or `-au` : lists TCP or UDP protocols  
+`:> netstat -l` : lists "listening" ports open to incoming communciations  
+`:> netstat -lt` : lists listening TCP ports  
+`:> netstat -s` : lists useage statics by protocol can be also used with "-t" or "-u"  
+`:> netstat -tp` : connections with the service name and PID information; add "l" to get listening ports  
+`:> netstat -i` : interface statistics  
+`:> netstat -ano` : "a" display all sockets; 'n' do not resolve names; "o" display timers  
 
 ## Authentication Bypass Techniques
 

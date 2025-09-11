@@ -1,7 +1,6 @@
 # OhSINT
 
-[Target Image](assets/thm-OhSINT-WindowsXP_1551719014755.jpg)  
-
+[Target Image](!assets/thm-OhSINT-WindowsXP_1551719014755.jpg)  
 
 ## Setup  
 

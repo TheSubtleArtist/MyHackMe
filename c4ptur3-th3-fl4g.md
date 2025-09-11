@@ -64,7 +64,26 @@ LS0tLS0gLi0tLS0gLi0tLS0gLS0tLS0gLS0tLS0gLi0tLS0gLi0tLS0gLS0tLS0KLS0tLS0gLi0tLS0g
 
 ## Spectrograms
 
-## Steganography  
+![The Sonogram](assets/thm-secretaudio_1559007588454.wav)  
+
+not the strings command
+
+Requires one of a number of tools like [Sonic Visualizer](!https://www.sonicvisualiser.org/download.html)  
+
+![The Answer](assets/ctf-spectrograms.jpg)  
+
+## Steganography 
+
+![Steg On Spag](assets/ctf-stegosteg_1559008553457.jpg)  
+
+strings command revealed nothing
+
+exiftool revealed nothing
+
+`:> steghide --info <image name>` started things off  
+
+`:> steghide extract -sf <image name>` and ignore the passphrase requirement.  
 
 ## Security Through Obscurity  
 
+`:> strings`

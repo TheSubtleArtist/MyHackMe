@@ -2,9 +2,9 @@
 
 ## The Background
 
-[Fuel Web](!https://www.getfuelcms.com/)  
+[Fuel Web](https://www.getfuelcms.com/)  
 
-[Fuel GIT](!https://github.com/daylightstudio/FUEL-CMS)
+[Fuel GIT](https://github.com/daylightstudio/FUEL-CMS)
 
 Fuel is based on PHP.
 

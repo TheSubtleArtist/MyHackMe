@@ -2,9 +2,9 @@
 
 ## The Background
 
-![Fuel Web](https://www.getfuelcms.com/)  
+[Fuel Web](!https://www.getfuelcms.com/)  
 
-![Fuel GIT](https://github.com/daylightstudio/FUEL-CMS)
+[Fuel GIT](!https://github.com/daylightstudio/FUEL-CMS)
 
 Fuel is based on PHP.
 
@@ -52,7 +52,7 @@ Finally, default credentials
 
 `http://10.201.126.242/robots.txt`  
 
-Webcrawlers are prevented from scanning the FUEL admin portal, unless the webcrawler ignores the robots.txt contents.
+Webcrawlers are prevented from scanning the FUEL admin portal, unless the webcrawler ignores the robots.txt contents.  
 ![robots.txt](assets/ignite-06.png)  
 
 ### Visit the FUEL admin portal  

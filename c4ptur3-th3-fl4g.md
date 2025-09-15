@@ -86,4 +86,6 @@ exiftool revealed nothing
 
 ## Security Through Obscurity  
 
+~[Target File](assets/ctf-meme_1559010886025.jpg)
+
 `:> strings`

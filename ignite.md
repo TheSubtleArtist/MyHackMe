@@ -204,5 +204,20 @@ verify attacker machine ip address
 
 `:> ip addr show`  
 
-![Attacker IP](assets/ignite-26.png)  
+![Attacker IP](assets/ignite-27.png)  
+
+Use the same shell that failed to upload earlier in the process.  
+
+![PHP Shell](assets/ignite-29.png)
+
+Ensure Attacker IP is in the reverse shell:  
+
+![PHP Shell](assets/ignite-28.png)  
+
+Use TMUX and split the screen to make working on both machines simpler.  
+
+`:> tmux` then `ctrl + b` then `"`
+![TMUX Horizontal Split](assets/ignite-28.png)  
+
+
 

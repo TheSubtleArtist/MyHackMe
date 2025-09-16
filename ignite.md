@@ -144,13 +144,21 @@ Test a few commands.
 
 ![Perform Initial Access](assets/ignite-17.png)  
 
-### Recon  
+### Recon and first flag
 
 Based on the instructions identified on the webpage, identify potential exploit points. 
 
 `:> cat .htaccess`  doesn't reveal anything valuable
 
-![HTACCESS](assets/ignite-18.png) 
+![HTACCESS](assets/ignite-18.png)  
+
+`:> cat composer.json`  
+
+Potential additional credentials: "mikey179" or "mikey179/vfsStream"  
+  
+
+![Composer.json](assets/ignite-26.png)  
+
 
 `:> cat fuel/application/config/database.php` has a default username and password  
 
@@ -180,4 +188,21 @@ Traverse directories to find the first flag
  
 ![The Flag](assets/ignite-24.png)  
 
- 
+## Privilege escalation  
+
+attempt to use the default password from the database to switch users
+
+`:> su root` with password "mememe"  
+
+Didn't work  
+
+![switch user attempt](assets/ignite-25.png)  
+
+### Upload Reverse Shell  
+
+verify attacker machine ip address  
+
+`:> ip addr show`  
+
+![Attacker IP](assets/ignite-26.png)  
+

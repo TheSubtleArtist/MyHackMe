@@ -216,8 +216,17 @@ Ensure Attacker IP is in the reverse shell:
 
 Use TMUX and split the screen to make working on both machines simpler.  
 
-`:> tmux` then `ctrl + b` then `"`
-![TMUX Horizontal Split](assets/ignite-28.png)  
+`:> tmux` then `ctrl + b` then `"`  
+![TMUX Horizontal Split](assets/ignite-30.png)  
 
+Start a simple server in one pane.  
+
+`:> python -m http.server 9999`
+
+Start a netcat listener in the other pane, using the port in the reverse shell.
+
+`:> nc -lvnp 5555`  
+
+![reverse shell setup](assets/ignite-30`png)  
 
 

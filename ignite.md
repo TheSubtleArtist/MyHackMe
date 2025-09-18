@@ -214,7 +214,7 @@ Traverse directories to find the first flag
 
 ![Up 3 Levels](assets/ignite-23.png)  
 
-`:> cat ../../../home/www-data/flag.txt`
+`:> cat ../../../home/www-data/flag.txt`  
  
 ![The Flag](assets/ignite-24.png)  
 
@@ -230,13 +230,13 @@ Didn't work
 
 ### Upload Reverse Shell  
 
+Move the cursor to the top-right pane. Consistent with previous instructions, use `:>CTRL + b`, then arrow keys to move the cursor among the active panes.
 
-
-verify attacker machine ip address  
+Verify attacker machine ip address  
 
 `:> ip addr show`  
 
-![Attacker IP](assets/ignite-27.png)  
+![Attacker IP](assets/ignite-27a.png)  
 
 Use the same shell that failed to upload earlier in the process.  
 

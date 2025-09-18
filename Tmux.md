@@ -180,7 +180,7 @@ Starting from the top window
 :>````CTRL + b````, then ```` % ````  
 ![Vertical Split Top](/images/vertSplitOne.png)  
 Move to the bottom window and create a split  
-![Vertical Split Top](/images/vertSplitTwo.png)
+![Vertical Split Bottom](/images/vertSplitTwo.png)
 
 ## Manipulating Panes  
 

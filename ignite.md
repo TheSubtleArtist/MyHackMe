@@ -252,3 +252,7 @@ Upgrade to an interactive shell:
 attempt to use the database username and password to achieve root privileges: `:> su root`  
 
 ![Root](assets/ignite-38.png)
+
+Navigate to the root directory and find the flag in the root directory  
+
+![flag](assets/ignite-39.png)

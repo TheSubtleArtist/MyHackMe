@@ -177,9 +177,9 @@ Resizing Windows :>````CTRL + b```` AND [Arrow Key]
 Starting from the top window  
 
 ![Vertical Split Starting Point](/images/vertSplitStart.png)  
-:>````CTRL + b````, then ```` % ````
+:>````CTRL + b````, then ```` % ````  
 ![Vertical Split Top](/images/vertSplitOne.png)  
-Move to the bottom window and create a split
+Move to the bottom window and create a split  
 ![Vertical Split Top](/images/vertSplitTwo.png)
 
 ## Manipulating Panes  

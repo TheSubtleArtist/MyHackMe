@@ -148,7 +148,7 @@ Use tmux to split the screen, creating panes for the local machine and the remot
 
 This creates what appears to be a duplicate window. However, these windows are independent and can handle separate tasks.  
 
-![Vertical Split](assets/ignite-29.png)  
+![Vertical Split](assets/ignite-33.png)  
 
 If the cursor is not in the right pane, use the following command to move the cursor into the right pane: 
 
@@ -158,7 +158,7 @@ From this position, create a horizontal split
 
 `:>CTRL + b`, then `"` (Double quotes)  
 
-![Three Panes](assets/ignite-30.png)  
+![Three Panes](assets/ignite-34.png)  
 
 If the cursor is not in the left pane, use the following command to move the cursor into the left pane:  
 

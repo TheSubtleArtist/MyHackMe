@@ -134,15 +134,47 @@ if "http" not in url:
 
 Note: A change in the target (victim) machine due to a restart of the remote target.
 
-`:> pythohn3 50477.py -u http://10.201.116.158`
+### Set up a working environment  
+
+It is not difficult to predict there are going to be multiple steps in gaining access to the target device and performing privilege escalation activites. This will require the ability to work on the target devices and the attacking device.
+
+Use tmux to split the screen, creating panes for the local machine and the remote machine.  
+
+`:> tmux -s ignite`  creates a new tmux session named "ignite"
+
+![New tmux session](assets/ignite-28.png)  
+
+`:>CTRL + b`, then `%` (shift + 5)  
+
+This creates what appears to be a duplicate window. However, these windows are independent and can handle separate tasks.  
+
+![Vertical Split](assets/ignite-29.png)  
+
+If the cursor is not in the right pane, use the following command to move the cursor into the right pane: 
+
+`:>CTRL + b`, then right arrow
+
+From this position, create a horizontal split  
+
+`:>CTRL + b`, then `"` (Double quotes)  
+
+![Three Panes](assets/ignite-30.png)  
+
+If the cursor is not in the left pane, use the following command to move the cursor into the left pane:  
+
+`:>CTRL + b`, then left arrow  
+
+### Gain initial access  
+
+`:> python3 50477.py -u http://10.201.125.124`
 
 Success is identified when the exploit provides a command input prompt.  
 
-![Perform Initial Access](assets/ignite-16.png)  
+![Perform Initial Access](assets/ignite-16a.png)  
 
 Test a few commands. 
 
-![Perform Initial Access](assets/ignite-17.png)  
+![Perform Initial Access](assets/ignite-17a.png)  
 
 ### Recon and first flag
 
@@ -156,13 +188,11 @@ Based on the instructions identified on the webpage, identify potential exploit 
 
 Potential additional credentials: "mikey179" or "mikey179/vfsStream"  
   
-
 ![Composer.json](assets/ignite-26.png)  
-
 
 `:> cat fuel/application/config/database.php` has a default username and password  
 
-![db creds](assets/ignite-19.png) 
+![db creds](assets/ignite-19.png)  
 
 `:> cat fuel/application/config/config.php | grep encryption`  
 
@@ -199,6 +229,8 @@ Didn't work
 ![switch user attempt](assets/ignite-25.png)  
 
 ### Upload Reverse Shell  
+
+
 
 verify attacker machine ip address  
 

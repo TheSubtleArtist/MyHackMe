@@ -20,7 +20,8 @@ Basic Buffer Overflows
 
 ============================================
 
-High Memory (0xFFFFFFFF)  
+```v
+High Memory (0xFFFFFFFF) 
 
 ┌─────────────────────────────────────┐  
 │             KERNEL SPACE            │ ← Reserved for OS  
@@ -88,8 +89,9 @@ High Memory (0xFFFFFFFF)
 │                                     │  
 └─────────────────────────────────────┘  
 Low Memory (0x00000000)  
+```
 
-#### Memory Growth Directions   
+#### Memory Growth Directions  
 
 ========================
 Stack:  ▼ ▼ ▼  (High → Low addresses)  

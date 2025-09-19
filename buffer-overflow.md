@@ -23,7 +23,7 @@ Basic Buffer Overflows
 High Memory (0xFFFFFFFF)  
 
 ┌─────────────────────────────────────┐  
-│              KERNEL SPACE           │ ← Reserved for OS  
+│             KERNEL SPACE            │ ← Reserved for OS  
 │         (Not accessible to          │  
 │           user programs)            │  
 ├─────────────────────────────────────┤  

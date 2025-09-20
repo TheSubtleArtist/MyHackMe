@@ -107,14 +107,42 @@ Heap:   ▲ ▲ ▲  (Low → High addresses)
 
 - The program code and data area stores the program executable and initialised variables.  
 
-#### Key Characteristics  
+#### Memory Section Details  
 
-==================  
-• Stack: Fast, automatic cleanup, limited size  
-• Heap: Flexible size, manual management, slower  
-• Code: Execute permissions, shared between processes  
-• Data: Read/write permissions for variables  
-• Libraries: Loaded at runtime, shared memory  
+##### User Stack  
+
+- Contains function call frames
+- Stores local variables and parameters
+- Manages return addresses
+- Fast allocation/deallocation
+- Limited in size (typically 1-8 MB)  
+
+##### Shared Library Region  
+
+- Houses dynamically linked libraries
+- Shared between multiple processes
+- Includes system libraries (libc, libm, etc.)
+- Loaded at program startup or on-demand  
+
+##### Run-Time Heap  
+
+- Used for dynamic memory allocation
+- Managed by malloc(), free(), new, delete
+- Flexible size but slower than stack
+- Risk of memory leaks if not properly managed  
+
+##### Read/Write Data  
+
+- Initialized data segment : Global variables with initial values
+- BSS segment : Uninitialized global variables
+- Static variables with function scope  
+
+##### Read-Only Code/Data  
+
+- Text segment : Compiled program instructions
+- String literals and constants
+- Shared between multiple instances of same program
+- Protected from modification  
 
 ## x86-64 Procedures
 

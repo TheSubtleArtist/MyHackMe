@@ -360,7 +360,6 @@ function_a() returns to main():
 
 ## Key Stack Concepts Summary
 
-```markdown
 | Concept | Description | Memory Effect |
 |---------|-------------|---------------|
 | **Stack Frame** | Dedicated memory area for each function | Allocated on call, deallocated on return |
@@ -368,7 +367,7 @@ function_a() returns to main():
 | **POP Operation** | Remove data from stack top | rsp increases by 8, data read (but memory unchanged!) |
 | **Stack Growth** | Always toward lower memory addresses | New data appears at progressively lower addresses |
 | **Frame Management** | Each function gets its own frame | Automatic allocation/deallocation |
-```
+
 
 ## Critical Notes
 

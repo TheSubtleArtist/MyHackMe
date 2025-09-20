@@ -15,12 +15,9 @@ Basic Buffer Overflows
 - processes may appear to run at the same time  
 - operating system keeps track of all the information in each process
 
-
 ### Memory Address Space (Virtual Memory Layout)  
 
-============================================
-
-```v
+```markdown
 High Memory (0xFFFFFFFF) 
 
 ┌─────────────────────────────────────┐  
@@ -93,7 +90,6 @@ Low Memory (0x00000000)
 
 #### Memory Growth Directions  
 
-========================
 Stack:  ▼ ▼ ▼  (High → Low addresses)  
 Heap:   ▲ ▲ ▲  (Low → High addresses)  
 
@@ -353,14 +349,14 @@ Memory State After POP Operations:
    ▼ Lower Memory Addresses (Stack Top, toward 0x0)
 ```
 
-Function Call Flow:
-main() calls function_a():
-  • Creates new stack frame
-  • rsp moves DOWN (lower addresses)
+Function Call Flow:  
+main() calls function_a():  
+  • Creates new stack frame  
+  • rsp moves DOWN (lower addresses)  
   
-function_a() returns to main():
+function_a() returns to main():  
   • Destroys stack frame  
-  • rsp moves UP (higher addresses)
+  • rsp moves UP (higher addresses)  
 
 ## Key Stack Concepts Summary
 

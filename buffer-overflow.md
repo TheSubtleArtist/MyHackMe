@@ -141,17 +141,16 @@ Heap:   ▲ ▲ ▲  (Low → High addresses)
 
 ## x86-64 Procedures
 
+### STACK OPERATIONS AND STACK FRAMES
 
-````markdown
-```
-STACK OPERATIONS AND STACK FRAMES
-==================================
+#### STACK MEMORY LAYOUT  
 
-STACK MEMORY LAYOUT:
+```markdown
 ┌─────────────────────────────────────────────────────────────────┐
-│                    STACK MEMORY REGION                         │
-│            (Contiguous Memory Addresses)                       │
-└─────────────────────────────────────────────────────────────────┘
+│                    STACK MEMORY REGION                          │
+│            (Contiguous Memory Addresses)                        │
+└─────────────────────────────────────────────────────────────────┘  
+
 
 Stack Bottom (High Memory Address)
 ┌─────────────────────────────────────┐
@@ -167,11 +166,11 @@ Stack Bottom (High Memory Address)
 │                                     │
 └─────────────────────────────────────┘
 Stack Top (Low Memory Address 0x0)
+```
 
+#### PUSH OPERATION  
 
-PUSH OPERATION STEP-BY-STEP:
-============================
-
+```markdown
 BEFORE: push var (var = 42)
 ┌─────────────────┐
 │   Unused Space  │
@@ -194,11 +193,11 @@ AFTER: push var
 │       42        │ ← NEW TOP OF STACK
 │   (from var)    │
 └─────────────────┘
+```
 
+#### POP OPERATION  
 
-POP OPERATION STEP-BY-STEP:
-===========================
-
+```markdown
 BEFORE: pop var (stack has value 42 on top)
 ┌─────────────────┐
 │   Unused Space  │
@@ -225,57 +224,58 @@ AFTER: pop var
 
 *** IMPORTANT: Memory content doesn't change during POP! ***
 *** Only the stack pointer (rsp) value changes! ***
+```
 
+#### MULTIPLE FUNCTION STACK FRAMES
 
-MULTIPLE FUNCTION STACK FRAMES:
-===============================
-
+```markdown
 Program: main() → function_a() → function_b()
 
 Stack Bottom (High Memory)
-┌─────────────────────────────────────┐
-│           UNUSED SPACE              │
-├─────────────────────────────────────┤
-│                                     │
-│        FUNCTION_B STACK FRAME       │ ← Currently executing
-│  ┌─────────────────────────────────┐ │
-│  │ Local Variables:                │ │
-│  │   int local_b = 30              │ │
-│  │ Function Arguments:             │ │
-│  │   int param_b                   │ │
-│  │ Return Address:                 │ │
-│  │   → back to function_a()        │ │
-│  │ Saved Registers                 │ │
-│  └─────────────────────────────────┘ │ ← rsp points here
-├─────────────────────────────────────┤
-│        FUNCTION_A STACK FRAME       │
-│  ┌─────────────────────────────────┐ │
-│  │ Local Variables:                │ │
-│  │   int local_a = 20              │ │
-│  │   char buffer[100]              │ │
-│  │ Function Arguments:             │ │
-│  │   (none)                        │ │
-│  │ Return Address:                 │ │
-│  │   → back to main()              │ │
-│  │ Saved Registers                 │ │
-│  └─────────────────────────────────┘ │
-├─────────────────────────────────────┤
-│          MAIN STACK FRAME           │
-│  ┌─────────────────────────────────┐ │
-│  │ Local Variables:                │ │
-│  │   int main_var = 10             │ │
-│  │   int argc                      │ │
-│  │ Function Arguments:             │ │
-│  │   char** argv                   │ │
-│  │ Return Address:                 │ │
-│  │   → back to OS                  │ │
-│  └─────────────────────────────────┘ │
-└─────────────────────────────────────┘
+┌───────────────────────────────────────┐
+│           UNUSED SPACE                │
+├───────────────────────────────────────┤
+│                                       │
+│        FUNCTION_B STACK FRAME         │ ← Currently executing
+│  ┌─────────────────────────────────┐  │
+│  │ Local Variables:                │  │
+│  │   int local_b = 30              │  │
+│  │ Function Arguments:             │  │
+│  │   int param_b                   │  │
+│  │ Return Address:                 │  │
+│  │   → back to function_a()        │  │
+│  │ Saved Registers                 │  │
+│  └─────────────────────────────────┘  │ ← rsp points here
+├───────────────────────────────────────┤
+│        FUNCTION_A STACK FRAME         │
+│  ┌─────────────────────────────────┐  │
+│  │ Local Variables:                │  │
+│  │   int local_a = 20              │  │
+│  │   char buffer[100]              │  │
+│  │ Function Arguments:             │  │
+│  │   (none)                        │  │
+│  │ Return Address:                 │  │
+│  │   → back to main()              │  │
+│  │ Saved Registers                 │  │
+│  └─────────────────────────────────┘  │
+├───────────────────────────────────────┤
+│          MAIN STACK FRAME             │
+│  ┌─────────────────────────────────┐  │
+│  │ Local Variables:                │  │
+│  │   int main_var = 10             │  │
+│  │   int argc                      │  │
+│  │ Function Arguments:             │  │
+│  │   char** argv                   │  │
+│  │ Return Address:                 │  │
+│  │   → back to OS                  │  │
+│  └─────────────────────────────────┘  │
+└───────────────────────────────────────┘
 Stack Top (Low Memory - toward 0x0)
+```
 
+#### STACK FRAME LIFECYCLE
 
-STACK FRAME LIFECYCLE:
-======================
+```markdown
 
 FUNCTION CALL (Allocating New Frame):
 ┌─────────────────────────────────────┐
@@ -306,11 +306,11 @@ FUNCTION RETURN (Deallocating Frame):
 │ 3. POP return address               │
 │ 4. Jump to return address           │
 └─────────────────────────────────────┘
+```
 
+#### DETAILED PUSH/POP MECHANICS
 
-DETAILED PUSH/POP MECHANICS:
-============================
-
+```markdown
 RSP Movement during PUSH:
 ┌──────────┬──────────┬──────────────────────────┐
 │ Before   │ After    │ Action                   │
@@ -339,10 +339,11 @@ Memory State After POP Operations:
 ├─────────────────┤   Will be overwritten by future pushes
 │      var3       │ ← DATA STILL EXISTS!
 └─────────────────┘
+```
 
+#### STACK POINTER DIRECTIONS
 
-STACK POINTER DIRECTIONS:
-=========================
+```markdown
    ▲ Higher Memory Addresses (Stack Bottom)
    │
    │ POP: rsp += 8 ↑ (moves UP toward higher addresses)
@@ -350,6 +351,7 @@ STACK POINTER DIRECTIONS:
    │ PUSH: rsp -= 8 ↓ (moves DOWN toward lower addresses)
    │
    ▼ Lower Memory Addresses (Stack Top, toward 0x0)
+```
 
 Function Call Flow:
 main() calls function_a():
@@ -359,11 +361,10 @@ main() calls function_a():
 function_a() returns to main():
   • Destroys stack frame  
   • rsp moves UP (higher addresses)
-```
-````
 
 ## Key Stack Concepts Summary
 
+```markdown
 | Concept | Description | Memory Effect |
 |---------|-------------|---------------|
 | **Stack Frame** | Dedicated memory area for each function | Allocated on call, deallocated on return |
@@ -371,6 +372,7 @@ function_a() returns to main():
 | **POP Operation** | Remove data from stack top | rsp increases by 8, data read (but memory unchanged!) |
 | **Stack Growth** | Always toward lower memory addresses | New data appears at progressively lower addresses |
 | **Frame Management** | Each function gets its own frame | Automatic allocation/deallocation |
+```
 
 ## Critical Notes
 

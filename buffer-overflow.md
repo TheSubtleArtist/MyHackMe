@@ -137,9 +137,7 @@ Heap:   ▲ ▲ ▲  (Low → High addresses)
 
 ## x86-64 Procedures
 
-### STACK OPERATIONS AND STACK FRAMES
-
-#### STACK MEMORY LAYOUT  
+### STACK MEMORY LAYOUT  
 
 ```markdown
 ┌─────────────────────────────────────────────────────────────────┐
@@ -164,7 +162,7 @@ Stack Bottom (High Memory Address)
 Stack Top (Low Memory Address 0x0)
 ```
 
-#### PUSH OPERATION  
+### PUSH OPERATION  
 
 ```markdown
 BEFORE: push var (var = 42)
@@ -191,7 +189,7 @@ AFTER: push var
 └─────────────────┘
 ```
 
-#### POP OPERATION  
+### POP OPERATION  
 
 ```markdown
 BEFORE: pop var (stack has value 42 on top)
@@ -222,7 +220,7 @@ AFTER: pop var
 *** Only the stack pointer (rsp) value changes! ***
 ```
 
-#### MULTIPLE FUNCTION STACK FRAMES
+### MULTIPLE FUNCTION STACK FRAMES
 
 ```markdown
 Program: main() → function_a() → function_b()
@@ -269,7 +267,7 @@ Stack Bottom (High Memory)
 Stack Top (Low Memory - toward 0x0)
 ```
 
-#### STACK FRAME LIFECYCLE
+### STACK FRAME LIFECYCLE
 
 ```markdown
 
@@ -304,7 +302,7 @@ FUNCTION RETURN (Deallocating Frame):
 └─────────────────────────────────────┘
 ```
 
-#### DETAILED PUSH/POP MECHANICS
+### DETAILED PUSH/POP MECHANICS
 
 ```markdown
 RSP Movement during PUSH:
@@ -337,7 +335,7 @@ Memory State After POP Operations:
 └─────────────────┘
 ```
 
-#### STACK POINTER DIRECTIONS
+### STACK POINTER DIRECTIONS
 
 ```markdown
    ▲ Higher Memory Addresses (Stack Bottom)

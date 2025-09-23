@@ -356,7 +356,7 @@ function_a() returns to main():
   • Destroys stack frame  
   • rsp moves UP (higher addresses)  
 
-## Key Stack Concepts Summary
+### Key Stack Concepts Summary
 
 | Concept | Description | Memory Effect |
 |---------|-------------|---------------|
@@ -366,8 +366,7 @@ function_a() returns to main():
 | **Stack Growth** | Always toward lower memory addresses | New data appears at progressively lower addresses |
 | **Frame Management** | Each function gets its own frame | Automatic allocation/deallocation |
 
-
-## Critical Notes
+### Critical Notes
 
 🔹 **Memory Persistence**: POP operations don't erase memory - they only move the stack pointer!
 

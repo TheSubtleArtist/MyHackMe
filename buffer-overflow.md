@@ -476,7 +476,7 @@ Stack Top (Low Memory Address 0x0)
 
 ### Data Transfer  
 
-[sym.calc](assets/buffer-overflow-03-calc-function.png)  
+![sym.calc](assets/buffer-overflow-03-calc-function.png)  
 
 The calc function takes 2 arguments(a and b).  
 Upto 6 arguments for functions can be stored in the following registers:  

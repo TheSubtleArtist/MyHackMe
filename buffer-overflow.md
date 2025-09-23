@@ -369,16 +369,39 @@ function_a() returns to main():
 ### Critical Notes
 
 🔹 **Memory Persistence**: POP operations don't erase memory - they only move the stack pointer!
-
 🔹 **Stack Direction**: Stack grows DOWN (toward address 0x0) but we often draw it growing UP for visual clarity
-
 🔹 **Frame Isolation**: Each function's stack frame is separate, providing local variable isolation
-
 🔹 **Automatic Management**: Stack frames are automatically managed by the CPU and compiler
 
-This design makes function calls efficient and provides automatic memory management for local variables and function parameters.
+This design makes function calls efficient and provides automatic memory management for local variables and function parameters.  
 
-## Endianness  
+### Example  
+
+````markdown
+int add(int a, int b){
+
+   int new = a + b;
+
+   return new;
+
+}
+
+
+
+int calc(int a, int b){
+
+   int final = add(a, b);
+
+   return final;
+
+}
+
+
+
+calc(4, 5)
+````
+
+## ENDIANNESS
 
 ```markdown
 

@@ -399,7 +399,7 @@ The following explanation assumes the current point of execution is inside the `
 
 The following presents the assembly code inside ```calc```dotnetcli
 
-[sym.calc](assets/buffer-overflow-01-calc-function.png)  
+![sym.calc](assets/buffer-overflow-01-calc-function.png)  
 
 ```markdown
 
@@ -422,7 +422,7 @@ Once the add function is invoked(and after it is completed), the program would n
 To do this, the computer pushes the address of the next instruction onto the stack, in this case the address of the instruction ```movl %eax, local_4h```.  
 After this, the program would allocate a stack frame for the new function, change the current instruction pointer to the first instruction in the function, change the stack pointer(rsp) to the top of the stack, and change the frame pointer(rbp) to point to the start of the new frame.  
 
-[sym.add](assets/buffer-overflow-02-add-function.png)
+![sym.add](assets/buffer-overflow-02-add-function.png)
 
 ```markdown
 

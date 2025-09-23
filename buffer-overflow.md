@@ -368,39 +368,153 @@ function_a() returns to main():
 
 ### Critical Notes
 
-🔹 **Memory Persistence**: POP operations don't erase memory - they only move the stack pointer!
-🔹 **Stack Direction**: Stack grows DOWN (toward address 0x0) but we often draw it growing UP for visual clarity
-🔹 **Frame Isolation**: Each function's stack frame is separate, providing local variable isolation
-🔹 **Automatic Management**: Stack frames are automatically managed by the CPU and compiler
+🔹 **Memory Persistence**: POP operations don't erase memory - they only move the stack pointer!  
+🔹 **Stack Direction**: Stack grows DOWN (toward address 0x0) but we often draw it growing UP for visual clarity  
+🔹 **Frame Isolation**: Each function's stack frame is separate, providing local variable isolation  
+🔹 **Automatic Management**: Stack frames are automatically managed by the CPU and compiler  
 
 This design makes function calls efficient and provides automatic memory management for local variables and function parameters.  
 
-### Example  
+### Control Flow
 
-````markdown
+Consider two functions:  
+
+```markdown
+
 int add(int a, int b){
-
    int new = a + b;
-
    return new;
-
 }
-
 
 
 int calc(int a, int b){
-
    int final = add(a, b);
-
    return final;
-
 }
 
-
-
 calc(4, 5)
-````
+```  
 
+The following explanation assumes the current point of execution is inside the ```calc``` function. In this case ```calc``` is known as the ```caller function``` and ```add``` is known as the ```callee function```dotnetcli
+
+The following presents the assembly code inside ```calc```dotnetcli
+
+[sym.calc](assets/buffer-overflow-01-calc-function.png)  
+
+```markdown
+
+Stack Bottom (High Memory Address)
+┌─────────────────────────────────────┐
+│                                     │
+│       Previous Stack Frame          │
+│                                     │
+├─────────────────────────────────────┤
+│                                     │
+│          CALC Stack Frame           │
+│                                     │
+└─────────────────────────────────────┘
+Stack Top (Low Memory Address 0x0)
+```
+
+```add``` is invoked using the call operand (```callq sym.add```) in assembly.  
+The call operand can take either a label as an argument(e.g. A function name), or it can take a memory address as an offset to the location of the start of the function in the form of call *value.  
+Once the add function is invoked(and after it is completed), the program would need to know what point (memory address) to continue in the program.  
+To do this, the computer pushes the address of the next instruction onto the stack, in this case the address of the instruction ```movl %eax, local_4h```.  
+After this, the program would allocate a stack frame for the new function, change the current instruction pointer to the first instruction in the function, change the stack pointer(rsp) to the top of the stack, and change the frame pointer(rbp) to point to the start of the new frame.  
+
+[sym.add](assets/buffer-overflow-02-add-function.png)
+
+```markdown
+
+Stack Bottom (High Memory Address)
+┌─────────────────────────────────────┐
+│                                     │
+│       Previous Stack Frame          │
+│                                     │
+├─────────────────────────────────────┤
+│                                     │
+│          CALC Stack Frame           │
+│                                     │
+├─────────────────────────────────────┤
+│                                     │
+│         Return address (retq)       │
+│ (remains part of calc stack frame)  │
+├─────────────────────────────────────┤
+│                                     │
+│         add Stack Frame             │
+│                                     │
+└─────────────────────────────────────┘
+
+Stack Top (Low Memory Address 0x0)
+```
+
+Once ```add``` finishes execution, it calls the return instruction(retq).  
+This instruction will:
+
+- pop the value of the return address of the stack (```popq %rbp```)
+- deallocate the stack frame for the add function
+- change the instruction pointer to the value of the return address (```0x562b77165631```)
+- change the stack pointer(rsp) to the top of the stack, and
+- change the frame pointer(rbp) to the stack frame of calc.
+
+This returns to the previous state  
+
+```markdown
+
+Stack Bottom (High Memory Address)
+┌─────────────────────────────────────┐
+│                                     │
+│       Previous Stack Frame          │
+│                                     │
+├─────────────────────────────────────┤
+│                                     │
+│          CALC Stack Frame           │
+│                                     │
+└─────────────────────────────────────┘
+Stack Top (Low Memory Address 0x0)
+```
+
+### Data Transfer  
+
+[sym.calc](assets/buffer-overflow-03-calc-function.png)  
+
+The calc function takes 2 arguments(a and b).  
+Upto 6 arguments for functions can be stored in the following registers:  
+
+- rdi: 64-bit general purpose register; primarily serves as the first argument register  
+- rsi: 64-bit general purpose register; primarily serves as the second argument register  
+- rdx: 64-bit general purpose register; third argument register, also a data register for controlling size parameters, modes, and enviornment variables
+- rcx: 64-bit general purpose register; fourth arguement register; loop counter register
+- r8: 64-bit general purpose extended register; fifth arguement register
+- r9: 64-bit general purpose extended register; sixth arguement register; last register for passing parameters/arguements  
+
+Note: The use of seven or more arguements results in storing of those values on the functions stack frame
+Arguments 7+: Stored on stack (slower access)  
+[RSP + 0x08] → arg7  
+[RSP + 0x10] → arg8  
+[RSP + 0x18] → arg9  
+
+Implications of 7+ arguements:  
+
+- Complexity Increase : Stack frames become larger and more complex
+- Performance Impact : Memory access overhead for stack arguments
+- Exploitation Opportunity : Direct stack argument control via overflow
+- Defense Challenges : Larger attack surface and complex memory layouts
+- Payload Simplification : No gadgets needed for arguments 7+ (direct stack control)
+
+Destination Indexes:  
+
+- rax: 64-bit accumulator register; systcall register; stores results of arithmetic operations  (eax is the 32-bit version)
+
+Caller's responsibility to preserve before function calls
+
+- RAX, RCX, RDX, RSI, RDI, R8, R9, R10, R11
+
+Callee's responsibility to preserve during function execution
+
+- RBX, RBP, R12, R13, R14, R15, RSP
+ 
+-
 ## ENDIANNESS
 
 ```markdown

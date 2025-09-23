@@ -381,6 +381,67 @@ This design makes function calls efficient and provides automatic memory managem
 
 ## Endianness  
 
+```markdown
+
+ENDIANNESS COMPARISON
+=====================
+
+Memory Address:    0x1000  0x1001  0x1002  0x1003
+                      |       |       |       |
+                      v       v       v       v
+
+BIG ENDIAN (Most Significant Byte First)
+========================================
+32-bit value: 0x12345678
+
+    ┌─────┬─────┬─────┬─────┐
+    │ 12  │ 34  │ 56  │ 78  │
+    └─────┴─────┴─────┴─────┘
+     MSB                 LSB
+   (Most              (Least
+ Significant)       Significant)
+
+Human readable order: "Reads naturally left to right"
+
+
+LITTLE ENDIAN (Least Significant Byte First)
+============================================
+32-bit value: 0x12345678
+
+    ┌─────┬─────┬─────┬─────┐
+    │ 78  │ 56  │ 34  │ 12  │
+    └─────┴─────┴─────┴─────┘
+     LSB                 MSB
+   (Least             (Most
+ Significant)       Significant)
+
+Human readable order: "Bytes stored in reverse order"
+
+
+MEMORY LAYOUT VISUALIZATION
+===========================
+
+Address:  │ Big Endian │ Little Endian │
+─────────────────────────────────────────
+0x1000    │     12     │      78       │
+0x1001    │     34     │      56       │
+0x1002    │     56     │      34       │
+0x1003    │     78     │      12       │
+
+KEY POINTS:
+• x86/x64 architectures use Little Endian
+• Network protocols typically use Big Endian
+• Important for buffer overflow exploitation
+• Affects how addresses are stored in memory
+```
+
+This visualization shows how the same 32-bit value (0x12345678) is stored differently in memory depending on the endianness of the system. This concept is crucial for buffer overflow training because:
+
+1. **Return addresses** are stored according to the system's endianness
+2. **Shellcode addresses** must be written in the correct byte order
+3. **Payload construction** requires understanding how multi-byte values are arranged in memory
+
+
 ## Overwriting Variables
 
 ## Overwriting Function Pointers

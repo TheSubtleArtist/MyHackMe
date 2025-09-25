@@ -770,10 +770,10 @@ int main(int argc, char **argv)
 
 ### EXECUTION
 
-The `gets()` function, again, readds user inptu in a 14-byte buffer which has no bounds checking.  
+The `gets()` function, again, reads user inptu into a 14-byte buffer which has no bounds checking.  
 The exploitation is more complex in this case.
-The attackers target: `volatile int (*new_ptr)() = normal`
-The objective: Change function pointer from normal to special (or arbitrary address)
+The attacker's target: `volatile int (*new_ptr)() = normal`
+The objective: Change function pointer from normal to special
 Requires the attacker to disocver the exact 8-byte address of the `special` function  
 
 **Execution Flow**  
@@ -788,7 +788,63 @@ Output: "this is the special function" an
 **Note**  
 The buffer variable is of size 14, indicating the solution is will require inputs beginning at the 15th position
 
+### EXERCISE  
 
-## Buffer Overflows Exercise 1  
+#### RECON
 
-## Buffer Overflows Exercise 2
+Use a component of Radare2 to gather metadata about the compiled application, without executing the application.
+`:> rabin2 -I func-pointer`  
+
+**Output**  
+
+```markdown  
+arch     x86 
+baddr    0x400000 // default memory load address
+binsz    6510
+bintype  elf
+bits     64 // helps with identification and use of memory pointers
+canary   false  // no built-in protection to detect stack buffer overflows
+class    ELF64
+compiler GCC: (GNU) 7.3.1 20180303 (Red Hat 7.3.1-5) // vulnerabilities or flaws in the compiler lead to vulnerablities or flaws in the binary
+crypto   false // sensitive data, password verification, communication all happen in plain text
+endian   little
+havecode true // indicates the binary can be disassembled to analys control flow, identify functions, and conduct vulnerability research
+intrp    /lib64/ld-linux-x86-64.so.2
+laddr    0x0
+lang     c
+linenum  true
+lsyms    true
+machine  AMD x86-64 architecture
+maxopsz  16
+minopsz  1
+nx       false
+os       linux
+pcalign  0
+pic      false
+relocs   true
+relro    partial
+rpath    NONE
+sanitiz  false
+static   false
+stripped false
+subsys   linux
+va       true
+```  
+
+**Analysis**  
+
+Architecture: x86-64 bit (drives )
+Endianness: LIttle endian
+Base Address (baddr): default load address in memory
+
+
+
+
+
+
+
+
+
+## BUFFER OVERFLOW EXERCISE 1
+
+## BUFFER OVERFLOW EXERCISE 2

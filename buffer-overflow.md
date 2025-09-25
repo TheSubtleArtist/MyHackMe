@@ -797,10 +797,10 @@ Use a component of Radare2 to gather metadata about the compiled application, wi
 
 **Output**  
 
-```markdown  
+```c 
 arch     x86 
 baddr    0x400000 // default memory load address
-binsz    6510
+binsz    6510 // size of the file in bytes
 bintype  elf
 bits     64 // helps with identification and use of memory pointers
 canary   false  // no built-in protection to detect stack buffer overflows
@@ -810,7 +810,7 @@ crypto   false // sensitive data, password verification, communication all happe
 endian   little
 havecode true // indicates the binary can be disassembled to analys control flow, identify functions, and conduct vulnerability research
 intrp    /lib64/ld-linux-x86-64.so.2
-laddr    0x0
+laddr    0x0 // indicates the load address is determined at runtime, no default address
 lang     c
 linenum  true
 lsyms    true
@@ -820,7 +820,7 @@ minopsz  1
 nx       false
 os       linux
 pcalign  0
-pic      false
+pic      false  
 relocs   true
 relro    partial
 rpath    NONE

@@ -633,6 +633,8 @@ This concept is crucial for buffer overflow training because:
 
 ## Overwriting Variables  
 
+### The Code  
+
 ```c
 
 // integer and character buffer are initialized next to each other
@@ -670,7 +672,7 @@ The compiler automatically adds the last 4-bytes ensuring the size of the vairal
 
 ### MAIN FUNCTION STACK FRAME  
 
-```md
+```markdown
             ┌─────────────────────────────────┐ ← MAIN'S STACK FRAME BEGINS
 0x7fff7fe0  │          char **argv            │ ← Function parameter 2
             │        (8 bytes - RSI)          │   (pointer to argument array)
@@ -720,8 +722,72 @@ The compiler automatically adds the last 4-bytes ensuring the size of the vairal
 Lower Memory Addresses
 ```
 
+The stack grows from high memory address to lower memory address  
+when data is copied/written into the buffer, it is written from lower memory addresses to higher memory addresses  
+
+### BUFFER OVERFLOW VULNERABILIY  
+
+```gets``` takes data afrom the standard input but has no bounds checking to ensure that data is no longer than 14 bytes
+
+Input length > 14 chars → Overwrites padding → Overwrites variable  
+Input length > 16 chars → Overwrites variable (changes from 0)  
+Input length > 32 chars → Overwrites saved registers  
+Input length > 40 chars → Overwrites return address (RIP control)  
 
 ## Overwriting Function Pointers
+
+### The Code
+
+```c
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+
+void special()
+{
+    printf("this is the special function\n");
+    printf("you did this, friend!\n");
+}
+
+void normal()
+{
+    printf("this is the normal function\n");
+}
+
+void other()
+{
+    printf("why is this here?");
+}
+
+int main(int argc, char **argv)
+{
+    volatile int (*new_ptr) () = normal;
+    char buffer[14];
+    gets(buffer);
+    new_ptr();
+}
+```
+
+### EXECUTION
+
+The `gets()` function, again, readds user inptu in a 14-byte buffer which has no bounds checking.  
+The exploitation is more complex in this case.
+The attackers target: `volatile int (*new_ptr)() = normal`
+The objective: Change function pointer from normal to special (or arbitrary address)
+Requires the attacker to disocver the exact 8-byte address of the `special` function  
+
+**Execution Flow**  
+
+`gets()` overflows buffer
+Function pointer `new_ptr` gets overwritten with address of `special()`
+`new_ptr()` call executes `special()` instead of `normal()`
+Output: "this is the special function" an
+
+### FORCING SPECIAL() to EXECUTE  
+
+**Note**  
+The buffer variable is of size 14, indicating the solution is will require inputs beginning at the 15th position
+
 
 ## Buffer Overflows Exercise 1  
 

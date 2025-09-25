@@ -587,8 +587,8 @@ Decimal value: b₇×2⁷ + b₆×2⁶ + b₅×2⁵ + b₄×2⁴ + b₃×2³ + b
 
 For the 8-bit binary number ```01010110```:
 
-MSB (bit 6): 1 → contributes 64 to the decimal value
-LSB (bit 0): 0 → contributes 0 to the decimal value
+MSB (bit 6): 1 → contributes 64 to the decimal value  
+LSB (bit 0): 0 → contributes 0 to the decimal value  
 Total decimal value: 64 + 16 + 4 + 2 = 86  
 
 #### ENDIANNESS RELATIONSHIP
@@ -603,7 +603,7 @@ Network protocols commonly use big-endian
 
 LSB stored at lowest memory address
 x86/x64 architectures employ little-endian
-Facilitates efficient arithmetic operations 
+Facilitates efficient arithmetic operations  
 
 
 ### MEMORY LAYOUT VISUALIZATION
@@ -631,7 +631,95 @@ This concept is crucial for buffer overflow training because:
 2. **Shellcode addresses** must be written in the correct byte order
 3. **Payload construction** requires understanding how multi-byte values are arranged in memory
 
-## Overwriting Variables
+## Overwriting Variables  
+
+```c
+
+// integer and character buffer are initialized next to each other
+// not always the case, but memory is allocated in continuous bytes
+int main(int argc, char **argv)
+{
+  volatile int variable = 0;
+  char buffer[14];
+
+  gets(buffer);
+
+  if(variable != 0) {
+      printf("You have changed the value of the variable\n");
+  } else {
+      printf("Try again?\n");
+  }
+}
+```  
+
+allocated variables are aligned to a particualr size boundaries easing memory allocation and deallocation
+
+### ALIGNMENT VISUALIZATION
+
+In the event a 12-byte array is allocated in a stack asigned for 16-bytes, the memory appears as:
+
+```markdown
+Byte Position:  0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15
+               ┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
+Array Data:    │ 0│ 1│ 2│ 3│ 4│ 5│ 6│ 7│ 8│ 9│10│11│XX│XX│XX│XX│
+               └──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
+               ←─────── Used (12 bytes) ───────→← Padding (4) →
+```
+
+The compiler automatically adds the last 4-bytes ensuring the size of the vairalbe aligns with the stack size.  
+
+### MAIN FUNCTION STACK FRAME  
+
+```md
+            ┌─────────────────────────────────┐ ← MAIN'S STACK FRAME BEGINS
+0x7fff7fe0  │          char **argv            │ ← Function parameter 2
+            │        (8 bytes - RSI)          │   (pointer to argument array)
+            ├─────────────────────────────────┤
+0x7fff7fd8  │           int argc              │ ← Function parameter 1  
+            │        (4 bytes - RDI)          │   (argument count)
+            │         [4 byte pad]            │   (alignment padding)
+            ├─────────────────────────────────┤ ← 16-byte boundary
+0x7fff7fd0  │         RETURN ADDRESS          │ ← Where main() returns to
+            │           (8 bytes)             │   (saved RIP register)
+            ├─────────────────────────────────┤
+0x7fff7fc8  │        SAVED RBP (old)          │ ← SAVED REGISTERS
+            │           (8 bytes)             │   (caller's base pointer)
+            ├─────────────────────────────────┤ ← 16-byte boundary  
+0x7fff7fc0  │                                 │
+            │      SAVED REGISTERS            │ ← Additional callee-saved
+            │    (RBX, R12-R15 if used)       │   registers (if any)
+            │                                 │
+            ├─────────────────────────────────┤ ← 16-byte boundary
+0x7fff7fb0  │     volatile int variable       │ ← VOLATILE INT VARIABLE
+            │          = 0                    │   (4 bytes)
+            │         [4 byte pad]            │   (alignment padding)
+            │         [8 byte pad]            │   (16-byte alignment)
+            ├─────────────────────────────────┤ ← 16-byte boundary
+0x7fff7fa0  │  buffer[13] (TOP OF BUFFER)     │ ← CHAR BUFFER TOP
+            │  buffer[12]                     │   (highest index)
+            │  buffer[11]                     │
+            │  buffer[10]                     │
+            ├─────────────────────────────────┤
+0x7fff7f98  │  buffer[9]                      │
+            │  buffer[8]                      │   
+            │  buffer[7]                      │   CHAR BUFFER[14]
+            │  buffer[6]                      │   (14 bytes allocated)
+            ├─────────────────────────────────┤
+0x7fff7f90  │  buffer[5]                      │
+            │  buffer[4]                      │
+            │  buffer[3]                      │
+            │  buffer[2]                      │
+            ├─────────────────────────────────┤ ← 16-byte boundary
+0x7fff7f88  │  buffer[1]                      │
+            │  buffer[0] (BOTTOM OF BUFFER)   │ ← CHAR BUFFER BOTTOM
+            │         [2 byte pad]            │   (lowest index + padding)
+            │         [4 byte pad]            │   (16-byte alignment)
+            │         [8 byte pad]            │
+            └─────────────────────────────────┘ ← 16-byte boundary
+
+Lower Memory Addresses
+```
+
 
 ## Overwriting Function Pointers
 

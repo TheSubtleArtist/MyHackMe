@@ -441,7 +441,7 @@ Stack Bottom (High Memory Address)
 │ (remains part of calc stack frame)  │
 ├─────────────────────────────────────┤
 │                                     │
-│         add Stack Frame             │
+│         ADD Stack Frame             │
 │                                     │
 └─────────────────────────────────────┘
 
@@ -484,9 +484,9 @@ Upto 6 arguments for functions can be stored in the following registers:
 - rdi: 64-bit general purpose register; primarily serves as the first argument register  
 - rsi: 64-bit general purpose register; primarily serves as the second argument register  
 - rdx: 64-bit general purpose register; third argument register, also a data register for controlling size parameters, modes, and enviornment variables
-- rcx: 64-bit general purpose register; fourth arguement register; loop counter register
-- r8: 64-bit general purpose extended register; fifth arguement register
-- r9: 64-bit general purpose extended register; sixth arguement register; last register for passing parameters/arguements  
+- rcx: 64-bit general purpose register; fourth argueargumentment register; loop counter register
+- r8: 64-bit general purpose extended register; fifth argument register
+- r9: 64-bit general purpose extended register; sixth argument register; last register for passing parameters/arguements  
 
 Note: The use of seven or more arguements results in storing of those values on the functions stack frame
 Arguments 7+: Stored on stack (slower access)  
@@ -561,6 +561,50 @@ Human readable order: "Reads naturally left to right"
 
 Human readable order: "Bytes stored in reverse order"
 
+### BIT SIGNIFICANCE  
+
+#### Most Significant Bit (MSB)
+
+The bit position in a binary number haivng the greatest value or carries the most weight in determining the number's magnitude  
+The leftmost bit and represents the highest power of 2 in the number's positional notation system.
+
+#### Least Significant Bit (LSB)
+
+The bit position with the smallest value or weight in a binary number  
+The rightmost position, the LSB represents 2^0 = 1 and determines whether a number is odd or even.
+
+#### POSITIONAL NOTATION  
+
+```markdown
+Binary number: b₇ b₆ b₅ b₄ b₃ b₂ b₁ b₀
+Decimal value: b₇×2⁷ + b₆×2⁶ + b₅×2⁵ + b₄×2⁴ + b₃×2³ + b₂×2² + b₁×2¹ + b₀×2⁰
+               ↑                                                           ↑
+              MSB                                                         LSB
+              (128)                                                        (1)
+```  
+
+#### EXAMPLE
+
+For the 8-bit binary number ```01010110```:
+
+MSB (bit 6): 1 → contributes 64 to the decimal value
+LSB (bit 0): 0 → contributes 0 to the decimal value
+Total decimal value: 64 + 16 + 4 + 2 = 86  
+
+#### ENDIANNESS RELATIONSHIP
+
+**Big-Endian Systems**  
+
+MSB stored at lowest memory address  
+Natural human reading order preserved  
+Network protocols commonly use big-endian  
+
+**Little-Endian Systems**  
+
+LSB stored at lowest memory address
+x86/x64 architectures employ little-endian
+Facilitates efficient arithmetic operations 
+
 
 ### MEMORY LAYOUT VISUALIZATION
 
@@ -586,7 +630,6 @@ This concept is crucial for buffer overflow training because:
 1. **Return addresses** are stored according to the system's endianness
 2. **Shellcode addresses** must be written in the correct byte order
 3. **Payload construction** requires understanding how multi-byte values are arranged in memory
-
 
 ## Overwriting Variables
 

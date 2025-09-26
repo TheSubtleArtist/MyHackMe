@@ -822,8 +822,8 @@ havecode true // indicates the binary can be disassembled to analys control flow
 intrp    /lib64/ld-linux-x86-64.so.2
 laddr    0x0 // indicates the load address is determined at runtime, no default address
 lang     c
-linenum  true // binary contains debut line number information mapping machine code to source code; exposes: source file paths and names, function names and locations; variable names and scopes; code structure and logic flow, and other items
-lsyms    true // binayr contains debugging metadata; exposes variable names and functionalities, algorithm implementation detials, security-sensitive variable names, etc...
+linenum  true // binary contains debug line number information mapping machine code to source code; exposes: source file paths and names, function names and locations; variable names and scopes; code structure and logic flow, and other items
+lsyms    true // binary contains debugging metadata; exposes variable names and functionalities, algorithm implementation detials, security-sensitive variable names, etc...
 machine  AMD x86-64 architecture
 maxopsz  16 // maximum instruction size supported by the architecture
 minopsz  1 // minimum instruction size supported by the architecture

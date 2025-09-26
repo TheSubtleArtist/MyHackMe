@@ -8,7 +8,7 @@ Basic Buffer Overflows
 [x86-64 Procedures](#x86-64-procedures)  
 [Endianness](#endianness)  
 [Overwriting Variables](#overwriting-variables)  
-[Overwriting Function Pointers](#overwriting-function-pointers)
+[Overwriting Function Pointers](#overwriting-function-pointers)  
 [Exercise 1](#buffer-overflow-exercise-1)  
 [Exercise 2](#buffer-overflow-exercise-2)
 
@@ -844,10 +844,13 @@ va       true
 `:> r2 func-pointer`  
 At the entry point
 
-![Start Radard2](/assets/buffer-overflow-04-function-pointer-01.png,"Radare2")  
+![Start Radare2](/assets/buffer-overflow-04-function-pointer-01.png,"Radare2")  
 
+**Display imports**  
 
+`:>ii`
 
+![Imports](/assets/buffer-overflow-04-function-pointer-02.png,"Imports")
 
 
 

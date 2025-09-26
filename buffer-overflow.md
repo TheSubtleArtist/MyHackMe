@@ -852,12 +852,46 @@ At the entry point
 
 ![Imports](assets/buffer-overflow-05-function-pointer-02.png)
 
+**Display Entrypoints**  
 
+`:>ie`  
 
+[Entry Points](assets/buffer-overflow-06-function-pointer-03.png)  
 
+**Display Strings in the Data Section**  
 
+`:>iz`
 
+[STrings](assets/buffer-overflow-07-function-pointer-04.png)
 
+**Show the flag namespaces**  
+
+`:>fs`  
+
+[flagspaces](assets/buffer-overflow-08-function-pointer-05.png)
+
+**Enumerate Flagspaces**  
+
+recon the flagspaces until there is something intersting
+`:> fs <flagspace name>`
+
+Use a compound command to enumerate the flags in a specific namespace
+
+`fs symbols;f`  
+
+[Symbols](assets/buffer-overflow-09-function-pointer-06.png)  
+
+The symbols flagspace provides the memory location of the sym.special function which is the target.  
+
+`0x00400567 27 sym.special`  
+
+#### EXPLOIT
+
+Exit radare2 and attempt to run the program  
+Based on the size of the char buffer, we know we need fifteen characters before exploiting the memory address.
+The memory address must be in Little Endian  
+
+`:> ./func-pointer aaaaaaaaaaaaaaa67054000`
 
 
 

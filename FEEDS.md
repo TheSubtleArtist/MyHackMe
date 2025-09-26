@@ -1,10 +1,6 @@
-# Awesome Threat Intel RSS Feeds
+# RSS Feeds
 
-A curated list of blogs posting threat intel.
-
-## RSS Feeds
-
-### Analysts
+## Analysts
 
 * nao sec
     * Description: “nao_sec” is a Cyber Security Research Team
@@ -24,7 +20,7 @@ A curated list of blogs posting threat intel.
 
 ---
 
-### Communities
+## Communities
 
 * /r/cybersecurity
     * Description: Cyber security sub-Reddit
@@ -39,7 +35,7 @@ A curated list of blogs posting threat intel.
 
 ---
 
-### Governments
+## Governments
 
 * BSI RSS-Newsfeed
     * Description: The BSI investigates security risks associated with the use of IT and develops preventive security measures.
@@ -104,7 +100,7 @@ A curated list of blogs posting threat intel.
 
 ---
 
-### Journalists
+## Journalists
 
 * Anton on Security
     * Description: Information Security, Cyber Security and Fun!
@@ -229,7 +225,7 @@ A curated list of blogs posting threat intel.
 
 ---
 
-### Vendors
+## Vendors
 
 * 0patch Blog
     * Description: 0patch (pronounced 'zero patch') is a platform for instantly distributing, applying and removing microscopic binary patches to/from running processes without having to restart these processes (much less reboot the entire computer). Brought to you by ACROS Security.

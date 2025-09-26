@@ -850,7 +850,7 @@ At the entry point
 
 `:>ii`
 
-![Imports](assets/buffer-overflow-04-function-pointer-02.png,"Imports")
+![Imports](assets/buffer-overflow-05-function-pointer-02.png,"Imports")
 
 
 

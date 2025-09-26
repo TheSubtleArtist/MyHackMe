@@ -844,13 +844,13 @@ va       true
 `:> r2 func-pointer`  
 At the entry point
 
-![Start Radare2](/assets/buffer-overflow-04-function-pointer-01.png,"Radare2")  
+![Start Radare2](assets/buffer-overflow-04-function-pointer-01.png,"Radare2")  
 
 **Display imports**  
 
 `:>ii`
 
-![Imports](/assets/buffer-overflow-04-function-pointer-02.png,"Imports")
+![Imports](assets/buffer-overflow-04-function-pointer-02.png,"Imports")
 
 
 

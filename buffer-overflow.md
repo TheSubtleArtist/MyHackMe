@@ -856,19 +856,19 @@ At the entry point
 
 `:>ie`  
 
-[Entry Points](assets/buffer-overflow-06-function-pointer-03.png)  
+![Entry Points](assets/buffer-overflow-06-function-pointer-03.png)  
 
 **Display Strings in the Data Section**  
 
 `:>iz`
 
-[STrings](assets/buffer-overflow-07-function-pointer-04.png)
+![Strings](assets/buffer-overflow-07-function-pointer-04.png)
 
 **Show the flag namespaces**  
 
 `:>fs`  
 
-[flagspaces](assets/buffer-overflow-08-function-pointer-05.png)
+![flagspaces](assets/buffer-overflow-08-function-pointer-05.png)
 
 **Enumerate Flagspaces**  
 
@@ -879,7 +879,7 @@ Use a compound command to enumerate the flags in a specific namespace
 
 `fs symbols;f`  
 
-[Symbols](assets/buffer-overflow-09-function-pointer-06.png)  
+![Symbols](assets/buffer-overflow-09-function-pointer-06.png)  
 
 The symbols flagspace provides the memory location of the sym.special function which is the target.  
 
@@ -896,7 +896,7 @@ git a
 This commmand will result in a segmentation fault.  
 Segmentation faults result when a program attempts to access memory it is not authorized to access, or possibly access memory in a way not allowed by the OS memory management unit.  
 
-[Attempt One](assets/buffer-overflow-10-function-pointer-07a.png)  
+![Attempt One](assets/buffer-overflow-10-function-pointer-07a.png)  
 
 We know the number of junk input bytes required to overflow the char buffer.  
 We know the address of the special function.  
@@ -906,7 +906,7 @@ Simplify the exploit using python to generate the bulk of the input.
 
 `python -c 'print "A" * 14 + "\x67\x05\x40"' | ./func-pointer`
 
-[Exploit](assets/buffer-overflow-11-function-pointer-08.png) 
+![Exploit](assets/buffer-overflow-11-function-pointer-08.png) 
 
 
 ## BUFFER OVERFLOW EXERCISE 1

@@ -792,10 +792,10 @@ The buffer variable is of size 14, indicating the solution is will require input
 
 #### RECON
 
-Use a component of Radare2 to gather metadata about the compiled application, without executing the application.
+Use a component of Radare2 to gather metadata about the compiled application, without executing the application.  
 `:> rabin2 -I func-pointer`  
 
-**Output**  
+**OUTPUT**  
 
 ```c 
 arch     x86 
@@ -812,30 +812,28 @@ havecode true // indicates the binary can be disassembled to analys control flow
 intrp    /lib64/ld-linux-x86-64.so.2
 laddr    0x0 // indicates the load address is determined at runtime, no default address
 lang     c
-linenum  true
-lsyms    true
+linenum  true // binary contains debut line number information mapping machine code to source code; exposes: source file paths and names, function names and locations; variable names and scopes; code structure and logic flow, and other items
+lsyms    true // binayr contains debugging metadata; exposes variable names and functionalities, algorithm implementation detials, security-sensitive variable names, etc...
 machine  AMD x86-64 architecture
-maxopsz  16
-minopsz  1
-nx       false
+maxopsz  16 // maximum instruction size supported by the architecture
+minopsz  1 // minimum instruction size supported by the architecture
+nx       false // missing protections; code stored in the stack, heap, or data areas will be executed as code and not treated only as data.
 os       linux
 pcalign  0
-pic      false  
+pic      false  // Position Independent Code; code execute correctly regardless of wheere it's loaded in memory
 relocs   true
 relro    partial
 rpath    NONE
-sanitiz  false
-static   false
-stripped false
+sanitiz  false  //whether or not the binary was compiled with runtime security sanitizers: AddressSanitizer, MemorySantizer; UndefeinedBehaviorSanitizer
+static   false  //whether dependencies are embedded, [statically linked, true] or shared [dynamically linked, false]; shared dependencies increase attack surface
+stripped false // whether or not debugging symbols and metadata have been removed fro mthe binary; impacts reverse engineering complexity
 subsys   linux
 va       true
 ```  
 
-**Analysis**  
+`:> r2 func-pointer`  
 
-Architecture: x86-64 bit (drives )
-Endianness: LIttle endian
-Base Address (baddr): default load address in memory
+
 
 
 

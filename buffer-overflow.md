@@ -890,9 +890,23 @@ The symbols flagspace provides the memory location of the sym.special function w
 Exit radare2 and attempt to run the program  
 Based on the size of the char buffer, we know we need fifteen characters before exploiting the memory address.
 The memory address must be in Little Endian  
+git a
+`:> ./func-pointer AAAAAAAAAAAAAA`
 
-`:> ./func-pointer aaaaaaaaaaaaaaa67054000`
+This commmand will result in a segmentation fault.  
+Segmentation faults result when a program attempts to access memory it is not authorized to access, or possibly access memory in a way not allowed by the OS memory management unit.  
 
+[Attempt One](assets/buffer-overflow-10-function-pointer-07a.png)  
+
+We know the number of junk input bytes required to overflow the char buffer.  
+We know the address of the special function.  
+We know the need to place the address into Little Endian
+
+Simplify the exploit using python to generate the bulk of the input.  
+
+`python -c 'print "A" * 14 + "\x67\x05\x40"' | ./func-pointer`
+
+[Exploit](assets/buffer-overflow-11-function-pointer-08.png) 
 
 
 ## BUFFER OVERFLOW EXERCISE 1

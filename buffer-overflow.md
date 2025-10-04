@@ -1094,12 +1094,68 @@ Enumerate the flagspace `fs <flagspace name>;f` to capture the entry point of th
 
 ![Initial Recon 2](assets/buffer-overflow-14-task8-3.png)  
 
-The entrypoint for the main function is x00400564.
+The entrypoint for the main function is 0x00400564.  
+
+Search for the main function (`s main`) and print (`pdf`) the main function:  
+
+```md
+[0x00400450]> s main
+[0x00400564]> pdf
+ 51: int main (int argc, char **argv, char **envp);
+           ; var char **var_10h @ rbp-0x10
+           ; var int64_t var_4h @ rbp-0x4
+           ; arg int argc @ rdi
+           ; arg char **argv @ rsi
+           ; DATA XREF from entry0 @ 0x40046d
+           0x00400564      55             push rbp
+           0x00400565      4889e5         mov rbp, rsp
+           0x00400568      4883ec10       sub rsp, 0x10
+           0x0040056c      897dfc         mov dword [var_4h], edi     ; argc
+           0x0040056f      488975f0       mov qword [var_10h], rsi    ; argv
+           0x00400573      bf30064000     mov edi, str.Here_s_a_program_that_echo_s_out_your_input ; 0x400630 ; "Here's a program that echo's out your input" ; const char *s
+           0x00400578      e8c3feffff     call sym.imp.puts           ; int puts(const char *s)
+           0x0040057d      488b45f0       mov rax, qword [var_10h]
+           0x00400581      4883c008       add rax, 8
+           0x00400585      488b00         mov rax, qword [rax]
+           0x00400588      4889c7         mov rdi, rax
+           0x0040058b      e897ffffff     call sym.copy_arg
+           0x00400590      b800000000     mov eax, 0
+           0x00400595      c9             leave
+           0x00400596      c3             ret
+[0x00400564]>     
+```  
+
+The call to copy_arg function is  0x0040058b
 The entrypoint for the copy_arg function is 0x00400527.  
+Move to the entry point of the function (`:> s sym.copy_arg`) and print(`pdf`) the function.  
 
-Move to the entry point of the function  
+```armasm
+[0x00400564]> s sym.copy_arg
+[0x00400527]> pdf
+ 61: sym.copy_arg (char *arg1);
+           ; var char *src @ rbp-0x98
+           ; var char *dest @ rbp-0x90
+           ; arg char *arg1 @ rdi
+           ; CALL XREF from main @ 0x40058b
+           0x00400527      55             push rbp
+           0x00400528      4889e5         mov rbp, rsp
+           0x0040052b      4881eca00000.  sub rsp, 0xa0
+           0x00400532      4889bd68ffff.  mov qword [src], rdi        ; arg1
+           0x00400539      488b9568ffff.  mov rdx, qword [src]
+           0x00400540      488d8570ffff.  lea rax, [dest]
+           0x00400547      4889d6         mov rsi, rdx                ; const char *src
+           0x0040054a      4889c7         mov rdi, rax                ; char *dest
+           0x0040054d      e8defeffff     call sym.imp.strcpy         ; char *strcpy(char *dest, const char *src)
+           0x00400552      488d8570ffff.  lea rax, [dest]
+           0x00400559      4889c7         mov rdi, rax                ; const char *s
+           0x0040055c      e8dffeffff     call sym.imp.puts           ; int puts(const char *s)
+           0x00400561      90             nop
+           0x00400562      c9             leave
+           0x00400563      c3             ret
+[0x00400527]> 
+```
 
-`:> s sym.copy_arg`  
+
 
 This will move to the entry point of the copy_arg function, shown by the display of the memory address corresponding to the flagspace
 

@@ -1139,11 +1139,11 @@ We can be reasonably certain we will not need more than two-hundred bytes. So ge
 
 ![Pattern Geenration](assets/buffer-overflow-16-task8-5.png)  
 
-#### Crash and Debug the Script  
+#### Crash and Debug  
 
 First set up the analysis with `aaaa`. This results in some odd output and not really sureif it will cause issues:  
 
-![Odd Output](assets/buffer-overflow-18-task8-7.png)  
+![Odd Output](assets/buffer-overflow-18-task8-7a.png)  
 
 After some looking around ( and by "looking around" I mean asking Claude 4 Sonnet)... here is what I found:  
 
@@ -1166,11 +1166,16 @@ These happen because:
 ```
 
 Since we know the weakness is in the copy_arg function we will use `pdf @sym.copy_arg` to print the function:  
-
-![copy_arg function](assets/buffer-overflow-19-task8-8.png) 
-
-Since I'm using the AttackBox, I don't change colors. That causes a bit of a problem. I know I'm looking for the `ret` address, but it's hidden by the color scheme. It is located at `0x00400563`
-
 Set the breakpoint at the return address: `db 0x00400563`
 
-![Set Breakpoint](assets/buffer-overflow-20-task8-9.png) 
+![Set Breakpoint](assets/buffer-overflow-19-task8-8b.png)
+
+
+**Run The Pattern** 
+
+`:> dc $(cat pattern.txt)` to cause the crash
+
+![Execute the Pattern](assets/buffer-overflow-20-task8-9.png) 
+
+
+**Inspect RSP**

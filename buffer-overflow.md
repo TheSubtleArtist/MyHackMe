@@ -100,8 +100,8 @@ Low Memory (0x00000000)
 
 #### Memory Growth Directions  
 
-Stack:  ▼ ▼ ▼  (High → Low addresses)  
-Heap:   ▲ ▲ ▲  (Low → High addresses)  
+User Stack:     ▼ ▼ ▼  (High → Low addresses)  
+Runtime Heap:   ▲ ▲ ▲  (Low → High addresses)  
 
 #### Memory Section Details  
 
@@ -156,7 +156,7 @@ Heap:   ▲ ▲ ▲  (Low → High addresses)
 └─────────────────────────────────────────────────────────────────┘  
 
 
-Stack Bottom (High Memory Address)
+User Stack Bottom (High Memory Address)
 ┌─────────────────────────────────────┐
 │                                     │
 │           UNUSED STACK              │
@@ -1071,6 +1071,28 @@ You’ve probably noticed that shellcode, memory addresses and NOP sleds are usu
 
 ### Task 8 Exploit  
 
+**Task 8 Code**  
+
+```c
+#include <stdio.h>                                              
+#include <stdlib.h>                                             
+                                                                
+void copy_arg(char *string)                                     
+{                                                               
+    char buffer[140];                                           
+    strcpy(buffer, string);                                     
+    printf("%s\n", buffer);                                     
+    return 0;                                                   
+}                                                               
+                                                                
+int main(int argc, char **argv)                                 
+{                                                               
+    printf("Here's a program that echo's out your input\n");    
+    copy_arg(argv[1]);                                          
+}   
+```
+
+
 **Known**  
 
 - The buffer is 140 bytes
@@ -1078,92 +1100,20 @@ You’ve probably noticed that shellcode, memory addresses and NOP sleds are usu
 - The minimum overflow length is 149 bytes to overflow into the return address
 - The given shellcode is 30 bytes, dropping the number of required NOPS to 118 (again, minimum), so the shellcode begins at 149.
 
-**Initial Recon**  
-
-Use Radare2 to open the buffer-overflow script (`:> r2 buffer-overflow`),  
-perform initial analysis (`:> aaa`), and  
-enumerate the flagspace (`:> fs`)  
-
-![Initial Recon 1](assets/buffer-overflow-13-task8-2.png)
-
-This reveals the entry point of the progra is 0x00400450  
-
-Enumerate the flagspace `fs <flagspace name>;f` to capture the entry point of the main function and the copy_arg function.  
-
-`:> fs symbols; f`  
-
-![Initial Recon 2](assets/buffer-overflow-14-task8-3.png)  
-
-The entrypoint for the main function is 0x00400564.  
-
-Search for the main function (`s main`) and print (`pdf`) the main function:  
-
-```asm
-[0x00400450]> s main
-[0x00400564]> pdf
- 51: int main (int argc, char **argv, char **envp);
-           ; var char **var_10h @ rbp-0x10
-           ; var int64_t var_4h @ rbp-0x4
-           ; arg int argc @ rdi
-           ; arg char **argv @ rsi
-           ; DATA XREF from entry0 @ 0x40046d
-           0x00400564      55             push rbp
-           0x00400565      4889e5         mov rbp, rsp
-           0x00400568      4883ec10       sub rsp, 0x10
-           0x0040056c      897dfc         mov dword [var_4h], edi     ; argc
-           0x0040056f      488975f0       mov qword [var_10h], rsi    ; argv
-           0x00400573      bf30064000     mov edi, str.Here_s_a_program_that_echo_s_out_your_input ; 0x400630 ; "Here's a program that echo's out your input" ; const char *s
-           0x00400578      e8c3feffff     call sym.imp.puts           ; int puts(const char *s)
-           0x0040057d      488b45f0       mov rax, qword [var_10h]
-           0x00400581      4883c008       add rax, 8
-           0x00400585      488b00         mov rax, qword [rax]
-           0x00400588      4889c7         mov rdi, rax
-           0x0040058b      e897ffffff     call sym.copy_arg
-           0x00400590      b800000000     mov eax, 0
-           0x00400595      c9             leave
-           0x00400596      c3             ret
-[0x00400564]>     
-```  
-
-The call to copy_arg function is  0x0040058b
-The entrypoint for the copy_arg function is 0x00400527.  
-Move to the entry point of the function (`:> s sym.copy_arg`) and print(`pdf`) the function.  
-
-```asm
-[0x00400564]> s sym.copy_arg
-[0x00400527]> pdf
- 61: sym.copy_arg (char *arg1);
-           ; var char *src @ rbp-0x98
-           ; var char *dest @ rbp-0x90
-           ; arg char *arg1 @ rdi
-           ; CALL XREF from main @ 0x40058b
-           0x00400527      55             push rbp
-           0x00400528      4889e5         mov rbp, rsp
-           0x0040052b      4881eca00000.  sub rsp, 0xa0
-           0x00400532      4889bd68ffff.  mov qword [src], rdi        ; arg1
-           0x00400539      488b9568ffff.  mov rdx, qword [src]
-           0x00400540      488d8570ffff.  lea rax, [dest]
-           0x00400547      4889d6         mov rsi, rdx                ; const char *src
-           0x0040054a      4889c7         mov rdi, rax                ; char *dest
-           0x0040054d      e8defeffff     call sym.imp.strcpy         ; char *strcpy(char *dest, const char *src)
-           0x00400552      488d8570ffff.  lea rax, [dest]
-           0x00400559      4889c7         mov rdi, rax                ; const char *s
-           0x0040055c      e8dffeffff     call sym.imp.puts           ; int puts(const char *s)
-           0x00400561      90             nop
-           0x00400562      c9             leave
-           0x00400563      c3             ret
-[0x00400527]> 
-```
+#### Find the Segmentation Error
 
 First, attempt to identify the overflow point:
 
 ```bash
 python -c "print('\x41' * 148)" | ./buffer-overflow
 ```
+
 This commmand fails
 
 ![Failed Command](assets/buffer-overflow-15-task8-4a.png)  
 
+The reason lies in the difference between STDIN and command line arguements.  
+Conversely, the command entered pipes the string to STDIN, leaving argv[1] as NULL.  
 
 ```c
 main(int argc, char **argv)  // ← Accepts command line arguments
@@ -1177,8 +1127,54 @@ $ ./program ARGUMENT_HERE
 //         This becomes argv[1]
 ```
 
-Conversely, the command entered pipes the string to STDIN, leaving argv[1] as NULL:
+`:> /buffer-overflow $(python -c "print('\x41'*144)")` causes the segementation error
 
-```bash
-python -c "print('\x41' * 148)" | ./buffer-overflow
+#### Generate A Test Pattern
+
+Continuing to use `\x41` will eventually fail because it will not demonstrate WHERE the program crash is actually caused, only that a crash is caused.  
+
+We can be reasonably certain we will not need more than two-hundred bytes. So generate a 200-by pattern pattern with python.  
+
+`:> python -c "print(''.join([chr(65 + (i % 26)) + str(i % 10) for i in range(100)]))" > pattern.txt`
+
+![Pattern Geenration](assets/buffer-overflow-16-task8-5)  
+
+#### Crash and Debug the Script  
+
+Try Using Tmux to improve efficiency by starting radare2 in debug mode in the left screen and using the right window to crash the script.  
+
+![Tmux](assets/buffer-overflow-17-task8-6a)  
+
+First set up the analysis with `aaaa`. This results in some odd output and not really sureif it will cause issues:  
+
+![Odd Output](assets/buffer-overflow-18-task8-7)  
+
+After some looking around ( and by "looking around" I mean asking Claude 4 Sonnet)... here is what I found:  
+
+```md
+Process with PID 12870 started...     # ✅ Debug process started successfully
+= attach 12870 12870                   # ✅ Attached to the process
+bin.baddr 0x00400000                   # ✅ Binary base address identified
+[0x7ffff7dd9ef0]>                      # ✅ You're now in radare2 debug mode
+
+The warnings you see are normal in debug mode and can be safely ignored for buffer overflow analysis:
+[Cannot analyze at 0x00600ff0g with sym. and entry0 (aa)
+Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
+[TOFIX: aaft can't run in debugger mode.
+
+These happen because:
+
+- Some analysis features work better on static files than live processes
+- radare2 is trying to analyze memory ranges that aren't accessible yet
+- Some advanced analysis doesn't work in debug mode
 ```
+
+Since we know the weakness is in the copy_arg function we will use `pdf @sym.copy_arg` to print the function:  
+
+![copy_arg function](assets/buffer-overflow-19-task8-8) 
+
+Since I'm using the AttackBox, I don't change colors. That causes a bit of a problem. I know I'm looking for the `ret` address, but it's hidden by the color scheme. It is located at `0x00400563`
+
+Set the breakpoint at the return address: `db 0x00400563`
+
+![Set Breakpoint](assets/buffer-overflow-20-task8-9) 

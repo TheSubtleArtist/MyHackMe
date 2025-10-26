@@ -1167,11 +1167,11 @@ Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' ma
            0x0040056f      488975f0       mov qword [var_10h], rsi    ; argv <- moves the memory address of argv array from rsi to var_10h
            0x00400573      bf30064000     mov edi, str.Here_s_a_program_that_echo_s_out_your_input ; 0x400630 ; "Here's a program that echo's out your input"
            0x00400578      e8c3feffff     call sym.imp.puts           ; int puts(const char *s) <- puts prints the string to stdout
-           0x0040057d      488b45f0       mov rax, qword [var_10h] <- go to memory location rbp-0x10, get the value stored there and place that value into rax. The value at this location is the memory address of argv
-           0x00400581      4883c008       add rax, 8 <- add 8 to value (memory address) at rax, effectivly now pointing to argv[1]. In this program, the user's input
-           0x00400585      488b00         mov rax, qword [rax] <- no longer holding a pointer to the memory storing argv[1]. Now holding the memory address of argv[1]
-           0x00400588      4889c7         mov rdi, rax <- moves the memory address of argv[1] to rdi. RDI is the 64-bit register that holds the first argument to a function. The next step is the call to a function that will expect a value in RDI. 
-           0x0040058b      e897ffffff     call sym.copy_arg <- calle the vulnerable function
+           0x0040057d      488b45f0       mov rax, qword [var_10h] ; <- go to memory location rbp-0x10, get the value stored there and place that value into rax. The value at this location is the memory address of argv
+           0x00400581      4883c008       add rax, 8 ; <- add 8 to value (memory address) at rax, effectivly now pointing to argv[1]. In this program, the user's input
+           0x00400585      488b00         mov rax, qword [rax] ; <- no longer holding a pointer to the memory storing argv[1]. Now holding the memory address of argv[1]
+           0x00400588      4889c7         mov rdi, rax ; <- moves the memory address of argv[1] to rdi. RDI is the 64-bit register that holds the first argument to a function. The next step is the call to a function that will expect a value in RDI. 
+           0x0040058b      e897ffffff     call sym.copy_arg ; <- call the vulnerable function
            0x00400590      b800000000     mov eax, 0
            0x00400595      c9             leave
            0x00400596      c3             ret
@@ -1190,20 +1190,20 @@ Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' ma
            ; arg int64_t arg1 @ rdi <- document a function paramter, pointing arg1 to the memory location of rdi
            ; CALL XREF from main @ 0x40058b
            0x00400527      55             push rbp
-           0x00400528      4889e5         mov rbp, rsp <- creates a static reference point that saves the beginning of the stack
-           0x0040052b      4881eca00000.  sub rsp, 0xa0 <- allocate 160 bytes (10*16 + 0 * 16) stack space for this function; subtracts 160 bytes from rsp to move it lower int the stacking, making room for local variables
+           0x00400528      4889e5         mov rbp, rsp ; <- creates a static reference point that saves the beginning of the stack
+           0x0040052b      4881eca00000.  sub rsp, 0xa0 ; <- allocate 160 bytes (10*16 + 0 * 16) stack space for this function; subtracts 160 bytes from rsp to move it lower int the stacking, making room for local variables
            0x00400532      4889bd68ffff.  mov qword [var_98h], rdi    ; arg1 <- rdi is currently storing the memory address of argv[1]. This will move that memory address from rdi as teh value contained in var_98h, at memory address rbp-0x98.
-           0x00400539      488b9568ffff.  mov rdx, qword [var_98h] <-the presence of the brackets moves the value stored at rbp-0x98 to memory location rdx. RDX now contains the pointer to argv[1]
-           0x00400540      488d8570ffff.  lea rax, [var_90h] <- go to the contents of variable var_90h. Determine the memory address where the value starts, load that address into rax.
-           0x00400547      4889d6         mov rsi, rdx <- moves the contents of rdi (the pointer to argv[1]) to rsi
-           0x0040054a      4889c7         mov rdi, rax <- rdi will now contain the beginning address of the 140-byte buffer
+           0x00400539      488b9568ffff.  mov rdx, qword [var_98h] ; <-the presence of the brackets moves the value stored at rbp-0x98 to memory location rdx. RDX now contains the pointer to argv[1]
+           0x00400540      488d8570ffff.  lea rax, [var_90h] ; <- go to the contents of variable var_90h. Determine the memory address where the value starts, load that address into rax.
+           0x00400547      4889d6         mov rsi, rdx ; <- moves the contents of rdi (the pointer to argv[1]) to rsi
+           0x0040054a      4889c7         mov rdi, rax ; <- rdi will now contain the beginning address of the 140-byte buffer
            0x0040054d      e8defeffff     call sym.imp.strcpy         ; char *strcpy(char *dest, const char *src) <- assumes any required parameters start with rdi; it requires two registers meaning rsi (source because it was the second paramter passed) and rdi (destination, as the first parameter passed) are the registers involved; reads the contents of rsi (the memory address location of argv[1], begins the copy operation, reads the value of rdi (the beginning of the 140-byte buffer) and starts writing to var_90h, the buffer)
-           0x00400552      488d8570ffff.  lea rax, [var_90h] <- identifies the beginning memory address of var_90h and places that memory address into rax
-           0x00400559      4889c7         mov rdi, rax <- moves the memory address in rax to rdi, for use in the next function call>
+           0x00400552      488d8570ffff.  lea rax, [var_90h] ; <- identifies the beginning memory address of var_90h and places that memory address into rax
+           0x00400559      4889c7         mov rdi, rax ; <- moves the memory address in rax to rdi, for use in the next function call>
            0x0040055c      e8dffeffff     call sym.imp.puts           ; int puts(const char *s) <- prints whatever the user input until reaching the null terminator '\0', even if it's longer than the 140 byte buffer
-           0x00400561      90             nop <- the next function in main() begins at 0x00400564. One nop is needed to align memory according to the 4-8-16-32-64 byte boundary convention
-           0x00400562      c9             leave <- two instructions in one `mov rsp, rbp` and `pop rbp`, in effect making the entire 160-byte stack available for other functions>
-           0x00400563      c3             ret <- the address of the next instruction to execute, in this case 0x400590, until it's hit with a buffer overflow>
+           0x00400561      90             nop ; <- the next function in main() begins at 0x00400564. One nop is needed to align memory according to the 4-8-16-32-64 byte boundary convention
+           0x00400562      c9             leave ; <- two instructions in one `mov rsp, rbp` and `pop rbp`, in effect making the entire 160-byte stack available for other functions>
+           0x00400563      c3             ret ; <- the address of the next instruction to execute, in this case 0x400590, until it's hit with a buffer overflow>
 
 ```
 

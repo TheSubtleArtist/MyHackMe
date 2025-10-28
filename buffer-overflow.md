@@ -1281,3 +1281,14 @@ Everything in this output is legitimate. The pattern is nowhere to be found.
 We can Print the Disassembly to determine exactly where we are in the program. We will use 5 instructions: `pd 5` This will print the first five instructions starting at rip, the current instruction pointer location:  
 
 ![pd command](assets/buffer-overflow-21-task8-10.png)
+
+```md
+[0x7ffff7b66a66]> pd 5
+        ;-- rip:
+        0x7ffff7b66a66      803900         cmp byte [rcx], 0
+        0x7ffff7b66a69      0f8491160000   je 0x7ffff7b68100
+        0x7ffff7b66a6f      80790100       cmp byte [rcx + 1], 0
+        0x7ffff7b66a73      0f8497160000   je 0x7ffff7b68110
+        0x7ffff7b66a79      80790200       cmp byte [rcx + 2], 0
+
+```

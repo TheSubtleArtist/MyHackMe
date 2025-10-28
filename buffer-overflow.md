@@ -1239,16 +1239,45 @@ Set the breakpoint at the return address: `db 0x00400563`. We want to see the va
 
 ![Execute the Pattern](assets/buffer-overflow-20-task8-9.png) 
 
-**Inspect RSP:** `:> dr rsp`
+**Inspect the Registers:** `dr`
 
 ```md
-[0x7ffff7b66a66]> dr rsp
-0x7fffffffe2d8
-[0x7ffff7b66a66]> px 8 @ rsp
-- offset -       0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
-0x7fffffffe2d8  5205 4000 0000 0000                      R.@.....
+[0x7ffff7b66a66]> dr
+rax = 0x7fffffffe300
+rbx = 0x00000000
+rcx = 0x00000000
+rdx = 0x7fffffffe300
+r8 = 0x00000003
+r9 = 0x00000077
+r10 = 0x0000005e
+r11 = 0x7ffff7b66a60
+r12 = 0x00400450
+r13 = 0x7fffffffe490
+r14 = 0x00000000
+r15 = 0x00000000
+rsi = 0x00000000
+rdi = 0x7fffffffe300
+rsp = 0x7fffffffe2e8
+rbp = 0x7fffffffe390
+rip = 0x7ffff7b66a66
+rflags = 0x00010206
+orax = 0xffffffffffffffff
+[0x7ffff7b66a66]> 
 ```
 
-At `rsp`, the offset is `0x7fffffffe2d8`. The value is `520540`. Since 64-bit architecture works in little-endian, we need to convert this back to big-endian: `400552` which, when converted to ASCII is `R.@.....`. Unfortunately, this  is not in the pattern.
+Problem: None of the pattern appears in any of the registers. It should appear in `rip`, but does not.  
 
-The crash happened before the breakpoing set at `ret` and 
+We need to inspect. We want to Print in heXadecimal the first 32 bytes starting at rsp (the stack pointer): `px 32 @ rsp`  
+
+```md
+[0x7ffff7b66a66]> px 32 @ rsp
+- offset -       0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
+0x7fffffffe2e8  5205 4000 0000 0000 c0f8 dcf7 ff7f 0000  R.@.............
+0x7fffffffe2f8  0000 0000 0000 0000 2b00 0000 0000 0000  ........+.......
+```
+
+Everything in this output is legitimate. The pattern is nowhere to be found.  
+
+We can Print the Disassembly to determine exactly where we are in the program. We will use 5 instructions: `pd 5` This will print the first five instructions starting at rip, the current instruction pointer location:  
+
+![pd command](assets/buffer-overflow-21-task8-10.png)

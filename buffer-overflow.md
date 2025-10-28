@@ -1229,11 +1229,58 @@ This gives us a string of four-byte characters that are still random within the 
 
 `:> r2 -d ./buffer-overflow`
 
-First set up the analysis with `aaaa`.
+First set up the analysis with `aaaa`  
+Search for the known vunlnerable function `s sym.copy_arg`.  
+Print the Disassmbly of the Function with `pdf`
 
-Set the breakpoint at the return address: `db 0x00400563`. We want to see the value that will be sent to `ret` before the crash actually happens. The break will happen before `ret` is executed.
+![pdf sym.copy_arg](assets/buffer-overflow-20-task8-9a.png)
+
++Set the breakpoint at the return address: `db 0x00400563`. We want to see the value that will be sent to `ret` before the crash actually happens. The break will happen before `ret` is executed.
 
 ![Set Breakpoint](assets/buffer-overflow-19-task8-8b.png)
 
-**Run The Pattern:** `:> dc $(cat pattern.txt)` to cause the crash
+**Run The Pattern:** `:> ood $(cat pattern.txt)` to cause the crash
 
+We see the program restarted with the pattern as arguement.  
+
+![ood command](assets/buffer-overflow-21-task8-10a.png)
+
+The `ood` command restarts the program. It's possible the breakpoint set previously did not survive. We check this with `db`:  
+
+[breakpoint check](assets/buffer-overflow-21-task8-10a.png)
+
+The breakpoint survived.  
+
+When executing the `ood` command, the program starts in debug mode. This means the entry point, not main(). Let's verify with `pd 5` to Print the Disassembly of 5 instructions from `rip`:  
+
+We can, now, execute the program to the breakpoint with `dc`.  
+
+![the breakpoint](assets/buffer-overflow-22-task8-12.png)
+
+Inspect the registers with `dr`:  
+
+![dr registers](assets/buffer-overflow-23-task8-13.png)
+
+```md
+[0x00400563]> dr
+rax = 0x000000c9
+rbx = 0x00000000
+rcx = 0x7ffff7b0d584
+rdx = 0x7ffff7dd58c0
+r8 = 0x4641414541414441
+r9 = 0x4141484141474141
+r10 = 0x414b41414a414149
+r11 = 0x00000246
+r12 = 0x00400450
+r13 = 0x7fffffffe380
+r14 = 0x00000000
+r15 = 0x00000000
+rsi = 0x00602260
+rdi = 0x00000000
+rsp = 0x7fffffffe288
+rbp = 0x4179414178414177 <- base pointer is corrupted with our pattern. After changing this from little to big-endian the pattern is "wAAxAAyA"
+rip = 0x00400563 <- Instruction Pointer is holding at the breakpoint
+rflags = 0x00000206
+orax = 0xffffffffffffffff
+
+```

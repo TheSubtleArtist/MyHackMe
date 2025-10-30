@@ -737,7 +737,7 @@ when data is copied/written into the buffer, it is written from lower memory add
 
 ### BUFFER OVERFLOW VULNERABILIY  
 
-```gets``` takes data afrom the standard input but has no bounds checking to ensure that data is no longer than 14 bytes
+`gets` takes data afrom the standard input but has no bounds checking to ensure that data is no longer than 14 bytes
 
 Input length > 14 chars → Overwrites padding → Overwrites variable  
 Input length > 16 chars → Overwrites variable (changes from 0)  
@@ -1043,7 +1043,7 @@ Earlier, we saw that when a function, in this case main, calls another function,
 
 Know that we know we can control the flow of execution by directing the return address to some memory address, how do we actually do something useful with this. This is where shellcode comes in; shell code quite literally is code that will open up a shell. More specifically, it is binary instructions that can be executed. Since shellcode is just machine code(in the form of binary instructions), you can usually start of by writing a C program to do what you want, compile it into assembly and extract the hex characters(alternatively it would involve writing your own assembly). 
 
-For now we’ll use this shellcode that opens up a basic shell:
+An example shellcode that opens up a basic shell:
 `\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05`
 
 The basic idea is that we need to point the overwritten return address to the shellcode, but where do we actually store the shellcode and what actual address do we point it at?  
@@ -1284,3 +1284,37 @@ rflags = 0x00000206
 orax = 0xffffffffffffffff
 
 ```
+
+We know `ret` will cause the program to jump to `rsp`. The value of `rsp` is the next item to question: `px 16 @ rsp`
+
+![rsp](assets/buffer-overflow-24-task8-14.png)
+
+`rsp` contains `AzAA1AA2AA3AA4AA`  
+
+There are now two pieces of valuable information:  
+
+- Saved rbp contains: "wAxAwAy"
+- Return address contains: "AzAA1AA2"
+
+Controlling the `ret`urn address, we must accurately identify the offset. That means identifying how many bytes are in the pattern before the pattern currently contained in `ret`.
+
+two available options are:
+
+`:> echo -n "$(cat pattern.txt)" | grep -b -o "AzAA1AA2"` 
+![option 1](assets/buffer-overflow-25-task8-15.png)
+
+`:> echo -n "$(cat pattern.txt'" | awk '{print index($0, "AzAA1AA2")-1}'`  
+
+![option 2](assets/buffer-overflow-26-task8-16.png)
+
+What we know now:
+
+- It took 144 bytes to crash the program
+- Bytes 144-151 overwrites some other date, like `rbp`
+- `ret` begins at 152 bytes
+- Butes 152-159 overwrite the return address  
+
+#### Exploit 
+
+The exploit works, as previously stated, by placing the shellcode into the buffer and inserting the memory address of the buffer start point into `ret`. Between `buffer` and `ret` we use NOPS.
+

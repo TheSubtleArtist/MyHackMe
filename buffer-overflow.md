@@ -1233,23 +1233,7 @@ First set up the analysis with `aaaa`
 Search for the known vunlnerable function `s sym.copy_arg`.  
 Print the Disassmbly of the Function with `pdf`
 
-![pdf sym.copy_arg](assets/buffer-overflow-20-task8-9a.png)
-
-+Set the breakpoint at the return address: `db 0x00400563`. We want to see the value that will be sent to `ret` before the crash actually happens. The break will happen before `ret` is executed.
-
-![Set Breakpoint](assets/buffer-overflow-19-task8-8b.png)
-
 **Run The Pattern:** `:> ood $(cat pattern.txt)` to cause the crash
-
-We see the program restarted with the pattern as arguement.  
-
-![ood command](assets/buffer-overflow-21-task8-10a.png)
-
-The `ood` command restarts the program. It's possible the breakpoint set previously did not survive. We check this with `db`:  
-
-[breakpoint check](assets/buffer-overflow-21-task8-10a.png)
-
-The breakpoint survived.  
 
 When executing the `ood` command, the program starts in debug mode. This means the entry point, not main(). Let's verify with `pd 5` to Print the Disassembly of 5 instructions from `rip`:  
 

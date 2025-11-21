@@ -1080,7 +1080,7 @@ You’ve probably noticed that shellcode, memory addresses and NOP sleds are usu
 - The buffer is 140 bytes
 - The 64-bit architecture uses an 8-byte base pointer (rbp)
 - There will also be an 8-byte instruction pointer
-- The minimum overflow length is 156 bytes to reach the return address and 149 bytes to begin overwriting the return address
+- The minimum overflow length is 156 bytes to reach the return address at byte 157 to begin overwriting the return address
 
 The Expected memory space looks like
 

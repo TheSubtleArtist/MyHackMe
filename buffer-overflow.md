@@ -1073,8 +1073,6 @@ You’ve probably noticed that shellcode, memory addresses and NOP sleds are usu
 
 ### Task 8 Exploit  
 
-**Task 8 Code**  
-
 **So Far**  
 
 - The buffer is 140 bytes
@@ -1087,7 +1085,6 @@ The Expected memory space looks like
 ```md
 [140-byte buffer][8-byte RBP][8-byte RIP][8-byt return address]
 ```
-
 
 #### Find the Segmentation Error
 
@@ -1116,7 +1113,7 @@ $ ./program ARGUMENT_HERE
 //         This becomes argv[1]
 ```
 
-`:> /buffer-overflow $(python -c "print('\x41'*144)")` causes the segementation error. However, this is much earlier than expected.  
+`:> /buffer-overflow $(python -c "print('\x41'*157)")` causes the segementation error.  
 
 #### Examine the flow
 
@@ -1247,7 +1244,7 @@ orax = 0xffffffffffffffff
 [0x00400563]> 
 ```
 
-For use in the eventual exploit, this must be in little-endian: \x10\xe2\xff\xff\xff\x7f\x00\x00
+For use in the eventual exploit, this must be in little-endian: \x10\xe2\xff\xff\xff\x7f
 
 continue to the next breakpoint: `dc`
 

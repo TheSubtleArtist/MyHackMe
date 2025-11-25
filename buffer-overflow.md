@@ -15,6 +15,8 @@ Basic Buffer Overflows
 ## Tools
 
 - radare2  
+- ragg2
+- pwn
 
 ## Process Layout
 
@@ -117,7 +119,7 @@ Runtime Heap:   ▲ ▲ ▲  (Low → High addresses)
 
 ##### Shared Library Region  
 
-- used to either statically or dynamically link libraries  
+- used to either statically or dynamically linked libraries  
 - Houses dynamically linked libraries
 - Shared between multiple processes
 - Includes system libraries (libc, libm, etc.)
@@ -312,183 +314,8 @@ FUNCTION RETURN (Deallocating Frame):
 └─────────────────────────────────────┘
 ```
 
-### DETAILED PUSH/POP MECHANICS
-
-```markdown
-RSP Movement during PUSH:
-┌──────────┬──────────┬──────────────────────────┐
-│ Before   │ After    │ Action                   │
-├──────────┼──────────┼──────────────────────────┤
-│ 0x1020   │ 0x1018   │ push var1 (rsp -= 8)     │
-│ 0x1018   │ 0x1010   │ push var2 (rsp -= 8)     │
-│ 0x1010   │ 0x1008   │ push var3 (rsp -= 8)     │
-└──────────┴──────────┴──────────────────────────┘
-
-RSP Movement during POP:
-┌──────────┬──────────┬──────────────────────────┐
-│ Before   │ After    │ Action                   │
-├──────────┼──────────┼──────────────────────────┤
-│ 0x1008   │ 0x1010   │ pop var3 (rsp += 8)      │
-│ 0x1010   │ 0x1018   │ pop var2 (rsp += 8)      │
-│ 0x1018   │ 0x1020   │ pop var1 (rsp += 8)      │
-└──────────┴──────────┴──────────────────────────┘
-
-Memory State After POP Operations:
-┌─────────────────┐
-│   Unused Space  │
-├─────────────────┤ ← rsp = 0x1020 (back to original)
-│      var1       │ ← DATA STILL EXISTS!
-├─────────────────┤   But is now "above" stack top
-│      var2       │ ← DATA STILL EXISTS!
-├─────────────────┤   Will be overwritten by future pushes
-│      var3       │ ← DATA STILL EXISTS!
-└─────────────────┘
-```
-
-### STACK POINTER DIRECTIONS
-
-```markdown
-   ▲ Higher Memory Addresses (Stack Bottom)
-   │
-   │ POP: rsp += 8 ↑ (moves UP toward higher addresses)
-   │
-   │ PUSH: rsp -= 8 ↓ (moves DOWN toward lower addresses)
-   │
-   ▼ Lower Memory Addresses (Stack Top, toward 0x0)
-```
-
-Function Call Flow:  
-main() calls function_a():  
-  • Creates new stack frame  
-  • rsp moves DOWN (lower addresses)  
-  
-function_a() returns to main():  
-  • Destroys stack frame  
-  • rsp moves UP (higher addresses)  
-
-### Key Stack Concepts Summary
-
-| Concept | Description | Memory Effect |
-|---------|-------------|---------------|
-| **Stack Frame** | Dedicated memory area for each function | Allocated on call, deallocated on return |
-| **PUSH Operation** | Add data to stack top | rsp decreases by 8, data written |
-| **POP Operation** | Remove data from stack top | rsp increases by 8, data read (but memory unchanged!) |
-| **Stack Growth** | Always toward lower memory addresses | New data appears at progressively lower addresses |
-| **Frame Management** | Each function gets its own frame | Automatic allocation/deallocation |
-
-### Critical Notes
-
-🔹 **Memory Persistence**: POP operations don't erase memory - they only move the stack pointer!  
-🔹 **Stack Direction**: Stack grows DOWN (toward address 0x0) but we often draw it growing UP for visual clarity  
-🔹 **Frame Isolation**: Each function's stack frame is separate, providing local variable isolation  
-🔹 **Automatic Management**: Stack frames are automatically managed by the CPU and compiler  
-
-This design makes function calls efficient and provides automatic memory management for local variables and function parameters.  
-
-### Control Flow
-
-Consider two functions:  
-
-```markdown
-
-int add(int a, int b){
-   int new = a + b;
-   return new;
-}
-
-
-int calc(int a, int b){
-   int final = add(a, b);
-   return final;
-}
-
-calc(4, 5)
-```  
-
-The following explanation assumes the current point of execution is inside the ```calc``` function. In this case ```calc``` is known as the ```caller function``` and ```add``` is known as the ```callee function```dotnetcli
-
-The following presents the assembly code inside ```calc```dotnetcli
-
-![sym.calc](assets/buffer-overflow-01-calc-function.png)  
-
-```markdown
-
-Stack Bottom (High Memory Address)
-┌─────────────────────────────────────┐
-│                                     │
-│       Previous Stack Frame          │
-│                                     │
-├─────────────────────────────────────┤
-│                                     │
-│          CALC Stack Frame           │
-│                                     │
-└─────────────────────────────────────┘
-Stack Top (Low Memory Address 0x0)
-```
-
-```add``` is invoked using the call operand (```callq sym.add```) in assembly.  
-The call operand can take either a label as an argument(e.g. A function name), or it can take a memory address as an offset to the location of the start of the function in the form of call *value.  
-Once the add function is invoked(and after it is completed), the program would need to know what point (memory address) to continue in the program.  
-To do this, the computer pushes the address of the next instruction onto the stack, in this case the address of the instruction ```movl %eax, local_4h```.  
-After this, the program would allocate a stack frame for the new function, change the current instruction pointer to the first instruction in the function, change the stack pointer(rsp) to the top of the stack, and change the frame pointer(rbp) to point to the start of the new frame.  
-
-![sym.add](assets/buffer-overflow-02-add-function.png)
-
-```markdown
-
-Stack Bottom (High Memory Address)
-┌─────────────────────────────────────┐
-│                                     │
-│       Previous Stack Frame          │
-│                                     │
-├─────────────────────────────────────┤
-│                                     │
-│          CALC Stack Frame           │
-│                                     │
-├─────────────────────────────────────┤
-│                                     │
-│         Return address (retq)       │
-│ (remains part of calc stack frame)  │
-├─────────────────────────────────────┤
-│                                     │
-│         ADD Stack Frame             │
-│                                     │
-└─────────────────────────────────────┘
-
-Stack Top (Low Memory Address 0x0)
-```
-
-Once ```add``` finishes execution, it calls the return instruction(retq).  
-This instruction will:
-
-- pop the value of the return address of the stack (```popq %rbp```)
-- deallocate the stack frame for the add function
-- change the instruction pointer to the value of the return address (```0x562b77165631```)
-- change the stack pointer(rsp) to the top of the stack, and
-- change the frame pointer(rbp) to the stack frame of calc.
-
-This returns to the previous state  
-
-```markdown
-
-Stack Bottom (High Memory Address)
-┌─────────────────────────────────────┐
-│                                     │
-│       Previous Stack Frame          │
-│                                     │
-├─────────────────────────────────────┤
-│                                     │
-│          CALC Stack Frame           │
-│                                     │
-└─────────────────────────────────────┘
-Stack Top (Low Memory Address 0x0)
-```
-
 ### Data Transfer  
 
-![sym.calc](assets/buffer-overflow-03-calc-function.png)  
-
-The calc function takes 2 arguments(a and b).  
 Upto 6 arguments for functions can be stored in the following registers:  
 
 - rdi: 64-bit general purpose register; primarily serves as the first argument register  
@@ -524,10 +351,7 @@ Callee's responsibility to preserve during function execution
 
 - RBX, RBP, R12, R13, R14, R15, RSP
 
-
 ## ENDIANNESS
-
-
 
 ### ENDIANNESS COMPARISON
 
@@ -1053,10 +877,8 @@ Here’s the general process so far:
 - Calculate the difference between these addresses so you know how much data to enter to overflow
 - Start out by entering the shellcode in the buffer, entering random data between the shellcode and the return address, and the address of the buffer in the return address
 
-![Shell Code In Stack](assets/buffer-overflow-12-task8-1.png)
-
 Memory addresses may not be the same on different systems, even across the same computer when the program is recompiled. 
-Make this more flexible by using a NOP instruction. A NOP instruction is a no operation instruction - when the system processes this instruction, it does nothing, and carries on execution. A NOP instruction is represented using \x90. Putting NOPs as part of the payload means an attacker can jump anywhere in the memory region that includes a NOP and eventually reach the intended instructions. This is what an injection vector would look like:
+Make this more flexible by using a NOP instruction. A NOP instruction is a `no operation instruction` - when the system processes this instruction, it does nothing, and carries on execution. A NOP instruction is represented using \x90. Putting NOPs as part of the payload means an attacker can jump anywhere in the memory region that includes a NOP and eventually reach the intended instructions. The vector looks like:
 
 ```markdown
 ┌──────────────────┐────────────────────┐────────────────────────┐
@@ -1068,16 +890,7 @@ You’ve probably noticed that shellcode, memory addresses and NOP sleds are usu
 
 `python -c “print (NOP * no_of_nops + shellcode + random_data * no_of_random_data + memory address)”`
 
-### Task 8 Exploit  
-
-**So Far**  
-
-- The buffer is 140 bytes
-- The 64-bit architecture uses an 8-byte base pointer (rbp)
-- There will also be an 8-byte instruction pointer
-- The minimum overflow length is 156 bytes to reach the return address at byte 157 to begin overwriting the return address
-
-#### Find the Segmentation Error
+### Find the Segmentation Error
 
 We will start at byte 141. This will allow us to see if a compiler has altered the stack layout
 

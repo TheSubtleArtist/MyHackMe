@@ -4,7 +4,11 @@ Basic Buffer Overflows
 
 ## TABLE OF CONTENTS
 
-@import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false}
+
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
+
 
 
 ## Tools

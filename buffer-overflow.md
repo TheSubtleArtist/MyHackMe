@@ -4,19 +4,13 @@ Basic Buffer Overflows
 
 ## TABLE OF CONTENTS
 
-[Process Layout](#process-layout)  
-[x86-64 Procedures](#x86-64-procedures)  
-[Endianness](#endianness)  
-[Overwriting Variables](#overwriting-variables)  
-[Overwriting Function Pointers](#overwriting-function-pointers)  
-[Exercise 1](#buffer-overflow-exercise-1)  
-[Exercise 2](#buffer-overflow-exercise-2)
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
+
 
 ## Tools
 
 - radare2  
 - ragg2
-- pwn
 
 ## Process Layout
 
@@ -732,7 +726,7 @@ Simplify the exploit using python to generate the bulk of the input.
 
 ![Exploit](assets/buffer-overflow-11-function-pointer-08.png) 
 
-## BUFFER OVERFLOW EXERCISE 1
+## BUFFER OVERFLOWS
 
 ### Task 8 Code
 
@@ -992,11 +986,7 @@ We can use a pattern of 200 bytes to make sure we get something we can trace.
 
 `:> python -c "print(''.join([chr(65 + (i % 26)) + str(i % 10) for i in range(100)]))" > pattern.txt`
 
-![Pattern Geenration](assets/buffer-overflow-16-task8-5.png)  
-
 Since we are already using radare2, we can use the simpler ragg2: `:> ragg2 -P 200 -r -o pattern.txt`
-
-![Different Pattern Geenration](assets/buffer-overflow-17-task8-6a.png)  
 
 This gives us a string of four-byte characters that are still random within the overall string. This will allow us to trace the offset where the overflow happens.
 
@@ -1299,3 +1289,151 @@ omgyoudidthissocool!!
 sh-4.2$ 
 
 ```
+
+## Buffer Overflow 2
+
+### Task 9 Code
+
+```c
+void concat_arg(char *string)
+{
+    char buffer[154] = "doggo";
+    strcat(buffer, string);
+    printf("new word is %s\n", buffer);
+    return 0;
+}
+
+int main(int argc, char **argv)
+{
+    concat_arg(argv[1]);
+}
+```
+
+### Find the Segmentation Error
+
+```md
+[user1@ip-10-67-163-144 overflow-4]$ ./buffer-overflow-2 $(ragg2 -P 153 -r)
+new word is doggoAAABAACAADAAEAAFAAGAAHAAIAAJAAKAALAAMAANAAOAAPAAQAARAASAATAAUAAVAAWAAXAAYAAZAAaAAbAAcAAdAAeAAfAAgAAhAAiAAjAAkAAlAAmAAnAAoAApAAqAArAAsAAtAAuAAvAAwAAxAAyAA
+[user1@ip-10-67-163-144 overflow-4]$ ./buffer-overflow-2 $(ragg2 -P 154 -r)
+new word is doggoAAABAACAADAAEAAFAAGAAHAAIAAJAAKAALAAMAANAAOAAPAAQAARAASAATAAUAAVAAWAAXAAYAAZAAaAAbAAcAAdAAeAAfAAgAAhAAiAAjAAkAAlAAmAAnAAoAApAAqAArAAsAAtAAuAAvAAwAAxAAyAAz
+[user1@ip-10-67-163-144 overflow-4]$ ./buffer-overflow-2 $(ragg2 -P 155 -r)
+new word is doggoAAABAACAADAAEAAFAAGAAHAAIAAJAAKAALAAMAANAAOAAPAAQAARAASAATAAUAAVAAWAAXAAYAAZAAaAAbAAcAAdAAeAAfAAgAAhAAiAAjAAkAAlAAmAAnAAoAApAAqAArAAsAAtAAuAAvAAwAAxAAyAAzA
+Segmentation fault
+```
+
+The Segmentation error begins at character 155 of the input string.  
+
+### Examine the Flow
+
+```md
+ser1@ip-10-67-163-144 overflow-4]$ r2 -d ./buffer-overflow-2 $(ragg2 -P 155 -r)
+Process with PID 12679 started...
+= attach 12679 12679
+bin.baddr 0x00400000
+Using 0x400000
+asm.bits 64
+ -- phrack, better than java in the browser -- jvoisin
+[0x7ffff7dd9ef0]> aaaa
+[Cannot analyze at 0x00600ff0g with sym. and entry0 (aa)
+Invalid address from 0x00400629
+[x] Analyze all flags starting with sym. and entry0 (aa)
+[Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
+Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
+[x] Analyze function calls (aac)
+[x] Analyze len bytes of instructions for references (aar)
+[x] Check for objc references
+[x] Check for vtables
+[TOFIX: aaft can't run in debugger mode.ions (aaft)
+[x] Type matching analysis for all functions (aaft)
+[x] Propagate noreturn information
+[x] Use -AA or aaaa to perform additional experimental analysis.
+[Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
+[x] Finding function preludes
+[x] Enable constraint types analysis for variables
+[0x7ffff7dd9ef0]> s main
+[0x004005ac]> pdf
+ 41: int main (int argc, char **argv, char **envp);
+           ; var int64_t var_10h @ rbp-0x10 <- initiate a 64-bit variable at memory address rbp-0x10 (rbp minus 16 bytes) 
+           ; var int64_t var_4h @ rbp-0x4 <- initiate a 64-bit variable at memory address rbp-0x04 (rbp minus 4 bytes) 
+           ; arg int argc @ rdi <- radare notation indicating that argc (argument count) parameter is passed via the rdi register
+           ; arg char **argv @ rsi <- argv, which is an array of string pointers,  will be passed using the rsi register
+           ; DATA XREF from entry0 @ 0x40046d
+           0x004005ac      55             push rbp ; <- takes the current value in the rbp register and pushes it onto the stack, preserving the caller's stack frame so it can be restored later.
+           0x004005ad      4889e5         mov rbp, rsp ;<- Copy the memory address of rsp into rbp. rsp and rbp temporarily point to the same memory location.
+           0x004005b0      4883ec10       sub rsp, 0x10 ;<- subtract 16 from rsp. Note: there are now 16 bytes between rsp and rbp
+```
+
+Summarize the function prologue:
+
+- Save old rbp (push rbp)
+- Establish new base pointer (mov rbp, rsp)
+- Allocate local stack space (sub rsp, 0x10)
+           
+Note: There are only 16 bytes allocated to the main function.
+
+```md
+           
+           0x004005b4      897dfc         mov dword [var_4h], edi     ; argc <- This instruction moves the value stored at edi to to the variable var_4h. The dword, or double word, type indicates it should be given 4 bytes of space.
+```
+```md
+rdi:  [-------- 64 bits / 8 bytes --------]
+edi:            [-- 32 bits / 4 bytes --]
+```
+
+```md
+
+           0x004005b7      488975f0       mov qword [var_10h], rsi    ; argv <- takes the value stored in the rsi register and moves it to become the value stored in the variable var_10h. This is argv. qword will take the full 8 bytes. It uses the full 8 bytes because the value being moved is a memory address that points to argv.
+           0x004005bb      488b45f0       mov rax, qword [var_10h] ;<- Move the value stored in var_10h (the memory address pointing to argv) into the rax register
+           0x004005bf      4883c008       add rax, 8 ; <- This instruction adds 8 to the value in the rax register. In effect, the memory address stored in the rax register no longer points to argv, but to argv[1], or $(ragg2 -P 155 -r)
+           0x004005c3      488b00         mov rax, qword [rax] ; pointer dereference <- dereference the pointer to argv[1] and store the memory address containing the actual string
+           0x004005c6      4889c7         mov rdi, rax ; <- moves the memory address containing the actual string into rdi , which is the first parameter register, making it available to pass to a function call.
+           0x004005c9      e859ffffff     call sym.concat_arg ; <- call the function, in this case the vulnerable function
+           0x004005ce      b800000000     mov eax, 0 ; <- zero out the content of register eax
+           0x004005d3      c9             leave ; <- cleans up the stack frame by setting rsp=rbp, pops rbp
+           0x004005d4      c3             ret ;<- return to the caller of main()
+[0x004005ac]> 
+```
+
+```md
+0x7ffff7dd9ef0]> s sym.concat_arg
+[0x00400527]> pdf
+ 133: sym.concat_arg (int64_t arg1);
+           ; var int64_t var_a8h @ rbp-0xa8 ; <- create variable var_a8h at rbp minus 168 bytes
+           ; var int64_t var_a0h @ rbp-0xa0 ; <- create variable var_a0h at rbp minus 160 bytes
+           ; var int64_t var_98h @ rbp-0x98 ; <- create variable var_98h at rbp minus 152 bytes
+           ; var int64_t var_90h @ rbp-0x90 ; <- create variable var_90h at rbp minus 144, this will be the user input
+           ; arg int64_t arg1 @ rdi ; <- create variable arg1 @ rdi, the first paramter register for this function
+           ; CALL XREF from main @ 0x4005c9
+           0x00400527      55             push rbp ; <- takes the current value in the rbp register and pushes it onto the stack, preserving the caller's stack frame so it can be restored later.
+           0x00400528      4889e5         mov rbp, rsp ; <- initiate a 64-bit variable at memory address rbp-0x04 (rbp minus 4 bytes) 
+           0x0040052b      4881ecb00000.  sub rsp, 0xb0 ;<- subtract 176 from rsp. Note: there are now 176 bytes between rsp and rbp
+           0x00400532      4889bd58ffff.  mov qword [var_a8h], rdi    ; arg1 <- move the memory address stored in rdi (which points to the string) into the variable var_a8h
+           0x00400539      48b8646f6767.  movabs rax, 0x6f67676f64    ; 'doggo'<- move the absolute value of the hex (which turns out to be doggo) and place it into rax register, not a memory pointer
+           0x00400543      ba00000000     mov edx, 0 ; <-zero out edx>
+           0x00400548      48898560ffff.  mov qword [var_a0h], rax ; <- move the 8-bytes stored in the rax register to the variable var_a0h, this is 'doggo'>
+           0x0040054f      48899568ffff.  mov qword [var_98h], rdx ; <-move the 8 bytes stored in the rdx register into the variable var_98h which stores 8 zero bytes in rdx since edx was zeroed in a previous instruction>
+           0x00400556      488d9570ffff.  lea rdx, [var_90h] ; <- load effective addres of var_90h into the rdx register>
+           0x0040055d      b800000000     mov eax, 0 ;<- zero out eax>
+           0x00400562      b911000000     mov ecx, 0x11               ; 17 <- load the  value of 17 inot ecx>
+           0x00400567      4889d7         mov rdi, rdx ;<- move the memory address pointing to var_90h into rdi register>
+           0x0040056a      f348ab         rep stosq qword [rdi], rax ; <- rax currnetly holds only zeros. Store 8 bytes of zeros from rax into the memory location pointed to by rdi. repeast (rep) this process whil incrementing the memory location by 8 bytes and perform this iteration based on the value stored in the exc register.>
+           0x0040056d      4889fa         mov rdx, rdi ;<- move the memory address stored at rdi into rdx.>
+           0x00400570      668902         mov word [rdx], ax ; <- move the two byte word stored at ax (two zeroes) into the memory location represented by rdx, This moves the 2 rightmost zero bytes from rax into the memory location that rdx points to>
+           0x00400573      4883c202       add rdx, 2 ; <- add two to the memory address stored in rdx>
+           0x00400577      488b9558ffff.  mov rdx, qword [var_a8h] ; <- move the 8 bytes stored at the beginning of var_a8h into rdx, this moves the memory pointer which points to the string into rdx>
+           0x0040057e      488d8560ffff.  lea rax, [var_a0h] ;<- load the effective address of var_a0h into rax. This will be the memory address that points to the doggo string>
+           0x00400585      4889d6         mov rsi, rdx ;<- move the memory address stored in rdx to rsi, rsi now contains the pointer to the input string>
+           0x00400588      4889c7         mov rdi, rax ; <- load the memory address at rax into rdi, rdi now contains the memory address pointing to the doggo string>
+           0x0040058b      e8b0feffff     call sym.imp.strcat         ; char *strcat(char *s1, const char *s2) <- call the string  concatenation function and send two parameters. rdi contains the pointer to the doggo string and rsi contains the pointer to the input string. The result is written back to the same memory location which rdi points to. this is where the buffer overflow happens.>
+           0x00400590      488d8560ffff.  lea rax, [var_a0h] ; <- load the effective address of var_a0h into rax. this was the memory address pointing to the doggo string, and is now the memory address pointing to the concatenated string>
+           0x00400597      4889c6         mov rsi, rax ;< move the memory address pointing to the concatenated string into rsi register>
+           0x0040059a      bf70064000     mov edi, str.new_word_is__s ; 0x400670 ; "new word is %s\n" ; <- moves the memory address pointing to the new string into the edi register>
+           0x0040059f      b800000000     mov eax, 0 ; <- zero out the eax register>
+           0x004005a4      e887feffff     call sym.imp.printf         ; int printf(const char *format) <- by convention, takes rdi (which includes edi) and rsi (containing the pointer to the concatenated string) and execute the print function>
+           0x004005a9      90             nop ; <- alignment byte>
+           0x004005aa      c9             leave ; <- cleans up the stack frame by setting rsp=rbp, pops rbp
+           0x004005ab      c3             ret ; <- return to calling function>
+[0x00400527]> 
+
+```
+

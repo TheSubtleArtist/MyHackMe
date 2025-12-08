@@ -50,16 +50,17 @@ Basic Buffer Overflows
     - [Task 8 Code](#task-8-code)
     - [The Stack Frame](#the-stack-frame)
     - [Shellcode](#shellcode)
-    - [Find the Segmentation Error](#find-the-segmentation-error)
-      - [Examine the flow](#examine-the-flow)
-      - [Call the Vulnerable Function](#call-the-vulnerable-function)
+    - [Find the Task 8 Segmentation Error](#find-the-task-8-segmentation-error)
+      - [Examine the task 8 flow](#examine-the-task-8-flow)
+      - [Call the Vulnerable Task 8 Function](#call-the-vulnerable-task-8-function)
       - [Generate A Test Pattern](#generate-a-test-pattern)
-      - [Crash and Debug](#crash-and-debug)
-      - [Exploit](#exploit-1)
+      - [Crash and Debug  the Task 8 program](#crash-and-debug--the-task-8-program)
+      - [Exploit the Task 8 program](#exploit-the-task-8-program)
   - [Buffer Overflow 2](#buffer-overflow-2)
     - [Task 9 Code](#task-9-code)
-    - [Find the Segmentation Error](#find-the-segmentation-error-1)
-    - [Examine the Flow](#examine-the-flow-1)
+    - [Find the Task 9 Segmentation Error](#find-the-task-9-segmentation-error)
+    - [Examine the Task 9 Flow](#examine-the-task-9-flow)
+    - [The Task 9 Stack Frame](#the-task-9-stack-frame)
 
 
 ## Tools
@@ -939,7 +940,7 @@ You’ve probably noticed that shellcode, memory addresses and NOP sleds are usu
 
 `python -c “print (NOP * no_of_nops + shellcode + random_data * no_of_random_data + memory address)”`
 
-### Find the Segmentation Error
+### Find the Task 8 Segmentation Error
 
 We will start at byte 141. This will allow us to see if a compiler has altered the stack layout
 
@@ -949,7 +950,7 @@ We will start at byte 141. This will allow us to see if a compiler has altered t
 
 It is likely we are overwriting the Saved Base Pointer (RBP). Disassembly is required to determine what is contained at bytes 141,142, and 143.  
 
-#### Examine the flow
+#### Examine the task 8 flow
 
 Start radare2 in  debug mode: `:> r2 -d ./buffer-overflow`  
 radare starts at the entry point instead of main().  
@@ -984,7 +985,7 @@ Use `:> s main` to find main(), then `pdf` to 'print disassembly of function' ma
 
 ```
 
-#### Call the Vulnerable Function  
+#### Call the Vulnerable Task 8 Function  
 
 ```md
 [0x00400564]> s sym.copy_arg
@@ -1045,7 +1046,7 @@ Since we are already using radare2, we can use the simpler ragg2: `:> ragg2 -P 2
 
 This gives us a string of four-byte characters that are still random within the overall string. This will allow us to trace the offset where the overflow happens.
 
-#### Crash and Debug  
+#### Crash and Debug  the Task 8 program
 
 It is unnecessary to actually generate the test pattern. Instead, we simply run radare2 with the ragg2 commad as argv[1]
 
@@ -1256,7 +1257,7 @@ We verifty by looking for `rbp-0x90`.
 
 ![Hex math](assets/buffer-overflows-task8-2.png)
 
-#### Exploit  
+#### Exploit the Task 8 program
 
 Known:  
 
@@ -1364,7 +1365,7 @@ int main(int argc, char **argv)
 }
 ```
 
-### Find the Segmentation Error
+### Find the Task 9 Segmentation Error
 
 ```md
 [user1@ip-10-67-163-144 overflow-4]$ ./buffer-overflow-2 $(ragg2 -P 153 -r)
@@ -1378,7 +1379,7 @@ Segmentation fault
 
 The Segmentation error begins at character 155 of the input string.  
 
-### Examine the Flow
+### Examine the Task 9 Flow
 
 ```md
 ser1@ip-10-67-163-144 overflow-4]$ r2 -d ./buffer-overflow-2 $(ragg2 -P 155 -r)
@@ -1460,8 +1461,18 @@ edi:            [-- 32 bits / 4 bytes --]
            ; arg int64_t arg1 @ rdi ; <- create variable arg1 @ rdi, the first paramter register for this function
            ; CALL XREF from main @ 0x4005c9
            0x00400527      55             push rbp ; <- takes the current value in the rbp register and pushes it onto the stack, preserving the caller's stack frame so it can be restored later.
-           0x00400528      4889e5         mov rbp, rsp ; <- initiate a 64-bit variable at memory address rbp-0x04 (rbp minus 4 bytes) 
+           0x00400528      4889e5         mov rbp, rsp ; <- Copy the memory address of rsp into rbp. rsp and rbp temporarily point to the same memory location.
            0x0040052b      4881ecb00000.  sub rsp, 0xb0 ;<- subtract 176 from rsp. Note: there are now 176 bytes between rsp and rbp
+
+return address : rbp + 8
+saved rbp : rbp
+var_90h @ rbp minus 144 bytes
+var_98h @ rbp minus 152 bytes
+var_a0h @ rbp minus 160 bytes
+var_a8h @ rbp minus 168 bytes
+rsp : rbp minus 176 bytes
+
+
            0x00400532      4889bd58ffff.  mov qword [var_a8h], rdi    ; arg1 <- move the memory address stored in rdi (which points to the string) into the variable var_a8h
            0x00400539      48b8646f6767.  movabs rax, 0x6f67676f64    ; 'doggo'<- move the absolute value of the hex (which turns out to be doggo) and place it into rax register, not a memory pointer
            0x00400543      ba00000000     mov edx, 0 ; <-zero out edx>
@@ -1491,3 +1502,17 @@ edi:            [-- 32 bits / 4 bytes --]
 [0x00400527]> 
 
 ```
+
+### The Task 9 Stack Frame  
+
+return address : rbp + 8
+saved rbp : rbp
+var_90h @ rbp minus 144 bytes
+var_98h @ rbp minus 152 bytes
+var_a0h @ rbp minus 160 bytes
+var_a8h @ rbp minus 168 bytes
+rsp : rbp minus 176 bytes
+
+
+
+

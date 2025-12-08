@@ -1429,15 +1429,7 @@ Note: There are only 16 bytes allocated to the main function.
 
 ```md
            
-           0x004005b4      897dfc         mov dword [var_4h], edi     ; argc <- This instruction moves the value stored at edi to to the variable var_4h. The dword, or double word, type indicates it should be given 4 bytes of space.
-```
-```md
-rdi:  [-------- 64 bits / 8 bytes --------]
-edi:            [-- 32 bits / 4 bytes --]
-```
-
-```md
-
+        0x004005b4      897dfc         mov dword [var_4h], edi     ; argc <- This instruction moves the value stored at edi to to the variable var_4h. The dword, or double word, type indicates it should be given 4 bytes of space.
            0x004005b7      488975f0       mov qword [var_10h], rsi    ; argv <- takes the value stored in the rsi register and moves it to become the value stored in the variable var_10h. This is argv. qword will take the full 8 bytes. It uses the full 8 bytes because the value being moved is a memory address that points to argv.
            0x004005bb      488b45f0       mov rax, qword [var_10h] ;<- Move the value stored in var_10h (the memory address pointing to argv) into the rax register
            0x004005bf      4883c008       add rax, 8 ; <- This instruction adds 8 to the value in the rax register. In effect, the memory address stored in the rax register no longer points to argv, but to argv[1], or $(ragg2 -P 155 -r)

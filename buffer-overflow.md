@@ -1455,7 +1455,7 @@ Note: There are only 16 bytes allocated to the main function.
            0x00400527      55             push rbp ; <- takes the current value in the rbp register and pushes it onto the stack, preserving the caller's stack frame so it can be restored later.
            0x00400528      4889e5         mov rbp, rsp ; <- Copy the memory address of rsp into rbp. rsp and rbp temporarily point to the same memory location.
            0x0040052b      4881ecb00000.  sub rsp, 0xb0 ;<- subtract 176 from rsp. Note: there are now 176 bytes between rsp and rbp
-
+```
 return address : rbp + 8
 saved rbp : rbp
 var_90h @ rbp minus 144 bytes
@@ -1464,7 +1464,7 @@ var_a0h @ rbp minus 160 bytes
 var_a8h @ rbp minus 168 bytes
 rsp : rbp minus 176 bytes
 
-
+```md
            0x00400532      4889bd58ffff.  mov qword [var_a8h], rdi    ; arg1 <- move the memory address stored in rdi (which points to the string) into the variable var_a8h
            0x00400539      48b8646f6767.  movabs rax, 0x6f67676f64    ; 'doggo'<- move the absolute value of the hex (which turns out to be doggo) and place it into rax register, not a memory pointer
            0x00400543      ba00000000     mov edx, 0 ; <-zero out edx>

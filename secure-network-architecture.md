@@ -383,7 +383,7 @@ GRE Tunnel: 10.0.0.0/30 (Point-to-point)
 
 #### Port Types and Technologies
 
-```md
+
 | Port Type    | Example                       | Description                                                                  | Use Cases                                                    | Configuration Notes                                            |
 | ------------ | ----------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------- |
 | **Physical** | `eth0`, `eth1`, `enp0s3`      | Standard ethernet interfaces connected to physical hardware                  | Server uplinks, switch connections, direct device attachment | Requires physical NIC, supports all standard ethernet features |
@@ -395,11 +395,11 @@ GRE Tunnel: 10.0.0.0/30 (Point-to-point)
 | **Tunnel**   | `gre0`, `vxlan1`, `geneve0`   | Overlay network tunnels for remote connectivity                              | Multi-site networking, cloud connectivity, overlay networks  | Supports GRE, VXLAN, Geneve, LISP protocols                    |
 | **TAP**      | `vm-tap0`, `qemu-if`          | Userspace packet capture interfaces                                          | VM hypervisor integration, packet inspection                 | Used by QEMU/KVM, userspace applications                       |
 | **Dummy**    | `dummy0`                      | Placeholder interfaces for testing/configuration                             | Testing, configuration validation, development               | No actual traffic handling, configuration only                 |
-```
+
 
 #### VLAN Strategy
 
-```md
+
 | VLAN Range  | Purpose               | Subnet Examples                                                | Description                                                 |
 | ----------- | --------------------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
 | **1-99**    | Infrastructure        | `192.168.1.0/24`, `10.0.0.0/24`                                | Core network infrastructure, management protocols           |
@@ -410,7 +410,7 @@ GRE Tunnel: 10.0.0.0/30 (Point-to-point)
 | **700-799** | DMZ/External          | `172.16.200.0/24`, `203.0.113.0/24`                            | Demilitarized zone, external-facing services                |
 | **800-899** | Development           | `192.168.80.0/24`, `10.80.0.0/24`                              | Development environments, testing, staging                  |
 | **900-999** | Guest/Temporary       | `192.168.90.0/24`, `10.90.0.0/24`                              | Guest access, temporary services, isolated testing          |
-```
+
 
 ## Zone-Pair Policies and Filtering
 

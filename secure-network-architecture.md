@@ -439,7 +439,7 @@ This set of commands should be duplicated for each zone
 
 #### Overview Comparison Table
 
-```md
+
 | Aspect                       | Stateless Firewalls                         | Stateful Firewalls                            |
 | ---------------------------- | ------------------------------------------- | --------------------------------------------- |
 | **State Awareness**          | No connection state tracking                | Tracks connection state and context           |
@@ -450,11 +450,11 @@ This set of commands should be duplicated for each zone
 | **Configuration Complexity** | Simple rule sets                            | More complex but flexible rules               |
 | **Connection Tracking**      | None                                        | Full TCP/UDP session tracking                 |
 | **Return Traffic Handling**  | Requires explicit rules for both directions | Automatic handling of established connections |
-```
+
 
 #### Technical Characteristics
 
-```md
+
 | Feature                         | Stateless                             | Stateful                         |
 | ------------------------------- | ------------------------------------- | -------------------------------- |
 | **Rule Processing**             | Linear rule matching per packet       | Context-aware rule processing    |
@@ -465,7 +465,7 @@ This set of commands should be duplicated for each zone
 | **NAT Compatibility**           | Limited                               | Full NAT state tracking          |
 | **Fragmented Packet Handling**  | Each fragment processed independently | Reassembles and tracks fragments |
 | **Application Layer Awareness** | None                                  | Can inspect application data     |
-```
+
 
 ## Addressing Common Attacks
 
@@ -477,7 +477,7 @@ validates DHCP messages, maintains a binding table of legitimate DHCP assignment
 
 ### Attack Prevention Table
 
-```md
+
 | Attack Type           | How DHCP Snooping Prevents                               |
 | --------------------- | -------------------------------------------------------- |
 | **Rogue DHCP Server** | Blocks DHCP server messages on untrusted ports           |
@@ -485,7 +485,7 @@ validates DHCP messages, maintains a binding table of legitimate DHCP assignment
 | **MAC Spoofing**      | Binding table validates MAC-IP relationships             |
 | **IP Spoofing**       | Dynamic ARP Inspection uses binding table for validation |
 | **Man-in-the-Middle** | Prevents unauthorized gateway advertisements             |
-```
+
 
 ### Dynamic ARP Inspection
 
@@ -495,7 +495,7 @@ validates DHCP messages, maintains a binding table of legitimate DHCP assignment
 
  #### Attack Mitigation Table
 
-```md
+
 | Attack Type               | DAI Protection Method                                      |
 | ------------------------- | ---------------------------------------------------------- |
 | **ARP Spoofing**          | Validates sender MAC/IP against binding database           |
@@ -503,4 +503,3 @@ validates DHCP messages, maintains a binding table of legitimate DHCP assignment
 | **Man-in-the-Middle**     | Blocks attempts to redirect traffic via fake ARP responses |
 | **Gateway Impersonation** | Validates gateway MAC address consistency                  |
 | **ARP DoS**               | Rate limiting prevents ARP flooding attacks                |
-```

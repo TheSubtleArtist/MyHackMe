@@ -19,8 +19,8 @@ Book: "Risk Centric Threat Modeling: Process for Attack Simulation and Threat An
 
 ## Benefits
 
-Adaptable to unique objectives
-improves alignment with compliance requirements by systematically identify inad addressing security risks while ensuring proper seucrty controsl are in place
-Fosters collaboration among stakeholers
-Comprehensive and systematic process
-ensures thorough anlysis of entire risk landscape
+Adaptable to unique objectives  
+improves alignment with compliance requirements by systematically identify inad addressing security risks while ensuring proper seucrty controsl are in place  
+Fosters collaboration among stakeholers  
+Comprehensive and systematic process  
+ensures thorough anlysis of entire risk landscape  

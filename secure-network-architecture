@@ -7,6 +7,7 @@ Security zones define what or who is in a VLAND and how traffic travels in and o
 
 Common security zones in a layered network architecture promte defense-in-depth.
 Security zones and access controls physically direct how and where traffic goes. Traffic rules are governed by organizaitonla security policy
+```md
 
 | Zone          | Trust Level       | Description                                                                 | Typical Examples                                      | Purpose/Notes                                                                 |
 |---------------|-------------------|-----------------------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------------------|
@@ -16,6 +17,7 @@ Security zones and access controls physically direct how and where traffic goes.
 | **Restricted**| Highly Restricted | Contains high-risk or high-value servers and databases holding sensitive or critical information. Access is tightly controlled. | Domain controllers, database servers with client information, application servers | Extra protections (e.g., additional firewalls, strict access controls) to prevent lateral movement in case of breach. |
 | **Management**| Highly Restricted | Dedicated to devices and services for network and infrastructure management. Often isolated to prevent compromise of administrative tools. | Virtualization management hosts (e.g., vCenter), backup servers, jump hosts, out-of-band management interfaces | Less common as a separate zone; sometimes merged with Restricted or Audit. Highly privileged access requires strong isolation. |
 | **Audit**     | Highly Restricted | Dedicated to security monitoring, logging, and auditing tools. Isolates sensitive telemetry to protect detection capabilities. | SIEM systems, log servers, intrusion detection systems, telemetry collectors | Less common; sometimes grouped with Management. Critical for maintaining visibility and responding to incidents without interference. 
+```
 
 ## Network Segmentation
 

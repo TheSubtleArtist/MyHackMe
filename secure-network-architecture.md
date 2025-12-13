@@ -18,6 +18,23 @@ Security zones and access controls physically direct how and where traffic goes.
 | **Management**               | Highly Restricted | Dedicated to devices and services for network and infrastructure management. Often isolated to prevent compromise of administrative tools.                   | Virtualization management hosts (e.g., vCenter), backup servers, jump hosts, out-of-band management interfaces | Less common as a separate zone; sometimes merged with Restricted or Audit. Highly privileged access requires strong isolation.              |
 | **Audit**                    | Highly Restricted | Dedicated to security monitoring, logging, and auditing tools. Isolates sensitive telemetry to protect detection capabilities.                               | SIEM systems, log servers, intrusion detection systems, telemetry collectors                                   | Less common; sometimes grouped with Management. Critical for maintaining visibility and responding to incidents without interference.       |
 
+## Network Security Policies and Controls  
+
+### Traffic Filtering
+
+Access Control Lists contain Access Control Entries defining a list's profile based on pre-defined criteria
+Provides network security, validation, and segmentaion by filtering network traffcibe based on the pre-defined criteria
+
+### VyOS ACL creation and policy definition Example  
+
+`:> set policy access-list <acl_number>` : Create the new access-list policy, defining the ACL number (1 - 2699)  
+`:> set policy access-list <acl_number> description <text>` : Set the description of the access list.  
+`:> set policy access-list <acl_number> rule <1-65535> action <permit|deny>` : Create a new rule (or ACE) under the ACL and define the action of the rule.  
+`:> set policy access-list <acl_number> rule <1-65535> <destination|source> <any|host|inverse-mask|network>` : Define criteria or parameters for the rule to enforce/match.  
+
+### Examples ACL Permitting valid SSH request
+
+
 
 ## Network Segmentation
 
@@ -54,8 +71,6 @@ Total Frame Size: 64 - 1518 bytes (excluding Preamble and SFD)
 - Minimum payload is 46 bytes (padded if necessary)
 - Inter-frame gap of 12 bytes between frames
 - Preamble and SFD are often considered separate from the frame itself
-
-
 
 ### Ethernet Frame with VLAN Tag (802.1Q)
 
@@ -104,7 +119,7 @@ PCP=2 DEI=0 VID=100
 - `0x88A8` - 802.1ad QinQ (Service VLAN)
 - `0x9100` - Legacy QinQ
 
-#### Notes
+#### Ethernet Frame Notes
 
 - VLAN tag adds 4 bytes to the frame
 - VID 0 = Priority tagged (no VLAN)
@@ -114,35 +129,35 @@ PCP=2 DEI=0 VID=100
 
 ### Example Open vSwitch Configuration
 
-[Open vSwitch](https://www.openvswitch.org/)
-[Open vSwitch Latest Documentation](https://docs.openvswitch.org/en/latest/)
-[Open vSwitch 3.6.1 Manpages](https://www.openvswitch.org/support/dist-docs/)  
+[Open vSwitch](https://www.openvswitch.org/)  
+[Open vSwitch Latest Documentation](https://docs.openvswitch.org/en/latest/)  
+[Open vSwitch 3.6.1 Manpages](https://www.openvswitch.org/support/dist-docs/) 
 
-`:> ovs-vsctl show` shows the configuration items
-`:> ovs-vsctl set port <interface> tag=<0-99>` Alter the configuration database to alter the network interface in the port table to include a tag number.
-`:> ovs-vsctl set port eth0 tag=10 vland_mode=native-untagged` used for any traffic not tagged and passing through the switch, even with unknown origins
+`:> ovs-vsctl show` shows the configuration items  
+`:> ovs-vsctl set port <interface> tag=<0-99>` Alter the configuration database to alter the network interface in the port table to include a tag number.  
+`:> ovs-vsctl set port eth0 tag=10 vland_mode=native-untagged` used for any traffic not tagged and passing through the switch, even with unknown origins  
 
-### VLAN Routing 
+### VLAN Routing
 
 #### Router on a Stick
 
-VLANS communicate with router through a designated interface on a switch (switch port)
-Trunk: connect the switch to a router
-VLAN traffic is router through the switch port, over the trunk.
-Many VLANs filter to a single Trunk
+VLANS communicate with router through a designated interface on a switch (switch port)  
+Trunk: connect the switch to a router  
+VLAN traffic is router through the switch port, over the trunk.  
+Many VLANs filter to a single Trunk  
 
 #### Trunk Configuration  
 
-Each vendor confgures trunks and switches either open or proprietary protocols
-`:> ovs-vsctl add-br br0` : add a bridge (trunk) named 'br0'
+Each vendor confgures trunks and switches either open or proprietary protocols  
+`:> ovs-vsctl add-br br0` : add a bridge (trunk) named 'br0'  
 `:> ovs-vsctl add-port br0 eth0 tag=10` : Adds the physical interface eth0 to bridge br0 as an access port assigned to VLAN 10  
 
 #### Router Configuration
 
-Because 802.1q tags are standardized
-Tell the router how to configure its switch and what tags to accept for each interface
+Because 802.1q tags are standardized  
+Tell the router how to configure its switch and what tags to accept for each interface  
 Virtual Sub-Interfaces allow router to keep each tagged frame separate, acting similarly to physica interfaces, adn commonly defined by the VLAND ID  
-Common sub-interface syntax: `<name>.<vlan/sub-interface id>`
+Common sub-interface syntax: `<name>.<vlan/sub-interface id>` 
 
 ***Example Configuration with VyOS open-source router***
 
@@ -306,12 +321,12 @@ Subnets: Multiple production VLANs
 │ │10,20│ │tag10│ │tag10│ │tag20│ │tag20│ │tag30│ │             │ │
 │ │30,40│ │     │ │     │ │     │ │     │ │     │ │             │ │
 │ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘ └─────────────┘ │
-│                                    ┌─────────────────────────┐   │
-│                                    │        bond0            │   │
-│                                    │   ┌─────────┬─────────┐ │   │
-│                                    │   │  eth2   │  eth3   │ │   │
-│                                    │   └─────────┴─────────┘ │   │
-│                                    └─────────────────────────┘   │
+│                                    ┌─────────────────────────┐  │
+│                                    │        bond0            │  │
+│                                    │   ┌─────────┬─────────┐ │  │
+│                                    │   │  eth2   │  eth3   │ │  │
+│                                    │   └─────────┴─────────┘ │  │
+│                                    └─────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
 
 VLAN 10: Web tier (10.1.10.0/24)
@@ -326,20 +341,20 @@ VLAN 40: Storage network (10.1.40.0/24)
 Purpose: Isolated customer environments
 Subnets: Customer-specific VLANs
 
-┌─────────────────────────────────────────────────────────────────┐
-│                        br-tenant                                │
-│ ┌────────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ │
-│ │tenant-uplink│ │cust-a   │ │cust-a   │ │cust-b   │ │cust-b   │ │
-│ │ (trunk)    │ │web(500) │ │db(501)  │ │web(502) │ │db(503)  │ │
-│ │500,501,502,│ │         │ │         │ │         │ │         │ │
-│ │503,600,700 │ │         │ │         │ │         │ │         │ │
-│ └────────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘ │
-│                ┌─────────┐ ┌─────────┐                         │
-│                │ shared  │ │   dmz   │                         │
-│                │services │ │services │                         │
-│                │(tag 600)│ │(tag 700)│                         │
-│                └─────────┘ └─────────┘                         │
-└─────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────┐
+│                        br-tenant                                  │
+│ ┌─────────────┐ ┌──────────┐ ┌──────────┐ ┌─────────┐ ┌─────────┐ │
+│ │tenant-uplink│ │ cust-a   │ │ cust-a   │ │cust-b   │ │cust-b   │ │
+│ │ (trunk)     │ │ web(500) │ │ db(501)  │ │web(502) │ │db(503)  │ │
+│ │500,501,502, │ │          │ │          │ │         │ │         │ │
+│ │503,600,700  │ │          │ │          │ │         │ │         │ │
+│ └─────────────┘ └──────────┘ └──────────┘ └─────────┘ └─────────┘ │
+│                ┌─────────┐ ┌─────────┐                            │
+│                │ shared  │ │   dmz   │                            │
+│                │services │ │services │                            │
+│                │(tag 600)│ │(tag 700)│                            │
+│                └─────────┘ └─────────┘                            │
+└───────────────────────────────────────────────────────────────────┘
 
 VLAN 500: Customer A Web (172.16.10.0/24)
 VLAN 501: Customer A DB (172.16.11.0/24)
@@ -368,11 +383,127 @@ WAN Links: 203.0.113.0/24 (Primary), 198.51.100.0/24 (Backup)
 GRE Tunnel: 10.0.0.0/30 (Point-to-point)
 ```
 
+#### Port Types and Technologies
 
+```md
+| Port Type | Example | Description | Use Cases | Configuration Notes |
+|-----------|---------|-------------|-----------|-------------------|
+| **Physical** | `eth0`, `eth1`, `enp0s3` | Standard ethernet interfaces connected to physical hardware | Server uplinks, switch connections, direct device attachment | Requires physical NIC, supports all standard ethernet features |
+| **Internal** | `br-mgmt`, `mgmt-vm1`, `tap0` | Virtual interfaces created by OVS for host/VM connectivity | VM interfaces, container networking, bridge management | Created in software, appears as network interface to OS |
+| **veth** | `web-server1`, `container-if` | Virtual ethernet pairs connecting containers/namespaces | Docker containers, LXC, network namespaces | Always created in pairs, one end in container, one in bridge |
+| **Bond** | `bond0` (eth2+eth3) | Link aggregation combining multiple physical interfaces | High availability, increased bandwidth, redundancy | Supports LACP, active-backup, balance modes |
+| **DPDK** | `wan-link1`, `dpdk0` | Data Plane Development Kit interfaces for high-performance packet processing | High-throughput applications, NFV, low-latency networking | Requires DPDK-enabled NICs, bypasses kernel |
+| **Patch** | `dmz-patch`, `inter-br` | Virtual patch cables connecting two OVS bridges | Inter-bridge communication, network segmentation | Always created in pairs, zero-copy forwarding |
+| **Tunnel** | `gre0`, `vxlan1`, `geneve0` | Overlay network tunnels for remote connectivity | Multi-site networking, cloud connectivity, overlay networks | Supports GRE, VXLAN, Geneve, LISP protocols |
+| **TAP** | `vm-tap0`, `qemu-if` | Userspace packet capture interfaces | VM hypervisor integration, packet inspection | Used by QEMU/KVM, userspace applications |
+| **Dummy** | `dummy0` | Placeholder interfaces for testing/configuration | Testing, configuration validation, development | No actual traffic handling, configuration only |
 ```
+
+#### VLAN Strategy
+
+```md
+| VLAN Range | Purpose | Subnet Examples | Description |
+|------------|---------|-----------------|-------------|
+| **1-99** | Infrastructure | `192.168.1.0/24`, `10.0.0.0/24` | Core network infrastructure, management protocols |
+| **100-199** | Management | `192.168.100.0/24`, `192.168.200.0/24` | Network management, monitoring, backup services |
+| **10-40** | Production tiers | `10.1.10.0/24`, `10.1.20.0/24`, `10.1.30.0/24`, `10.1.40.0/24` | Multi-tier application environments (web, app, db, storage) |
+| **500-599** | Customer environments | `172.16.10.0/24`, `172.16.20.0/24`, `172.16.30.0/24` | Multi-tenant customer isolation and services |
+| **600-699** | Shared services | `172.16.100.0/24`, `10.100.0.0/24` | Common services, shared infrastructure, utilities |
+| **700-799** | DMZ/External | `172.16.200.0/24`, `203.0.113.0/24` | Demilitarized zone, external-facing services |
+| **800-899** | Development | `192.168.80.0/24`, `10.80.0.0/24` | Development environments, testing, staging |
+| **900-999** | Guest/Temporary | `192.168.90.0/24`, `10.90.0.0/24` | Guest access, temporary services, isolated testing |
+```
+
 ## Zone-Pair Policies and Filtering
 
-## Validating Network Traffic
+### Zone-Pairs
+
+Consider how to apply the requirements of zones to firewall rules and how to define different actions based on the protocol and source/destiatnion zone
+
+Use of direction-based and stateful policy enforcing traffic in a signle direction for each VLAN (e.g. DMZ->LAN or LAN->DMZ)  
+Each zone in a topology must have different zone-pairs for each other zone in the topology and every possible direction, providing visibility from a firewall and filtering capabilities
+
+#### Example setting of default policy
+
+***Set default policy for VyOS routers***
+
+`:> set zone-policy zone dmz default-action drop` : set the default policy for the dmz to drop unmatched traffic (default deny)
+`:> set zone-policy zone dmz interface eth0.30` : Assigns the network interface eth0.30 (VLAN 30 subinterface) to the "dmz" security zone. All traffic entering or leaving through this interface will be subject to the DMZ zone's firewall policies.
+
+This set of commands should be duplicated for each zone.
+
+***Generic syntax for adding a zone pair***  
+`:> set zone-policy zone <zone A> from <zone B> firewall <name> <ruleset name>` : creates a directional firewall policy `<name>` that applies a specific ruleset `<ruleset name>` to traffic flowing from `<zone B>` to `<zone A>`, enabling granular control over inter-zone communications in a zone-based firewall architecture.
+
+`:> set zone-policy zone LAN from WAN firewall name lan-wan`
+`:> set zone-policy zone WAN from LAN firewall name wan-lan`
+
+### Stateful vs. Stateless Firewalls
+
+#### Overview Comparison Table
+
+```md
+| Aspect | Stateless Firewalls | Stateful Firewalls |
+|--------|--------------------|--------------------|
+| **State Awareness** | No connection state tracking | Tracks connection state and context |
+| **Decision Basis** | Individual packet inspection only | Connection history and packet relationships |
+| **Memory Usage** | Minimal (no state tables) | Higher (maintains connection state tables) |
+| **Performance** | Faster per-packet processing | Slower due to state table lookups |
+| **Security Level** | Basic filtering | Advanced threat protection |
+| **Configuration Complexity** | Simple rule sets | More complex but flexible rules |
+| **Connection Tracking** | None | Full TCP/UDP session tracking |
+| **Return Traffic Handling** | Requires explicit rules for both directions | Automatic handling of established connections |
+```
+
+#### Technical Characteristics
+
+```md
+| Feature | Stateless | Stateful |
+|---------|-----------|----------|
+| **Rule Processing** | Linear rule matching per packet | Context-aware rule processing |
+| **Connection Table** | Not maintained | Active connection state table |
+| **TCP Sequence Tracking** | No | Yes - tracks sequence numbers |
+| **Protocol Understanding** | Basic header inspection | Deep protocol analysis |
+| **Session Correlation** | Cannot correlate related packets | Links packets to sessions |
+| **NAT Compatibility** | Limited | Full NAT state tracking |
+| **Fragmented Packet Handling** | Each fragment processed independently | Reassembles and tracks fragments |
+| **Application Layer Awareness** | None | Can inspect application data |
+```
 
 ## Addressing Common Attacks
 
+### DHCP Snooping
+
+a Layer 2 security feature
+acts as a firewall between untrusted DHCP clients and trusted DHCP servers
+validates DHCP messages, maintains a binding table of legitimate DHCP assignments, and prevents various DHCP-based attacks  
+
+### Attack Prevention Table
+
+```md
+| Attack Type | How DHCP Snooping Prevents |
+|-------------|----------------------------|
+| **Rogue DHCP Server** | Blocks DHCP server messages on untrusted ports |
+| **DHCP Starvation** | Rate limiting prevents excessive DHCP requests |
+| **MAC Spoofing** | Binding table validates MAC-IP relationships |
+| **IP Spoofing** | Dynamic ARP Inspection uses binding table for validation |
+| **Man-in-the-Middle** | Prevents unauthorized gateway advertisements |
+```
+
+### Dynamic ARP Inspection
+
+ a Layer 2 security feature
+ validates ARP packets to prevent ARP spoofing and man-in-the-middle attacks
+ intercepts, validates, and filters ARP packets on untrusted ports by checking them against a trusted database of IP-to-MAC address bindings  
+
+ #### Attack Mitigation Table
+
+```md
+| Attack Type | DAI Protection Method |
+|-------------|----------------------|
+| **ARP Spoofing** | Validates sender MAC/IP against binding database |
+| **ARP Cache Poisoning** | Prevents malicious ARP replies from being forwarded |
+| **Man-in-the-Middle** | Blocks attempts to redirect traffic via fake ARP responses |
+| **Gateway Impersonation** | Validates gateway MAC address consistency |
+| **ARP DoS** | Rate limiting prevents ARP flooding attacks |
+```

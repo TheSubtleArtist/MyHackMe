@@ -1,0 +1,62 @@
+# Secure Network Architecture
+
+## Common Secure Network Architecture
+
+Perperly implementing VLANs as a security boundary using security zones.  
+Security zones define what or who is in a VLAND and how traffic travels in and out  
+
+Common security zones in a layered network architecture promte defense-in-depth.
+Security zones and access controls physically direct how and where traffic goes. Traffic rules are governed by organizaitonla security policy
+
+| Zone          | Trust Level       | Description                                                                 | Typical Examples                                      | Purpose/Notes                                                                 |
+|---------------|-------------------|-----------------------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------------------|
+| **External**  | Untrusted         | All devices and entities outside of the organization's network or asset control. This includes the public internet and any external connections. | Internet users, external devices connecting to public services | Highest risk zone; access is heavily restricted and monitored. No direct access to internal resources. |
+| **DMZ (Demilitarized Zone)** | Semi-Trusted | A buffer zone that separates untrusted external networks from internal resources. Hosts public-facing services that need to be accessible from outside. | Public web servers, email servers, DNS servers, BYOD/remote users/guests in some setups | Provides an additional layer of security by isolating exposed services. If compromised, attackers still face barriers to internal networks. |
+| **Trusted**   | Trusted           | Internal networks or devices where standard user and business operations occur. Suitable for resources without highly confidential or sensitive information. | User workstations, printers, B2B partner connections  | Basic internal access; protected from external threats but allows normal business traffic flow. |
+| **Restricted**| Highly Restricted | Contains high-risk or high-value servers and databases holding sensitive or critical information. Access is tightly controlled. | Domain controllers, database servers with client information, application servers | Extra protections (e.g., additional firewalls, strict access controls) to prevent lateral movement in case of breach. |
+| **Management**| Highly Restricted | Dedicated to devices and services for network and infrastructure management. Often isolated to prevent compromise of administrative tools. | Virtualization management hosts (e.g., vCenter), backup servers, jump hosts, out-of-band management interfaces | Less common as a separate zone; sometimes merged with Restricted or Audit. Highly privileged access requires strong isolation. |
+| **Audit**     | Highly Restricted | Dedicated to security monitoring, logging, and auditing tools. Isolates sensitive telemetry to protect detection capabilities. | SIEM systems, log servers, intrusion detection systems, telemetry collectors | Less common; sometimes grouped with Management. Critical for maintaining visibility and responding to incidents without interference. 
+
+## Network Segmentation
+
+VLANs are configured on a switch by adding a "tag" to a frame.
+RFC: 802.1q (dot1q)
+
+```md
+Ethernet Frame (IEEE 802.3 / Ethernet II) Structure
+
++--------------------------------------------------------------------------+
+| Preamble (7 bytes) | SFD (1 byte) | Dest MAC (6) | Src MAC (6) | Length/Type (2) |
++---------------------+--------------+--------------+-------------+-----------------+
+|                                   Data / Payload (46-1500 bytes)             |
++--------------------------------------------------------------------------------+
+|                                      FCS (4 bytes)                             |
++--------------------------------------------------------------------------------+
+
+Detailed breakdown (bytes):
+
+    7         1         6            6            2         46-1500        4
++---------+---------+------------+------------+---------+--------------+---------+
+| Preamble| Start   | Destination| Source     | Length/ | Data &       | Frame   |
+| (1010...) Frame   | MAC Address| MAC Address| Type    | Padding      | Check   |
+|         | Delimiter|            |            |         |              | Sequence|
++---------+---------+------------+------------+---------+--------------+---------+
+```
+
+Notes:
+
+- Preamble: Alternating 10101010... for clock synchronization (7 bytes)
+- SFD: 10101011 (marks actual start of frame)
+- Length/Type: In IEEE 802.3: length of payload; In Ethernet II: protocol type (e.g., 0x0800 for IPv4)
+- Minimum frame size: 64 bytes (excluding Preamble/SFD)
+- Maximum payload: 1500 bytes (standard; jumbo frames allow more)
+- FCS: 32-bit CRC for error detection
+
+
+
+## Zone-Pair Policies and Filtering
+
+## Validating Network Traffic
+
+## Addressing Common Attacks
+

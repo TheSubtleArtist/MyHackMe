@@ -238,7 +238,7 @@ List the sessions to observe the new meterpreter: `sessions`
 
 Switch to the meterpreter session: `sessions -i 2`  
 
-![switch session](assets/blue-110)  
+![switch session](assets/blue-110.png)  
 
 Identify running processes: `ps` to find the powershell PID  
 

@@ -4,11 +4,25 @@
 
 ### Enumerate the System  
 
-[Query The System](#query-the-system)  
-[Use LinEnum.sh to exfiltrate system information](#linenumsh-to-exfiltrate-the-system-information)  
-[use FIND to enumerate potential exploits](#use-find-to-identify-useful-file-properties-and-attributes)  
-[Identify Exploitable Commands](#identify-exploitable-commands)  
-[Identify Network Activity](#identify-network-activity)  
+- [Linux Privilege Escalation](#linux-privilege-escalation)
+  - [Table of Contents](#table-of-contents)
+    - [Enumerate the System](#enumerate-the-system)
+    - [Authentication Bypass](#authentication-bypass)
+  - [Initial checklist](#initial-checklist)
+  - [Enumeration](#enumeration)
+    - [Query the System](#query-the-system)
+    - [LinEnum.sh to Exfiltrate comprehensive system information](#linenumsh-to-exfiltrate-comprehensive-system-information)
+    - [Use FIND to identify useful file properties and attributes](#use-find-to-identify-useful-file-properties-and-attributes)
+    - [Identify exploitable commands](#identify-exploitable-commands)
+    - [Identify Network Activity](#identify-network-activity)
+    - [Identify exploitable processes](#identify-exploitable-processes)
+  - [Authentication Bypass Techniques](#authentication-bypass-techniques)
+    - [SUID/GUID](#suidguid)
+    - [Writeable /etc/passwd files](#writeable-etcpasswd-files)
+    - [Escaping the Vi editor](#escaping-the-vi-editor)
+    - [Exploit Crontab](#exploit-crontab)
+    - [Exploiting the PATH variable](#exploiting-the-path-variable)
+  - [Other References](#other-references)
 
 ### Authentication Bypass  
 

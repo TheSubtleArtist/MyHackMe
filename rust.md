@@ -312,4 +312,33 @@ Read the entire chapter on them from the [Rust Book](https://doc.rust-lang.org/b
 
 Iterators are zero cost abstractions in Rust. For loops are not.
 
-By using iterators, we are taking advantage of the fantastic zero cost abstraction. Speeding up our entire program.
+By using iterators, we are taking advantage of the fantastic zero cost abstraction. Speeding up our entire program.  
+
+## Rayon
+
+External [Crate](https://crates.io/crates/rayon) for Rust.  
+
+Rayon is a data-parallelism library for Rust.  
+
+convert a sequential computation into a parallel computation
+
+```rust
+// single threaded code
+fn sum_of_squares(input: &[i32]) -> i32 {
+    input.iter()
+         .map(|&i| i * i)
+         .sum()
+}
+```
+
+```rust
+// multi-threaded code with rayon
+use rayon::prelude::*;
+fn sum_of_squares(input: &[i32]) -> i32 {
+    input.par_iter() // <-- just change that!
+         .map(|&i| i * i)
+         .sum()
+}
+```
+
+## IF Statements

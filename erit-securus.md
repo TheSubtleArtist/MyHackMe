@@ -64,7 +64,7 @@ Finished
 
 `:> curl https://raw.githubusercontent.com/r3m0t3nu11/Boltcms-Auth-rce-py/refs/heads/master/exploit.py > exploit.py`
 
-## Reverse Shell
+## On the Attacker
 
 Execute the exploit to gain initial access: `:> pytyon3 exploit.py http://<target> <default username> <defalut password>`>  
 

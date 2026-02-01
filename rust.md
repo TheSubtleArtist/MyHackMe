@@ -175,3 +175,141 @@ growable allocated data structure
 
 immutable fixed-length string
 is a string slice of string
+
+## Functions
+
+Rust returns the final expression of a function  
+
+```rust
+fn hello() -> u16{
+    println!("hello!"); // print this line
+    6 //return this value to the calling function
+}
+```
+
+```rust
+fn main(){
+    println!("I do not return!") // prints this line, but returns nothing because it has no calling function
+}
+```
+
+### Adding Arguements
+
+```rust
+fn print_name(name: String){  //function arguments must include the argument type
+    println!("{}", name);
+}
+```
+
+A function with arguments which returns a value:  
+
+```rust
+fn print_name(name: String) -> u16{ // function argument type and the type for the returned value
+    println!("{}", name);
+    6;                              // returned value, semi-colon is not mandatory
+}
+```
+
+## Loops
+
+loop: keyword, loops forever or until explicity stopped  
+
+```rust
+fn main(){
+    loop {
+        println!("TryHackMe Rocks!");
+        break;                          //break keyword stops the loop
+    }
+}
+```
+
+### Conditional Loops
+
+```rust
+fn main() {
+    let mut number = 3;             // creating of a mutable variable called "number" and set the value to 3
+
+    while number != 0 {             // sets the condition for execution of the loop
+        println!("{}!", number);    // action performed by the loop
+
+        number -= 1;                // decrement the value of the variable, which is why it needs to be mutable
+    }
+
+    println!("LIFTOFF!!!");         // action taken after the conditional loop exits
+}
+```
+
+### For Loops
+
+```rust
+fn main() {
+    let a = [10, 20, 30, 40, 50];
+
+    for element in a.iter() {                   // convert 'a' into an object which can be manipulated
+        println!("the value is: {}", element);
+    }
+}
+```
+
+## Zero-Cost Abstraction
+
+Rust has this really cool thing called Zero Cost Abstractions. 
+
+Zero cost abstraction is: `What you don’t use, you don’t pay for. And what you do use, you couldn’t do any better if you coded by hand.`
+
+Let’s talk about the 2 parts of this sentence.
+
+### "What you don’t use, you don’t pay for."
+
+The language shouldn’t have a global cost for a feature that isn’t used.  
+Let’s say to use a for loop, the language needs to have some massive 1gb file that slows down everything else. If we never use a for loop, we still pay for the for loop!
+
+### "And what you do use, you couldn’t do any better if you coded by hand."
+
+Here’s the kicker.
+
+Say you wrote some code, a function that calculated Fibonacci numbers. And you compiled this code down into assembly.
+
+Now let’s say you hand-write assembly to do the same function — calculate Fibonacci numbers but this time in assembly.
+
+Handwriting it in assembly would mean we would either gain no performance, or we would lose performance.
+
+By using zero cost abstractions, we write abstracted code (not handwritten assembly) and we couldn’t do any better if we tried to hand-write assembly.  
+
+### Iterators  
+
+Iterators are a way of processing a series of items with Rust, much like a for loop. 
+
+`a.iter()` turns the variable `a` into an iterator over the items of `a`.  
+
+Iterators are lazy. You have to tell them to do something to get values from them.  
+
+Let's take a look at a real example.  
+
+```rust
+let a = vec![1, 2, 3];
+let a_iter = a.iter();
+for val in a_iter {
+    println!("The value is {}, val);
+}
+```
+
+We make the iterator do something by calling it in this for loop.  
+
+Now we can make the code do something and consume the iter using some nifty functional programming skills.  
+To square every number in an iterator, and then to sum it we can do:
+
+```rust
+let a = vec![1, 2, 3];
+a.iter()
+.map(|&i| i * i
+.sum()
+```
+
+Rust can separate applications of methods with new lines.
+
+Read the entire chapter on them from the [Rust Book](https://doc.rust-lang.org/book/ch13-02-iterators.html#processing-a-series-of-items-with-iterators) here.
+
+Iterators are zero cost abstractions in Rust. For loops are not.
+
+By using iterators, we are taking advantage of the fantastic zero cost abstraction. Speeding up our entire program.

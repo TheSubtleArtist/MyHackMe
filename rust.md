@@ -342,3 +342,210 @@ fn sum_of_squares(input: &[i32]) -> i32 {
 ```
 
 ## IF Statements
+
+```rust
+let var =  6;
+if var == 6{
+    println!("oh no the var is 6");
+}
+else {
+    println!("yay the var isn't 6");
+}
+```
+
+Assigning value to a variable based on an `if` statement  
+
+```rust
+
+fn func() -> i8{
+9
+}
+
+let var = 6 + func();
+let result = if var == 6{15} else {200};
+
+
+let output =
+if var == 15{
+    println!("it is 15");
+    9;
+}
+else {
+    println!("it is not 15");
+    10;
+};
+```
+
+## Error Handling
+
+Anything with the potential to error returns a result: Specifically `Result<T, E>`.
+
+```rust
+enum Result<T, E> {
+    Ok(T),           // <-- The desired results
+    Err(E),          // <-- The Error
+}
+```
+
+### Description:  
+
+In any attempt to open a file may idenitify a file which is not in the expected location or may simply fail or open for some reason.
+The failure returns a result.
+
+In Python, exception handling is the responsiblity of the developer.  
+
+In Rust, no matter what (unless you explicitly tell the compiler to ignore it) errors must be handled  
+
+### Example
+
+```rust
+use std::fs::File;
+
+fn main() {
+    let f = File::open("hello.txt"); // 'f' doesn't store the file reference. 'f' store the Result enum.
+}
+```
+
+Two ways to check if an action returns a result
+
+1. Rust Analyzer will tell us what the return type is.
+2. We assign a type we know is wrong, and the compiler will tell us. 
+
+If we assigned  
+
+```rust
+let f: u32 = File::open("hello.txt");
+```
+
+the compiler will tell us.
+
+```rust
+--> src/main.rs:4:18
+  |
+4 |     let f: u32 = File::open("hello.txt");
+  |            ---   ^^^^^^^^^^^^^^^^^^^^^^^ expected `u32`, found enum `std::result::Result` 
+  |            |
+  |            expected due to this
+  |
+  = note: expected type `u32`
+             found enum `std::result::Result<std::fs::File, std::io::Error>
+```
+
+#### Error Handling Method 1: Unwrap
+
+```rust
+use std::fs::File;
+
+fn main() {
+    let f = File::open("hello.txt").unwrap(); // <-- Developer is sure this will not fail, instructs the compiler to take whatever the value is. Failure causes a panic in Rust
+}
+```
+
+#### Error Handling Meethod 2: Match
+
+Similar to python try:except
+
+```rust
+use std::fs::File;
+
+fn main() {
+    let f = File::open("hello");
+    match f {
+        Ok(file) => file,                        // Do one thing for success ("try")     
+        Err(_) => panic!("Couldn't open file."), // Do a different thing for failure ("except")
+    }
+}
+```
+
+#### Error Handling Method 3: ?
+
+The ? operator states "if the result is Ok, carry on in this function. Else if it is an Err, propagate it back up the stack to the function that called me. "
+
+Example from the [Rust Blog Post](https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html)  
+
+```rust
+fn read_username_from_file() -> Result<String, io::Error> {
+    let f = File::open("username.txt");
+
+    let mut f = match f {
+        Ok(file) => file,              // Return the "Result" enum to the calling function
+        Err(e) => return Err(e),      // Fail to open the file: Return the error to the calling function
+    };
+
+    let mut s = String::new();
+
+    match f.read_to_string(&mut s) {
+        Ok(_) => Ok(s),                // Return the "Result" enum to the calling function
+        Err(e) => Err(e),             // Faiel to read the string: Return the error to the calling function
+    }
+}
+```
+
+## Challenge
+
+Add to Cargo.toml: base64 = "0.22"
+
+```rust
+use std::io::{self, BufRead};
+
+fn main() {
+    println!("Please enter the ROT13-encoded input:");
+
+    let stdin = io::stdin();
+    let mut lines = stdin.lines();
+
+    let input = match lines.next() {
+        Some(Ok(line)) => line.trim().to_string(),
+        _ => {
+            println!("No input received.");
+            return;
+        }
+    };
+
+    // Step 1: The input we received is already ROT13-encoded
+    let rot13_once = input;
+
+    // Step 2: Decode ROT13 → should give us a Base64 string
+    let base64_str = decode_rot13(&rot13_once);
+
+    // Step 3: Decode Base64 → should give us another ROT13 string
+    let rot13_twice = match base64::decode(&base64_str) {
+        Ok(bytes) => match String::from_utf8(bytes) {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("Base64 contained invalid UTF-8: {}", e);
+                return;
+            }
+        },
+        Err(e) => {
+            eprintln!("Invalid Base64 input: {}", e);
+            return;
+        }
+    };
+
+    // Step 4: Decode ROT13 again → should give us the final plaintext
+    let plaintext = decode_rot13(&rot13_twice);
+
+    println!("\nResults:");
+    println!("  Input (ROT13)          : {}", rot13_once);
+    println!("  After first ROT13 decode (Base64): {}", base64_str);
+    println!("  After Base64 decode    (ROT13)  : {}", rot13_twice);
+    println!("  Final plaintext        : {}", plaintext);
+}
+
+fn decode_rot13(s: &str) -> String {
+    s.chars()
+        .map(|c| match c {
+            'A'..='Z' => {
+                let offset = (c as u8 - b'A' + 13) % 26;
+                (b'A' + offset) as char
+            }
+            'a'..='z' => {
+                let offset = (c as u8 - b'a' + 13) % 26;
+                (b'a' + offset) as char
+            }
+            _ => c,
+        })
+        .collect()
+}
+```

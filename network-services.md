@@ -6,7 +6,7 @@ Learn about, then enumerate and exploit a variety of network services and miscon
 
 [Guide](https://man.freebsd.org/cgi/man.cgi?query=xfreerdp)  
 
-`:> xfreerdp /u:Administrator /p:P@$$w0rd /v:10.65.184.100 
+`:> xfreerdp /u:Administrator /p:P@$$w0rd /v:10.65.184.100`
 
 ## SMB
 

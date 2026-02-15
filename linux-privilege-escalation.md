@@ -2,34 +2,23 @@
 
 ## Table of Contents
 
-### Enumerate the System  
+- [Table of Contents](#table-of-contents)
+- [Initial checklist](#initial-checklist)
+- [Enumeration](#enumeration)
+  - [Query the System](#query-the-system)
+  - [LinEnum.sh to Exfiltrate comprehensive system information](#linenumsh-to-exfiltrate-comprehensive-system-information)
+  - [Use FIND to identify useful file properties and attributes](#use-find-to-identify-useful-file-properties-and-attributes)
+  - [Identify exploitable commands](#identify-exploitable-commands)
+  - [Identify Network Activity](#identify-network-activity)
+  - [Identify exploitable processes](#identify-exploitable-processes)
+- [Authentication Bypass Techniques](#authentication-bypass-techniques)
+  - [SUID/GUID](#suidguid)
+  - [Writeable /etc/passwd files](#writeable-etcpasswd-files)
+  - [Escaping the Vi editor](#escaping-the-vi-editor)
+  - [Exploit Crontab](#exploit-crontab)
+  - [Exploiting the PATH variable](#exploiting-the-path-variable)
+- [Other References](#other-references)
 
-- [Linux Privilege Escalation](#linux-privilege-escalation)
-  - [Table of Contents](#table-of-contents)
-    - [Enumerate the System](#enumerate-the-system)
-    - [Authentication Bypass](#authentication-bypass)
-  - [Initial checklist](#initial-checklist)
-  - [Enumeration](#enumeration)
-    - [Query the System](#query-the-system)
-    - [LinEnum.sh to Exfiltrate comprehensive system information](#linenumsh-to-exfiltrate-comprehensive-system-information)
-    - [Use FIND to identify useful file properties and attributes](#use-find-to-identify-useful-file-properties-and-attributes)
-    - [Identify exploitable commands](#identify-exploitable-commands)
-    - [Identify Network Activity](#identify-network-activity)
-    - [Identify exploitable processes](#identify-exploitable-processes)
-  - [Authentication Bypass Techniques](#authentication-bypass-techniques)
-    - [SUID/GUID](#suidguid)
-    - [Writeable /etc/passwd files](#writeable-etcpasswd-files)
-    - [Escaping the Vi editor](#escaping-the-vi-editor)
-    - [Exploit Crontab](#exploit-crontab)
-    - [Exploiting the PATH variable](#exploiting-the-path-variable)
-  - [Other References](#other-references)
-
-### Authentication Bypass  
-
-[Exploit SUID/GUID](#suidguid)  
-[Misconfigured permissions on /etc/passwd](#writeable-etcpasswd-files)  
-[Exploit Crontab](#exploit-crontab)  
-[Exploit the PATH](#exploiting-the-path-variable)  
 
 ## Initial checklist
 
@@ -143,7 +132,6 @@ Reverse the server setup and transfer the enum.txt to the attacking device for a
 `:> sudo -u#<user id> <command>` : execute a command using the profile of the given `<user id>`, which might be in the sudoers file  
 `:> sudo -u#-1 <command>` : sudo security bypass (CVE-2019-14287) with potentially available commands
 `:> sudo visudo` : edit the sudoers file
-
 
 ### Identify Network Activity  
 

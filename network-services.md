@@ -1,6 +1,31 @@
 # Network Services  
 
-Learn about, then enumerate and exploit a variety of network services and misconfigurations.
+Learn about, then enumerate and exploit a variety of network services and misconfigurations.  
+
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [XFREERDP](#xfreerdp)
+- [SMB](#smb)
+  - [Enumerate SMB](#enumerate-smb)
+  - [Exploit SMB with SMBClient](#exploit-smb-with-smbclient)
+- [Telnet](#telnet)
+  - [Enumerate Telnet](#enumerate-telnet)
+  - [Exploiting Telnet](#exploiting-telnet)
+- [FTP](#ftp)
+  - [Enumerating FTP](#enumerating-ftp)
+  - [Exploiting FTP](#exploiting-ftp)
+- [Powerview](#powerview)
+  - [Enumeration with Powerview](#enumeration-with-powerview)
+- [Bloodhound](#bloodhound)
+  - [Install Bloodhound on the Attacking device](#install-bloodhound-on-the-attacking-device)
+  - [Run SharpHound on the victim Device](#run-sharphound-on-the-victim-device)
+  - [Run Bloodhound on the Attacking device](#run-bloodhound-on-the-attacking-device)
+- [Mimikatz](#mimikatz)
+  - [Dump Hashes](#dump-hashes)
+  - [Golden Ticket Attacks](#golden-ticket-attacks)
+  - [Golden Ticket access](#golden-ticket-access)
+
 
 ## XFREERDP
 

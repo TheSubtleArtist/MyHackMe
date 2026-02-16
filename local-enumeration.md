@@ -1,5 +1,19 @@
 # Linux: Local Enumeration  
 
+- [TTY](#tty)
+  - [Python Shell Upgrade](#python-shell-upgrade)
+  - [Upgrading Resources](#upgrading-resources)
+- [SSH](#ssh)
+- [Basic Enumeration](#basic-enumeration)
+  - [Query the System](#query-the-system)
+  - [LinEnum.sh to Exfiltrate comprehensive system information](#linenumsh-to-exfiltrate-comprehensive-system-information)
+- [/etc](#etc)
+- [Find Command and Interesting files](#find-command-and-interesting-files)
+- [SUID](#suid)
+- [Port Forwarding](#port-forwarding)
+- [Automating Scripts](#automating-scripts)
+
+
 ## TTY
 
 A netcat reverse shell can be easily broken by simple mistakes.

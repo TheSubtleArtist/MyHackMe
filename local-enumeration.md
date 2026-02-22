@@ -79,6 +79,8 @@ After that, connect to the machine using your id_rsa file.
 
 `:> history` : information about the target system and limited information on potentially captured usernames and passwords  
 
+`:> df -h` : displays the amount of space available on the file system containing each file name argument, in human readable format
+
 ### Auto-Generated Bash Files
 
 Bash keeps tracks of our actions by putting plaintext used commands into a history file `~/.bash_history`  

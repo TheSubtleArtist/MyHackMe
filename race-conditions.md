@@ -8,11 +8,9 @@ Learn about race conditions and how they affect web application security.
 
 set of instructions to achieve a specific task  
 
-
 ### Processes
 
 a program in execution (job)  
-
 
 ***Program:*** The executable code related to the process
 ***Memory:*** Temporary data storage
@@ -27,7 +25,7 @@ a lightweight unit of execution. It shares various memory parts and instructions
 ***Serial:*** One process is running; it serves one user after the other sequentially. New users are enqueued.
 ***Parallel:*** One process is running; it creates a thread to serve every new user. New users are only enqueued after the maximum number of running threads is reached.
 
-## Example Race Condition 
+## Example Race Condition
 
 ***Situation***:  
 You call a restaurant to reserve a table for a crucial business lunch. You are familiar with the restaurant and its setup. One particular table, number 17, is your preferred choice, considering it has a nice view and is relatively isolated. You call to make a reservation for Table 17; the host confirms it is free as no “Reserved” tag is placed on it. At the same time, another customer is talking with another host and making a reservation for the same table.  
@@ -50,7 +48,7 @@ Thread 1 will set the remaining balance to $55.
 Afterwards, Thread 2 might set the remaining balance to $65 if not appropriately handled. (Thread 2 calculated that $65 should remain in the account after the withdrawal because the balance was $100 when Thread 2 checked it.)  
 In other words, the user made two withdrawals, but the account balance was deducted only for the second one because Thread 2 said so!  
 
-### Scenarior B  
+### Scenario B  
 
 Let’s consider another scenario:
 
@@ -153,7 +151,6 @@ A web application follows a multi-tier architecture. Such architecture separates
 
 transferring money to a friend or your other account. The program will progress as follows:  
 
-
 1. The user clicks on the “Confirm Transfer” button
 2. The application queries the database to confirm that the account balance can cover the transfer amount
 3. The database responds to the query
@@ -206,7 +203,6 @@ In this demo, we will check if the system is susceptible to a race condition vul
 credentials:  
 User1: 07799991337:pass1234
 User2: 07113371111:pass1234
-
 
 ### Enumerate  
 
@@ -404,7 +400,7 @@ Zavodni Balance Post Transfer:
 
 Outcome: The transfers can be manipulated  
 
-### Test 3: Verify Test 2 
+### Test 3: Verify Test 2
 
 Manipulated Transfer Request:  
 

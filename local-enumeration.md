@@ -7,16 +7,17 @@
 - [Basic Enumeration](#basic-enumeration)
   - [Query the System](#query-the-system)
   - [Auto-Generated Bash Files](#auto-generated-bash-files)
-  - [Sudo Version](#sudo-version)
-  - [Sudo Rights](#sudo-rights)
+  - [Sudo](#sudo)
 - [/etc](#etc)
   - [/etc/passwd](#etcpasswd)
   - [/etc/shadow](#etcshadow)
   - [/etc/hosts](#etchosts)
   - [Identify exploitable processes](#identify-exploitable-processes)
 - [Find Command and Interesting files](#find-command-and-interesting-files)
-- [Port Forwarding](#port-forwarding)
+- [Networking](#networking)
+  - [Port Forwarding](#port-forwarding)
   - [Identify Network Activity](#identify-network-activity)
+  - [DNS Information](#dns-information)
 - [Automating Scripts](#automating-scripts)
   - [LinPEAS](#linpeas)
   - [LinEnum.sh](#linenumsh)
@@ -59,27 +60,27 @@ After that, connect to the machine using your id_rsa file.
 
 ### Query the System
 
+`:> cat /etc/os-release` : Display release information
 `:> hostname` : Query the hostname  
-
 `:> uname -a`  : Query Kernel information  
-
 `:> cat /etc/passwd`  :  Identify system users  
-
+`:> cat /etc/passwd | column -t -s : `  :  Identify system users, display in a table with columns separated by a colon
 `:> cat /etc/shells` : Identify potentially useful shells on the system
-
 `:> cat /etc/crontab` : List cron jobs
-
 `:> cat /proc/version` : Specifics about the kern verion and the GCC compilers use to build the kernel  
-
 `:> cat /etc/issue` : Contains the pre-login prompt and can be changed  
-
 `:> env` : Display environment variables  
-
 `:> id` : overview of user's privileges; providing another username as an argument can reveal priviileges of that user
-
 `:> history` : information about the target system and limited information on potentially captured usernames and passwords  
-
 `:> df -h` : displays the amount of space available on the file system containing each file name argument, in human readable format
+`:> cat /var/log btmp` : show failed logins
+`:> cat /var/log/wtmp` show historiccal data of logins  
+`:> cat /var/log/auth.log | tail` : show the last 10 entries in the authentication logs, including privlege escalations
+`:> cat /etc/timezone` : display the timezone  
+`:> who` : which users are active on which terminals
+`:> ls /etc/init.d` : list of services
+`:> cat /var/log/syslog*` : view messages about system activity
+
 
 ### Auto-Generated Bash Files
 
@@ -88,22 +89,35 @@ Bash keeps tracks of our actions by putting plaintext used commands into a histo
 Use read permission on this file to enumerate system user's action and retrieve some sensitive information. (plaintext passwords, privilege escalation methods, etc..)  
 
 `.bash_profile` and `.bashrc` contain shell commands run when `Bash` is invoked  
-May contain start-up settings that can potentially reveal information. For example a bash alias can be pointed towards an important file or process.  
 
-### Sudo Version
+May contain start-up settings that can potentially reveal information. For example a bash alias can be pointed towards an important file or process.   
+
+When a bash shell is spawned, it runs the commands stored in the .bashrc file.  
+This file can be considered as a startup list of actions to be performed.  
+Hence it can prove to be a good place to look for persistence.  
+
+`:>cat ~/.bashrc`
+
+### Sudo
+
+#### Sudo Version
 
 Sudo version can identify known exploits and vulnerabilities.  
 `:> sudo -V` to retrieve the version.  
 For example, sudo versions < 1.8.28 are vulnerable to CVE-2019-14287, which is a vulnerability that allows to gain root access with 1 simple command.  
 
-### Sudo Rights
+#### Sudo Rights
 
 `:> sudo -l` : list commands on which the current user may use sudo  
 `:> sudo -u#<user id> <command>` : execute a command using the profile of the given `<user id>`, which might be in the sudoers file  
 `:> sudo -u#-1 <command>` : sudo security bypass (CVE-2019-14287) with potentially available commands
 `:> sudo visudo` : edit the sudoers file
 
+#### Sudo Execution History
 
+All commands run with `sudo` are stored in the auth log  
+
+`cat /var/log/auth.log* | grep -i COMMAND | tail` : show commands run using sudo  
 
 ## /etc
 
@@ -167,7 +181,9 @@ It can help us to enumerate the network further.
 
 A [list](https://lauraliparulo.altervista.org/most-common-linux-file-extensions/) of file extensions for which you usually look.  
 
-## Port Forwarding
+## Networking
+
+### Port Forwarding
 
 Application of network address translation (NAT)  
 redirects a request from one address and port number combination to different address and port number combination.  
@@ -179,6 +195,8 @@ Read more about [port forwarding](fumenoid.github.io/posts/port-forwarding)
 
 ### Identify Network Activity  
 
+`:> cat /etc/network/interface`  :Information on the network interfaces
+`:> ip addr show` : display network configuration information
 `:> ifconfig` : network interfaces on the system; useful for pivoting
 `:> ip route` : which network routes exist
 `:> netstat` : list existing communications  
@@ -190,6 +208,12 @@ Read more about [port forwarding](fumenoid.github.io/posts/port-forwarding)
 `:> netstat -tp` : connections with the service name and PID information; add "l" to get listening ports  
 `:> netstat -i` : interface statistics  
 `:> netstat -ano` : "a" display all sockets; 'n' do not resolve names; "o" display timers  
+
+### DNS Information  
+
+`:> man hosts` : information about the hosts file
+`:> cat /etc/hosts` : display information in the hosts file
+`:> cat /etc/resolv.conf` : display the DNS servers used for DNS resolution
 
 ## Automating Scripts
 

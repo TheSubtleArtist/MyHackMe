@@ -1,5 +1,28 @@
 # What the Shell
 
+- [Types of Shells](#types-of-shells)
+  - [Reverse shells](#reverse-shells)
+  - [Bind shells](#bind-shells)
+  - [Interactive Shell](#interactive-shell)
+  - [Non-Interactive Shell](#non-interactive-shell)
+- [Netcat](#netcat)
+  - [Reverse Shell Listener](#reverse-shell-listener)
+  - [Bind Shell](#bind-shell)
+  - [Stabilisation](#stabilisation)
+- [Socat](#socat)
+  - [Socat Reverse Shells](#socat-reverse-shells)
+  - [Socat Bind Shells](#socat-bind-shells)
+  - [a fully stable Linux tty reverse shell](#a-fully-stable-linux-tty-reverse-shell)
+  - [Socat Encrypted Shells](#socat-encrypted-shells)
+- [Common Shell Payload](#common-shell-payload)
+- [MSFVENOM](#msfvenom)
+  - [Staged vs Stageless](#staged-vs-stageless)
+  - [Meterpreter](#meterpreter)
+  - [Payload Naming Conventions](#payload-naming-conventions)
+- [Metasploit multi/handler](#metasploit-multihandler)
+- [Webshells](#webshells)
+
+
 ## Types of Shells
 
 ### Reverse shells

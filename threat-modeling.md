@@ -112,11 +112,11 @@ Threats  and techniques used against industrial controls sytems, controllling cr
 
 ### Searching and Selecting Techniques
 
-![Attack Navigator Searching and Selecting Techniques](images/attack-navigator-01.png)  
+![Attack Navigator Searching and Selecting Techniques](assets/attack-navigator-01.png)  
 
 Use the magnifying glass to search for and see the behaviors of an APT.  
 
-![APT41](images/attack-navigator-02.png)  
+![APT41](assets/attack-navigator-02.png)  
 
 Layer Controls allow 
 

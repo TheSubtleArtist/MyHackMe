@@ -1,5 +1,41 @@
 # Linux System Hardening
 
+- [Physical Security](#physical-security)
+  - [Grub Password](#grub-password)
+- [Filesystem Partitioning and Encryption](#filesystem-partitioning-and-encryption)
+  - [LUKS (Linux Unified Key Setup)](#luks-linux-unified-key-setup)
+  - [LUKS Installation and Implementation Guide](#luks-installation-and-implementation-guide)
+- [Firewall](#firewall)
+  - [NetFilter](#netfilter)
+  - [Uncomplicated Firewall (UFW)](#uncomplicated-firewall-ufw)
+- [Remote Access](#remote-access)
+  - [Disable remote login as root](#disable-remote-login-as-root)
+  - [Disable password authentication](#disable-password-authentication)
+  - [Linux SSH Public Key Authentication Implementation](#linux-ssh-public-key-authentication-implementation)
+  - [Backup and Recovery](#backup-and-recovery)
+- [Securing User Accounts](#securing-user-accounts)
+  - [Sudo](#sudo)
+  - [Disable Root (and other accounts)](#disable-root-and-other-accounts)
+  - [Password Policy](#password-policy)
+- [Software and Services](#software-and-services)
+- [Update and Upgrade Policies](#update-and-upgrade-policies)
+- [Audit and Log Configuration](#audit-and-log-configuration)
+- [GNU Privacy Guard](#gnu-privacy-guard)
+  - [Overview of Pretty Good Privacy](#overview-of-pretty-good-privacy)
+  - [Creating GPG Keys](#creating-gpg-keys)
+  - [GPG File Encryption](#gpg-file-encryption)
+- [SSH](#ssh)
+  - [Protocol 1](#protocol-1)
+  - [Creating and SSH Key Set](#creating-and-ssh-key-set)
+  - [Disable Username \& Password SSH Login](#disable-username--password-ssh-login)
+  - [X11 Forwarding \& SSH Tunneling](#x11-forwarding--ssh-tunneling)
+  - [Improving SSH Logging](#improving-ssh-logging)
+- [Mandatory Access Control](#mandatory-access-control)
+  - [AppArmor](#apparmor)
+  - [AppArmor Configuration](#apparmor-configuration)
+  - [AppArmor Command Line Utilities](#apparmor-command-line-utilities)
+
+
 ## Physical Security
 
 ### Grub Password
@@ -744,6 +780,7 @@ sudo nft delete rule inet filter input tcp dport 22
 | **Rules not matching** | SSH still blocked | Verify rule order and chain policies |
 
 ***Emergency Recovery Commands***
+
 ```bash
 # If locked out, use console/KVM access:
 # Flush all rules (removes firewall completely)
@@ -755,7 +792,7 @@ sudo nft add chain inet filter input { type filter hook input priority 0 \; poli
 sudo nft add chain inet filter output { type filter hook output priority 0 \; policy accept \; }
 ```
 
-## Step 8: Verification and Testing
+##### Step 8: Verification and Testing
 
 ***Rule Check***
 
@@ -1381,3 +1418,210 @@ done
 /var/log/kern.log - a log file containing messages from the kernel
 /var/log/boot.log - a log file that contains start-up messages and boot information
 
+## GNU Privacy Guard
+
+### Overview of Pretty Good Privacy
+
+Widely used to encrypt and decrypt email by using asymmetrical and symmetrical systems.  
+When you first send your email, it is encrypted with your own public key, as well as a session key, which is a one-time use random number called a nonce.  
+The session key is then encrypted into the public key and sent with the cipher text.  
+To decrypt your email, the receiving end must use their private key in order to discover the session key.  
+The session key combined with the private key are then used to decrypt the cipher text back into the original document.
+
+### Creating GPG Keys
+
+When you first want to use GPG, it requires you to create your own keys. To do that we use `:> gpg --gen-key.`
+auto-generates files and directories  
+
+![gpg1](assets/hardening-101.png)  
+
+verify the keys were created with `:> gpg --list-keys`  
+
+### GPG File Encryption
+
+#### Symmetric
+
+encrypt a text file with a passphrase and then anyone that wants to decrypt and read that file must know the passphrase: `:> gpg -c <our_file>`  
+This will prompt the user to enter a passphrase to protect the file.  
+*Note* This is not the passphrase you used to create your keys  
+
+![gpg2](assets/hardening-102.png)  
+![gpg3](assets/hardening-103.png)  
+
+Symmetrically encrypting your file leaves a backup copy that's unencrypted. You can remove it with shred or rm.  
+Then let's decrypt our file and see what's inside! `:> gpg -d <file>.gpg`  
+
+#### Asymmetric
+
+We'll need two users here: Nick and Spooky.  
+To perform Asymmetric encrption, both parties need to have previously generated keys.  
+
+The public key is used to encrypt the data, both Nick and Spooky need to extract their public keys and send them to each other.  
+
+1. Navigate to Nick's .gnupg folder  
+2. `:> gpg --export -a -o <filename>` : exports Nick's public key as ASCII armored output as the `<filename>`
+3. Move to Spooky's .gnupg folder (or know the path)  
+4. `:>  gpg --import nick_public_key.txt`
+
+Now, let's say Nick wants to send Spooky an encrypted file.  
+Encrypt his document asymmetrically with `:> gpg -e <document>`  
+Nick would send this file to Spooky  
+When Spooky goes to decrypt it: `:> gpg -d <filename>.txt.gpg`  
+Spooky is prompted for his passphrase for his private key.  
+
+## SSH
+
+### Protocol 1
+
+In your /etc/ssh/sshd_config file, if you see `Protocol 1` or `Protocol 1, 2`, disable Protocol version 1 as soon as possible.  
+It's available to run on Legacy machines but has been compromised and is no longer considered secure.  
+SSH Protocol Version 2 is the current, more secure version of SSH.
+
+### Creating and SSH Key Set
+
+#### Creating SSH Keys
+
+`:> ssh-keygen` to generate a pair of public and private keys.  
+
+![ssh-keygen](assets/hardening-104.png)
+
+#### Copying Using ssh-copy-id
+
+`:> ssh-copy-id username@remote-host`  
+
+![ssh-copy-id](assets/hardening-105.png)
+
+#### Creating Keys with Updated Encryption Algorithms
+
+`ssh-keygen`, by default uses RSA with a 2048 size key.  
+
+#### RSA
+
+To create that modified RSA key, we can use the following command during key generation
+
+`:> ssh-keygen -t rsa -b 3072`  
+
+The -t option specifies the encryption type and the -b option specifies the bit size.  
+
+#### ECDSA
+
+`:> ssh-keygen -t ecdsa -b 384
+
+The max key size with ECDSA is 521 bits.  
+NIST does not recommend this key size as they could be susceptible to padding attacks.  
+384 bits is quite strong and although the key size is smaller than RSA's 3072 key size, it's just as strong as RSA while also requiring less computing power, which is a plus.
+
+### Disable Username & Password SSH Login
+
+Only do this after you've verified that your key exchange login works. Otherwise, you risk locking yourself or other users out of the system.  
+Go to the /etc/ssh/sshd_config file and edit the following line  
+
+![passAuth](assets/hardening-106.png)  
+
+to completely remove password based logins
+
+### X11 Forwarding & SSH Tunneling
+
+#### X11 Forwarding
+
+You've connected to your workstation that has SSH enabled and you go about your work on the command-line.  
+Everything is going great. But then you run into a problem. You need to run a program that only has a GUI.  How would you accomplish that via SSH?  
+X11 allows you to forward GUI application displays to your local environment (thought it has to have a GUI itself, right?).  
+X11 has some flaws that make it dangerous to use. So let's look at turning it off.
+
+#### Turn off X11 Forwarding
+
+Another setting in sshd_config. You'll want to find the line that says  
+
+![x11 off](assets/hardening-107.png)  
+
+#### SSH Tunneling
+
+Scenario: you're on your computer at work and your favorite streaming service is blocked.  
+By forwarding the SSH connection to a computer or device running SSH that you own (most likely at home), you can browse blocked sites at work.  
+There's a few settings in the sshd_config that allow a user to accomplish (or block) this.  
+
+![block ssh tunneling](assets/hardening-108.png)  
+
+### Improving SSH Logging
+
+A log file is created any time someone logs in with a Protocol that uses SSH. So that would be SSH, SCP, or SFTP.  
+By default, linux stores this log file in /var/log/auth.log.  
+
+Therea re different levels of logging described on `:> man sshd_config`:  
+
+  INFO (default setting)  
+  QUIET  
+  FATAL  
+  ERROR  
+  INFO  
+  VERBOSE  
+  DEBUG1  
+  DEBUG2  
+  DEBUG3  
+
+INFO is the default setting. This is one of the two we would normally care about. The other would be VERBOSE.  
+To change the logging level,avigate to /etc/ssh/sshd_config  
+![log level](assets/hardening-109.png)  
+
+## Mandatory Access Control
+
+considered the strongest form of access control due to allowing more control over who has access over what.  
+In a Linux system, there are multiple ways to implement MAC. Two of which being SELinux and AppArmor.  
+
+### AppArmor
+
+Both, AppArmor and SELinux can be used to implement MAC on a Linux system  
+can prevent malicious actors from accessing the data on your systems. As a system administrator, this is extremely important; protecting the confidentiality of your data
+Applications have their own profiles thus making it a little easier
+SELinux and AppArmor have the capability to create your own custom profiles but the scripting in AppArmor is a little easier to understand and reduces the learning curve
+
+### AppArmor Configuration
+
+The AppArmor directory is located at `/etc/apparmor.d`.  
+This directory contains all of the AppArmor profiles. The sbin.dhclient and usr.* files are AppArmor profiles. 
+
+![apparmor-dir](assets/hardening-110.png)  
+
+The `abstractions` directory is a sort of "includes" folder that has partially written profiles that can be used and included in your own profiles.  
+
+![abstractions-dir](assets/hardening-111.png)
+
+For this example, look at the gnupg file.
+
+![apparmor-example](assets/hardening-112.png)  
+
+each line/rule ends in a comma. This is required syntax (even for the last rule).  
+each rule has an owner @{HOME} portion for each listing. The @{HOME} is an AppArmor variable that allows the rule to work with any user's home directory.  
+The access methods before the end of the rule: r for reading, w for writing. These indicate that the AppArmor daemon have those permissions to read and write to that location preceding it.  
+`m` indicates that the file can be used for executable mapping - the file can be mapped into memory using mmap.  
+these are not configured profiles. They are partials meant to be included in custom profiles.  
+The only two profiles upon a fresh install of Ubuntu are `sbin.dhclient` and `usr.*`.
+
+Additional profiles can be installed with `:> sudo apt install apparmor-profiles apparmor-profiles-extra`
+
+### AppArmor Command Line Utilities
+
+To get the AppArmor status, we can enter `:> aa-status`.  
+
+![aa-status](assets/hardening-113.png)  
+
+***AppArmor modes***
+
+- Enforce - Enforces the active profiles
+- Complain - Allows processes to perform disallowed actions by the profile and are logged
+- Audit - The same as Enforce mode but allowed and disallowed actions get logged to /var/log/audit/audit.log or system log (depending on if auditd is installed)
+
+Install apparmor command-line utilities: `:> sudo apt install apparmor-utils`  
+enables the following commands  
+
+- aa-enforce
+- aa-disable
+- aa-audit
+- aa-complain  
+
+Let's set the usr.sbin.rsyslogd profile to enforce mode and then check the status.
+
+`:> sudo aa-enforce usr.sbin.rsyslogd`  
+
+![enforce](assets/hardening-114.png)  

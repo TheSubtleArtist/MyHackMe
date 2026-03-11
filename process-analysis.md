@@ -346,11 +346,11 @@ This example illustrates a common tactic attackers use to leverage compromised s
 Next, additional system cronjob directories are important for a thorough analysis.  
 These directories are found under the /etc/ directory with the following naming convention:
 
-    *  **/etc/cron.hourly/** - System cronjobs that run once per hour.
-    *  **/etc/cron.daily/** - System cronjobs that run once per day.
-    *  **/etc/cron.weekly/** - System cronjobs that run once per week.
-    *  **/etc/cron.monthly/** - System cronjobs that run once per month.
-    *  **/etc/cron.d/** - Additional custom system cronjobs.
+*  **/etc/cron.hourly/** - System cronjobs that run once per hour.
+*  **/etc/cron.daily/** - System cronjobs that run once per day.
+*  **/etc/cron.weekly/** - System cronjobs that run once per week.
+*  **/etc/cron.monthly/** - System cronjobs that run once per month.
+*  **/etc/cron.d/** - Additional custom system cronjobs.
 
 With these locations in mind, we can list out any configured cronjobs with the ls command:
 

@@ -356,150 +356,173 @@ With these locations in mind, we can list out any configured cronjobs with the l
 
 #### Listing Additional Cronjobs
 
-           
-investigator@tryhackme:~$ ls /etc/cron.d
-anacron  e2scrub_all  popularity-contest
-investigator@tryhackme:~$ ls /etc/cron.hourly
-beacon
-investigator@tryhackme:~$ ls /etc/cron.daily
-0anacron  apt-compat    cracklib-runtime  logrotate  popularity-contest
-apport    bsdmainutils  dpkg              man-db     update-notifier-common
-investigator@tryhackme:~$ ls /etc/cron.weekly
-0anacron  man-db  update-notifier-common
-investigator@tryhackme:~$ ls /etc/cron.monthly
-0anacron
+`:> investigator@tryhackme:~$ ls /etc/cron.d`  
 
-        
+    anacron  e2scrub_all  popularity-contest  
 
-In the output above, most of these cronjobs look benign - however, it's always important to investigate their contents to be sure. Similar to processes, this is why it's always essential to have a pre-established baseline in order to spot anomalies quickly.
+`:> investigator@tryhackme:~$ ls /etc/cron.hourly`  
 
-/var/spool/cron/crontabs/
+    beacon  
 
-After investigating the system-level cronjobs, we can look at the various user-level cronjobs configured by users on the system. User-level cronjobs are specific to individual user configuration files and are managed independently of system-wide cronjobs. We can navigate to the /var/spool/cron/crontabs/ directory. Each user with permission to use cron will have their file inside this directory, named after their username.
+`:> investigator@tryhackme:~$ ls /etc/cron.daily`  
 
-There are several ways to enumerate this information. The easiest way is to list the contents of the directory with sudo-privileges:
-Listing User-Level Cronjobs
+    0anacron  apt-compat    cracklib-runtime  logrotate  popularity-contest  
 
-           
-investigator@tryhackme:~$ sudo ls -al /var/spool/cron/crontabs/
-total 28
-drwx-wx--T 2 root   crontab 4096 Mar 13 00:05 .
-drwxr-xr-x 5 root   root    4096 Oct 26  2020 ..
--rw------- 1 bob    crontab 1157 Mar 13 00:05 bob
--rw------- 1 elijah crontab 1122 Mar 13 00:02 elijah
--rw------- 1 janice crontab 1132 Mar 12 23:38 janice
--rw------- 1 root   crontab 1122 Mar 12 23:45 root
--rw------- 1 ubuntu crontab 1225 Feb 27  2022 ubuntu
+    apport    bsdmainutils  dpkg              man-db     update-notifier-common  
 
-        
+`:> investigator@tryhackme:~$ ls /etc/cron.weekly`  
+
+    0anacron  man-db  update-notifier-common  
+
+`:> investigator@tryhackme:~$ ls /etc/cron.monthly`  
+
+    0anacron
+
+In the output above, most of these cronjobs look benign - however, it's always important to investigate their contents to be sure.  
+Similar to processes, this is why it's always essential to have a pre-established baseline in order to spot anomalies quickly.
+
+#### /var/spool/cron/crontabs/
+
+After investigating the system-level cronjobs, we can look at the various user-level cronjobs configured by users on the system.  
+User-level cronjobs are specific to individual user configuration files and are managed independently of system-wide cronjobs.  
+Each user with permission to use cron will have their file inside this directory, named after their username.
+
+There are several ways to enumerate this information.  
+The easiest way is to list the contents of the directory with sudo-privileges:
+
+#### Listing User-Level Cronjobs
+
+`:> investigator@tryhackme:~$ sudo ls -al /var/spool/cron/crontabs/`  
+
+    total 28
+    drwx-wx--T 2 root   crontab 4096 Mar 13 00:05 .
+    drwxr-xr-x 5 root   root    4096 Oct 26  2020 ..
+    -rw------- 1 bob    crontab 1157 Mar 13 00:05 bob
+    -rw------- 1 elijah crontab 1122 Mar 13 00:02 elijah
+    -rw------- 1 janice crontab 1132 Mar 12 23:38 janice
+    -rw------- 1 root   crontab 1122 Mar 12 23:45 root
+    -rw------- 1 ubuntu crontab 1225 Feb 27  2022 ubuntu
 
 As seen in the above output, user-level cronjobs have been configured by several users on the system.
 
-We can view the contents of these files separately (using cat) to analyse their contents, or we could use the crontab command. This command can manage, create, or view user-level cronjobs. The -u argument can be used to specify a specific user's cron configuration, and the -l argument can be used to display the contents of the cronjob. To view Janice's cronjobs, we can run:
-Viewing Janice's Configured Cronjobs
+We can view the contents of these files separately (using cat) to analyse their contents, or we could use the crontab command.  
+This command can manage, create, or view user-level cronjobs.  
+The `-u` argument can be used to specify a specific user's cron configuration  
+The `-l` argument can be used to display the contents of the cronjob.  
 
-           
-investigator@tryhackme:~$ sudo crontab -l -u janice
-...
-# m h  dom mon dow   command
-* * * * * /home/janice/abzkd83o4jakxld.sh
+#### Viewing Janice's Configured Cronjobs
 
-        
+`:> investigator@tryhackme:~$ sudo crontab -l -u janice`  
 
-As seen in the above output, we have discovered the specific cronjob that executes the abzkd83o4jakxld.sh bind shell, which we identified in the previous task.
+    # m h  dom mon dow   command
+    * * * * * /home/janice/abzkd83o4jakxld.sh
 
-Using a clever one-liner command, we can quickly loop through the users on the system and identify if they have any user-level cronjobs configured. If so, we can output the contents of the cronjob entry to the terminal. This type of hybrid automation can help speed up investigations and ensure thorough coverage:
-Using a One-Liner to List User Cron Entries
+As seen in the above output, we have discovered the specific cronjob that executes the `abzkd83o4jakxld.sh` bind shell, which we identified in the previous task.
 
-           
-investigator@tryhackme:~$ sudo bash -c 'for user in $(cut -f1 -d: /etc/passwd); do entries=$(crontab -u $user -l 2>/dev/null | grep -v "^#"); if [ -n "$entries" ]; then echo "$user: Crontab entry found!"; echo "$entries"; echo; fi; done'
-...
-janice: Crontab entry found!
-* * * * * /home/janice/abzkd83o4jakxld.sh
+Using a clever one-liner command, we can quickly loop through the users on the system and identify if they have any user-level cronjobs configured.  
+If so, we can output the contents of the cronjob entry to the terminal.  
+This type of hybrid automation can help speed up investigations and ensure thorough coverage:  
 
-bob: Crontab entry found!
-10 05 * * * /home/bob/backup_tmp.sh
-30 04 * * * /var/tmp/findme.sh
-...
+#### Using a One-Liner to List User Cron Entries
 
-        
+`:> investigator@tryhackme:~$ sudo bash -c 'for user in $(cut -f1 -d: /etc/passwd); do entries=$(crontab -u $user -l 2>/dev/null | grep -v "^#"); if [ -n "$entries" ]; then echo "$user: Crontab entry found!"; echo "$entries"; echo; fi; done'`  
 
-To break down this command, we are iterating over all of the users on the system by filtering out the entries in /etc/passwd. From each of these returned users, it iterates each user and fetches their crontab entries using the crontab command we ran earlier. If a crontab entry exists for that user, we will return their username and the entry from the crontab file.
+    ...
+    janice: Crontab entry found!
+    * * * * * /home/janice/abzkd83o4jakxld.sh
 
-As seen in the above output, we have quickly determined the values of multiple users' crontab entries.
+    bob: Crontab entry found!
+    10 05 * * * /home/bob/backup_tmp.sh
+    30 04 * * * /var/tmp/findme.sh
+    ...
+
+To break down this command, we are iterating over all of the users on the system by filtering out the entries in /etc/passwd.  
+From each of these returned users, it iterates each user and fetches their crontab entries using the crontab command we ran earlier.  
+If a crontab entry exists for that user, we will return their username and the entry from the crontab file.  
 
 ### Cron Execution Logs
 
-Cron logs record the execution of scheduled tasks managed by the cron daemon and provide a chronological record of when cron jobs were executed, along with any associated output or error messages. From a forensic standpoint, these logs can be invaluable in uncovering execution artefacts of cronjobs and lead to discovering suspicious activities or system compromises. For example, suppose a malicious actor abused an existing cronjob or created a malicious cronjob and attempted to cover their tracks. In that case, the logs might reveal unusual patterns of execution or unexpected commands being run.
+Cron logs record the execution of scheduled tasks managed by the cron daemon and provide a chronological record of when cron jobs were executed, along with any associated output or error messages.  
+From a forensic standpoint, these logs can be invaluable in uncovering execution artefacts of cronjobs and lead to discovering suspicious activities or system compromises.  
+For example, suppose a malicious actor abused an existing cronjob or created a malicious cronjob and attempted to cover their tracks.  
+In that case, the logs might reveal unusual patterns of execution or unexpected commands being run.
 
-On Debian-based systems, cron execution logs are typically stored in /var/log/syslog. This file aggregates system logs, including messages from the cron daemon. In some Linux distributions, such as Red Hat Enterprise Linux (RHEL) and CentOS, these logs may be found in the aptly named /var/log/cron.
+On Debian-based systems, cron execution logs are typically stored in `/var/log/syslog`.  
+This file aggregates system logs, including messages from the cron daemon.  
+In some Linux distributions, such as Red Hat Enterprise Linux (RHEL) and CentOS, these logs may be found in the aptly named `/var/log/cron`.
 
-Because the system we're investigating stores cron logs in the syslog file, we can grep the contents and filter for any logs related to cron:
-Filtering Syslog for Cron Logs
+Because the system we're investigating stores cron logs in the syslog file, we can grep the contents and filter for any logs related to cron:  
 
-           
-investigator@tryhackme:~$ sudo grep cron /var/log/syslog
+#### Filtering Syslog for Cron Logs
 
-        
+`:> investigator@tryhackme:~$ sudo grep cron /var/log/syslog`
 
-The above command will produce a large amount of output. It is a good idea to filter the results further based on specific criteria to focus on relevant information. Some example ideas to filter on include:
-Filtering Syslog for Failed Cron Logs
+The above command will produce a large amount of output.  
+It is a good idea to filter the results further based on specific criteria to focus on relevant information.  
+Some example ideas to filter on include:  
 
-           
-investigator@tryhackme:~$ sudo grep cron /var/log/syslog | grep -E 'failed|error|fatal'
+#### Filtering Syslog for Failed Cron Logs
 
-        
+`:> investigator@tryhackme:~$ sudo grep cron /var/log/syslog | grep -E 'failed|error|fatal'`
 
-The above command will filter out cron entries associated with failed job executions. In this case, there are no results - but this can be a useful method to catch anomalies.
+The above command will filter out cron entries associated with failed job executions.  
+In this case, there are no results - but this can be a useful method to catch anomalies.
 
-We can also filter for specific users:
-Filtering Syslog for Bob's Cron Logs
+We can also filter for specific users:  
 
-           
-investigator@tryhackme:~$ sudo grep cron /var/log/syslog | grep -i 'bob'
-Mar 13 00:04:35 tryhackme crontab[3016]: (root) LIST (bob)
-Mar 13 00:05:17 tryhackme crontab[3053]: (bob) BEGIN EDIT (bob)
-Mar 13 00:05:45 tryhackme crontab[3053]: (bob) END EDIT (bob)
-Mar 13 00:05:47 tryhackme crontab[3058]: (bob) BEGIN EDIT (bob)
-Mar 13 00:05:59 tryhackme crontab[3058]: (bob) REPLACE (bob)
-Mar 13 00:05:59 tryhackme crontab[3058]: (bob) END EDIT (bob)
-Mar 13 00:06:01 tryhackme cron[704]: (bob) RELOAD (crontabs/bob)
-Mar 13 00:06:32 tryhackme crontab[3259]: (root) LIST (bob)
+#### Filtering Syslog for Bob's Cron Logs
 
-        
+ `:> investigator@tryhackme:~$ sudo grep cron /var/log/syslog | grep -i 'bob'`  
+
+    Mar 13 00:04:35 tryhackme crontab[3016]: (root) LIST (bob)
+    Mar 13 00:05:17 tryhackme crontab[3053]: (bob) BEGIN EDIT (bob)
+    Mar 13 00:05:45 tryhackme crontab[3053]: (bob) END EDIT (bob)
+    Mar 13 00:05:47 tryhackme crontab[3058]: (bob) BEGIN EDIT (bob)
+    Mar 13 00:05:59 tryhackme crontab[3058]: (bob) REPLACE (bob)
+    Mar 13 00:05:59 tryhackme crontab[3058]: (bob) END EDIT (bob)
+    Mar 13 00:06:01 tryhackme cron[704]: (bob) RELOAD (crontabs/bob)
+    Mar 13 00:06:32 tryhackme crontab[3259]: (root) LIST (bob)
+
 
 The above command will filter cron entries specifically associated with Bob. Note that in the above output, we can even see the timestamps of when Bob's crontab file was modified.
 
 ### Pspy
 
-Pspy is a powerful open-source tool used to monitor Linux processes without the need for root privileges. It is designed to capture and display real-time information about running processes, including their execution commands, user IDs, process IDs (PIDs), parent process IDs (PPIDs), timestamps, and other relevant details. It operates by reading data directly from the /proc virtual filesystem, providing real-time insights into process activity without modifying system files or requiring elevated permissions.
+Pspy is a powerful open-source tool used to monitor Linux processes without the need for root privileges.  
+It captures and displays real-time information about running processes, including their execution commands, user IDs, process IDs (PIDs), parent process IDs (PPIDs), timestamps, and other relevant details.  
+It operates by reading data directly from the /proc virtual filesystem, providing real-time insights into process activity without modifying system files or requiring elevated permissions.  
 
-While it's excellent for enumeration purposes, incident responders can benefit from its ability to collect execution artefacts and catch short-lived processes. Due to its real-time monitoring, it can also detect processes generated by various cronjobs through the system, giving us more insight into which processes occur when cronjobs are run.
+excellent for enumeration purposes  
+incident responders can benefit from its ability to collect execution artefacts and catch short-lived processes.  
+Due to its real-time monitoring, it can also detect processes generated by various cronjobs through the system, giving us more insight into which processes occur when cronjobs are run.  
 
-In this system, Pspy has been pre-installed along with the mounted binaries we have been using. As such, it is in our path and can be called simply by running pspy64. It will begin to monitor in real time, and we should let it run for a few minutes to capture events. It can be stopped by pressing Ctrl + C:
-Using pspy64 to Monitor Executions
+It can be stopped by pressing Ctrl + C:  
 
-           
-investigator@tryhackme$ pspy64
-pspy - version: v1.2.1 - Commit SHA: f9e6a1590a4312b9faa093d8dc84e19567977a6d
+#### Using pspy64 to Monitor Executions
 
-Config: Printing events (colored=true): processes=true | file-system-events=false ||| Scanning for processes every 100ms and on inotify events ||| Watching directories: [/usr /tmp /etc /home /var /opt] (recursive) | [] (non-recursive)
+`:> investigator@tryhackme$ pspy64`  
 
-Draining file system events due to startup...
-done
-...
-2024/03/13 19:38:45 CMD: UID=0     PID=1      | /sbin/init 
-2024/03/13 19:39:01 CMD: UID=0     PID=3396   | /usr/sbin/CRON -f 
-2024/03/13 19:39:01 CMD: UID=1003  PID=3403   | /bin/bash /home/janice/abzkd83o4jakxld.sh 
-2024/03/13 19:39:01 CMD: UID=1003  PID=3402   | /bin/sh -i 
-2024/03/13 19:39:01 CMD: UID=1003  PID=3401   | /bin/bash /home/janice/abzkd83o4jakxld.sh
+    pspy - version: v1.2.1 - Commit SHA: f9e6a1590a4312b9faa093d8dc84e19567977a6d
+
+    Config: Printing events (colored=true): processes=true | file-system-events=false ||| Scanning for processes every 100ms and on inotify events ||| Watching directories: [/usr /tmp /etc /home /var /opt] (recursive) | [] (non-recursive)
+
+    Draining file system events due to startup...
+    done
+    ...
+    2024/03/13 19:38:45 CMD: UID=0     PID=1      | /sbin/init 
+    2024/03/13 19:39:01 CMD: UID=0     PID=3396   | /usr/sbin/CRON -f 
+    2024/03/13 19:39:01 CMD: UID=1003  PID=3403   | /bin/bash /home/janice/abzkd83o4jakxld.sh 
+    2024/03/13 19:39:01 CMD: UID=1003  PID=3402   | /bin/sh -i 
+    2024/03/13 19:39:01 CMD: UID=1003  PID=3401   | /bin/bash /home/janice/abzkd83o4jakxld.sh
 
         
-
 Note: The output may appear stalled or paused for a few moments as it initialises.
 
-This command will produce a large amount of continuous output as normal system operations occur. However, we can quickly note that the cronjobs on the system that we identified previously (such as /bin/bash /home/janice/abzkd83o4jakxld.sh) are detected.
-Answer the questions below
+This command will produce a large amount of continuous output as normal system operations occur.  
+However, we can quickly note that the cronjobs on the system that we identified previously (such as /bin/bash /home/janice/abzkd83o4jakxld.sh) are detected.  
+
+### Cronjobs Questions
+
 Search around the system for suspicious system-level cronjob entries. What is the full URL of the C2 server?
 
 List the user-level cronjobs in the system. What is the hidden flag in one of the scripts?
@@ -507,6 +530,41 @@ List the user-level cronjobs in the system. What is the hidden flag in one of th
 Use pspy64 to monitor executions occurring through the system. What is the decoded flag value that is echoed every 15 seconds?
 
 ## Services
+
+In Linux, services refer to various background processes or daemons that run continuously, performing tasks such as managing system resources, providing network services, or handling user requests.  
+For example, the cron daemon we analysed previously ran the cronjobs.  
+Other common services include SSH (`sshd`) for secure shell or the Apache HTTP Server (`httpd`).  
+Typically, services are configured using the system's service management utility - systemd or init.  
+Some environments like BusyBox, however, do not use systemd.
+
+Services can be a target for attackers if they can exploit vulnerabilities, abuse misconfigurations, or manipulate legitimate services to establish persistence or escalate privileges on the system.  
+For example, attackers might create new malicious services or modify existing ones to inject or execute malicious commands during system startup or ad-hoc if they can start and stop the service.
+
+As such, incident responders need to have a pre-established baseline to detect anomalies and locate artefacts related to service abuse.
+
+### Enumerating Services
+
+#### systemctl  
+
+a utility in Linux used for controlling systemd and service managers.  
+As mentioned earlier, systemd is a service management utility in Unix-based systems and, for the most part, has replaced the traditional init system in many distributions.  
+As such, systemd is responsible for managing the startup processes, services, and daemons on a Linux system, and `systemctl` lets us manage these services directly.
+
+We can perform a number of actions using `systemctl`, including:
+
+- `systemctl start <service>` — Starts the specified service.
+- `systemctl stop <service>` — Stops the specified service.
+- `systemctl restart <service>` — Restarts the specified service.
+- `systemctl enable <service>` — Enables the specified service to start automatically at boot.
+- `systemctl disable <service>` — Disables the specified service from starting automatically at boot.
+- `systemctl status <service>` — Displays the status of the specified service (e.g., Active, Inactive, Failed).
+
+We can also use `systemctl` to iterate and query all the services on the system using the following syntax:
+
+##### Listing All System Services**
+
+```shell-session
+investigator@tryhackme:~$ sudo systemctl list-units --all --type=service
 
 ## Autostart Scripts
 

@@ -283,11 +283,16 @@ Cron entries follow a specific format consisting of space-separated fields.
 
 #### Explanation
 
-**Minute (10)** : The first field specifies the minute when the command will be executed. In this case, it's 10, indicating that the command will be executed at the 10th minute of the hour.  
+**Minute (10)** : The first field specifies the minute when the command will be executed. In this case, it's 10, indicating that the command will be executed at the 10th minute of the hour. 
+
 **Hour (05)** : The second field specifies the hour when the command will be executed. It's 05, indicating that the command will be executed at 5:10 AM.  
+
 **Day of the Month (*)** : The third field specifies the day of the month when the command will be executed. In this case, it's *, a wildcard value, meaning it will be executed every day of the month. You can also specify a specific day of the month using numbers from 1 to 31. For example, to execute the command on the 15th day of every month, you would use 15.  
+
 **Month (*)** : The fourth field specifies the month when the command will be executed. Here, it's also *, meaning the command will be executed monthly. You can specify months using either numbers (1 for January, 2 for February, etc.) or shorthand names (Jan for January, Feb for February, etc.). For example, you can use either 2 or Feb to execute the command only in February.  
+
 **Day of the Week (*)** : The fifth field specifies the day of the week the command will be executed. In this case, it's *, which means the command will be executed every day of the week. You can also specify days of the week using numbers from 0 to 7, where 0 and 7 represent Sunday, 1 represents Monday, and so on. Alternatively, you can use the shorthand names (Sun, Mon, Tue, etc.). For example, you can use either 1 or Mon.  
+
 **Command (/home/bob/backup_tmp.sh)** : The final field contains the command to be executed.  
 
 Additionally, it's important to note that the system-level `/etc/crontab` differs from user-level crontabs.  

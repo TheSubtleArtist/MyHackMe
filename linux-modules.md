@@ -214,14 +214,13 @@ With $0 I didn't had anything else, if it were to be $0,$0 then the lines would 
 
 Use [linux-modules-awk.txt](assets/linux-module-awk.txt) and the awk command to print the following output:
 
-    ```text
+
     ippsec:34024  
     john:50024  
     thecybermentor:25923  
     liveoverflow:45345  
     nahamsec:12365  
     stok:1234  
-    ```
 
 How will you make the output as following (there can be multiple; answer it using the above specified variables in BEGIN pattern):
 

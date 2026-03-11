@@ -141,14 +141,17 @@ To simply print a file with awk.
 
 ![awk print](assets/linux-modules-104.png)  
 
-To search for a pattern inside a file you enclose the pattern in forward slashes /pattern/ . For instance, if I want to know who all plays CTF competitions the command should be like: `:> awk '/ctf/' file.txt`  
+To search for a pattern inside a file you enclose the pattern in forward slashes /pattern/ . For instance, if I want to know who all plays CTF competitions the command should be like:  
+ `:> awk '/ctf/' file.txt`  
 
 ![awk pattern match](assets/linux-modules-10.png)  
 
 #### Built-In variables in AWK
 
  Built-in variables include field variables ($1, $2, $3 .. $n). These field variables are used to specify a piece of data (data separated by a delimeter defaulting to space).  
- `:> awk '{print $1 $3}' file.txt` lists the words contained at 1st and 3rd fields.  
+ `:> awk '{print $1 $3}' file.txt`  
+ 
+ lists the words contained at 1st and 3rd fields.  
 
 ![awk print 1](assets/linux-modules-106.png)  
 
@@ -211,7 +214,7 @@ With $0 I didn't had anything else, if it were to be $0,$0 then the lines would 
 
 Use [linux-modules-awk.txt](assets/linux-module-awk.txt) and the awk command to print the following output:
 
-    ```md
+    ```text
     ippsec:34024  
     john:50024  
     thecybermentor:25923  

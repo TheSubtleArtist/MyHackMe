@@ -809,9 +809,12 @@ Other user-related configuration files that should be investigated include:
 
 >What is the full URL that receives Janice's private SSH key on system startup?  
 
-
+`:>  cat /home/janice/.config/autostart/keygrabber.desktop`
 
 >Identify and investigate the remaining `.desktop` files on the system. What is the command that executes with the Show Network Interfaces autostart script?
+
+`:> find /home/ -name *.desktop 2>/dev/null > /tmp/search.txt`  
+`:> cat /home/franklin/.config/autostart/netwk.desktop`  
 
 ## Application Artefacts
 
@@ -983,5 +986,21 @@ Overall, understanding and enumerating the specific applications and services ru
 
 >Analyse Janice's .viminfo log. What flag do you find within the Vim search history?  
 
+`:> cat /home/janice/.viminfo`
 
->Use DumpZilla to investigate Eduardo's Firefox bookmarks. What flag do you find in one of the entries?
+>Use DumpZilla to investigate Eduardo's Firefox bookmarks. What flag do you find in one of the entries?  
+
+`:> investigator@tryhackme:/home$ sudo python3 /home/investigator/dumpzilla.py  /home/eduardo/.mozilla/firefox/niijyovp.default-release --Cookies > /home/investigator/cookies.txt`  
+
+many possibilities... maybe an easier way  
+
+`:> cd /home/eduardo/.mozilla/firefox/niijyovp.default-release`  
+
+`:> grep -ir thm{`  
+
+    Binary file places.sqlite matches
+    Binary file sessionstore.jsonlz4 matches
+    Binary file favicons.sqlite matches
+    Binary file sessionstore-backups/previous.jsonlz4 matches  
+
+`:> strings places.sqlite | grep -i thm{`}

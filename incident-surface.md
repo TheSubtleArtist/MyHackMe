@@ -7,6 +7,35 @@ Linux Attack Surface refers to various entry points where an attack or unauthori
 
 We will observe how the attack-related activities could be translated into the incident footprints or indicators of the attack on the Linux system.
 
+- [Scenario](#scenario)
+- [Overview](#overview)
+  - [Attack Surface](#attack-surface)
+  - [Incident Surface](#incident-surface)
+- [Processes and Network Communication](#processes-and-network-communication)
+  - [Investigating Processes](#investigating-processes)
+  - [Activity 1: Create and Run a Simple Process](#activity-1-create-and-run-a-simple-process)
+  - [Process with Network Connection](#process-with-network-connection)
+  - [Investigating Network Communication](#investigating-network-communication)
+  - [Where Processes Fit in the Linux Incident Surface](#where-processes-fit-in-the-linux-incident-surface)
+- [Persistence](#persistence)
+  - [Taking Foothold](#taking-foothold)
+  - [Activity 1: Account Creation](#activity-1-account-creation)
+  - [Activity # 2 Cron Job](#activity--2-cron-job)
+  - [Activity 2 Services](#activity-2-services)
+  - [Examining the Running Service](#examining-the-running-service)
+  - [Persistence Questions](#persistence-questions)
+- [Footprints on Disk](#footprints-on-disk)
+  - [File System and Directories](#file-system-and-directories)
+  - [Investigating Malicious Package](#investigating-malicious-package)
+  - [Investigate the Suspicious Installed Package](#investigate-the-suspicious-installed-package)
+  - [Footprints on Disk Questions](#footprints-on-disk-questions)
+- [Linux Logs](#linux-logs)
+  - [Syslog](#syslog)
+  - [Messages](#messages)
+  - [Authentication Logs](#authentication-logs)
+  - [Examples of Events That May Indicate an Incident](#examples-of-events-that-may-indicate-an-incident)
+  - [Linux Log Questions](#linux-log-questions)
+
 ## Scenario
 
 Alice and Bob will assist us in completing the learning objectives of this room. Alice is a Red teamer, and Bob is a Blue teamer at Cybertees Pvt Ltd. Alice will help us perform post-exploitation activities. Bob will help us examine various incident surfaces to identify the footprints of the attack.

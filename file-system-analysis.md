@@ -1,5 +1,38 @@
 # File System Analysis
 
+- [Investigation Setup](#investigation-setup)
+  - [Scenario](#scenario)
+  - [Securing the Environment](#securing-the-environment)
+  - [Modifying Environment Variables to Include Trusted Paths](#modifying-environment-variables-to-include-trusted-paths)
+  - [Investigation Questions](#investigation-questions)
+- [Files, Permissions, and Timestamps](#files-permissions-and-timestamps)
+  - [Identifying the Foothold](#identifying-the-foothold)
+  - [Ownership and Permissions](#ownership-and-permissions)
+  - [Metadata](#metadata)
+  - [Analysing Checksums](#analysing-checksums)
+  - [Timestamps](#timestamps)
+- [Users and Groups](#users-and-groups)
+  - [Identifying User Accounts](#identifying-user-accounts)
+  - [Identifying Groups](#identifying-groups)
+  - [User Logins and Activity](#user-logins-and-activity)
+  - [Sudo](#sudo)
+  - [Users and Groups Questions](#users-and-groups-questions)
+- [User Directories and Files](#user-directories-and-files)
+  - [User Home Directories](#user-home-directories)
+  - [Hidden Files](#hidden-files)
+  - [SSH and Backdoors](#ssh-and-backdoors)
+  - [User Directory and Files Questions](#user-directory-and-files-questions)
+- [Binaries and Executables](#binaries-and-executables)
+  - [Identifying Suspicious Binaries](#identifying-suspicious-binaries)
+  - [Strings](#strings)
+  - [Debsums](#debsums)
+  - [Binary Permissions](#binary-permissions)
+  - [Binary and Executable Questions](#binary-and-executable-questions)
+- [Rootkits](#rootkits)
+  - [Chkrootkit](#chkrootkit)
+  - [RKHunter](#rkhunter)
+  - [Rootkit Questions](#rootkit-questions)
+
 ## Investigation Setup
 
 ### Scenario

@@ -1,5 +1,31 @@
 # Linux Logging for SOC
 
+- [Working with Text Logs](#working-with-text-logs)
+  - [Working With Logs](#working-with-logs)
+  - [Discovering Logs](#discovering-logs)
+  - [Logging Caveats](#logging-caveats)
+  - [Use the /var/log/syslog file on the VM to answer the questions.](#use-the-varlogsyslog-file-on-the-vm-to-answer-the-questions)
+- [Authetnication Logs](#authetnication-logs)
+  - [Local and Remote Logins](#local-and-remote-logins)
+  - [Cron and Sudo Logins](#cron-and-sudo-logins)
+  - [SSH Specific Events](#ssh-specific-events)
+  - [Miscellaneous Events](#miscellaneous-events)
+  - [Continue with the VM and use the /var/log/auth.log file.](#continue-with-the-vm-and-use-the-varlogauthlog-file)
+- [Common Linux Logs](#common-linux-logs)
+  - [Generic System Logs](#generic-system-logs)
+  - [App-Specific Logs](#app-specific-logs)
+  - [Bash History](#bash-history)
+  - [According to the VM's package manager logs,](#according-to-the-vms-package-manager-logs)
+- [Runtime Monitoring](#runtime-monitoring)
+  - [System Calls](#system-calls)
+  - [Questions](#questions)
+- [Auditd](#auditd)
+  - [Audit Daemon](#audit-daemon)
+  - [Using Auditd](#using-auditd)
+  - [File Events](#file-events)
+  - [Auditd Alternatives](#auditd-alternatives)
+  - [Uncover the threat actor](#uncover-the-threat-actor)
+
 ## Working with Text Logs
 
 ### Working With Logs

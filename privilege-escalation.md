@@ -31,7 +31,7 @@
   - [Build an imitation binary](#build-an-imitation-binary)
   - [Alter the PATH variable](#alter-the-path-variable)
   - [Run the script file](#run-the-script-file)
-- [Other References](#other-references)
+- [Kernel Exploits](#kernel-exploits)
 
 
 ## Initial checklist
@@ -205,8 +205,4 @@ Achieve root shell
 
 ![root](assets/Linux-PrivEsc-09-path-04.png)  
 
-## Other References
-
-[Internal All The Things](https://swisskyrepo.github.io/InternalAllTheThings/redteam/escalation/linux-privilege-escalation/)  
-[David Varghese Writeup - Linux Privilege Escalation](https://david-varghese.medium.com/tryhackme-linux-privesc-9ea2cfac3b76)  
-[Christine Nec Writeup - Linux Privilege Escalation](https://dev.to/christinec_dev/try-hack-me-linux-privesc-complete-write-up-20fg)  
+## Kernel Exploits

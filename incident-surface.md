@@ -21,7 +21,7 @@ We will observe how the attack-related activities could be translated into the i
   - [Taking Foothold](#taking-foothold)
   - [Activity 1: Account Creation](#activity-1-account-creation)
   - [Activity # 2 Cron Job](#activity--2-cron-job)
-  - [Activity 2 Services](#activity-2-services)
+  - [Activity #3 Services](#activity-3-services)
   - [Examining the Running Service](#examining-the-running-service)
   - [Persistence Questions](#persistence-questions)
 - [Footprints on Disk](#footprints-on-disk)
@@ -407,7 +407,7 @@ This opens the user's crontab file for editing.
 Cron jobs associated with users can be examined in `/var/spool/cron/crontabs/[username]`
 
 
-### Activity 2 Services
+### Activity #3 Services
 
 Another persistence method is installing a background **service** that runs automatically on system startup.
 

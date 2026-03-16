@@ -36,14 +36,47 @@ Agent 47, we are ICA, the Linux Agency. We will test your Linux Fundamentals. Le
 
 ### What is the mission4 flag?
 
+`:> su mission4`  
+
+`:> cd ../mission4`
+
+`:> ls -alh > directory`
+
+`:> cat directory`
+
+`:> cat flag/flag.txt`
 
 ### What is the mission5 flag?
 
+`:> su mission5`  
+
+`:> cd ../mission5`
+
+`:> cat .flag.txt`
+
 ### What is the mission6 flag?
+
+`:> su mission6`  
+
+`:> cd ../mission6`  
+
+`:> ls -alh > directory`  
+
+explanation: directory names were hidden from the screen but showed when the listing was directed into a file  
+
+`:> cat .flag/flag.txt`
 
 ### What is the mission7 flag?
 
-### What is the mission8 flag?
+`:> su mission7`  
+
+`:> cd ../mission7`
+
+`:> cat flag.txt`  
+
+### What is the mission8 flag? 
+
+
 
 ### What is the mission9 flag?
 

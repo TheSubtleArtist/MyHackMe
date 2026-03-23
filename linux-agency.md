@@ -283,7 +283,29 @@ puts "#{encrypted}"
 
 ### What is the mission21 flag?
 
+`:> su mission20`  
+
+`:> cd ../mission20`
+
+`:> ls -alh`  
+
+`:> pythong3 flag.py`  
+
+`:> exit`
+
 ### What is the mission22 flag?
+
+`:> su mission21`
+
+`:> cd ../mission21`  
+
+`:> find / -user mission21 2>/dev/null > out`  
+
+`:> find / -name *flag* 2>/dev/null > /home/mission21/out`
+
+
+
+
 
 ### What is the mission23 flag?
 

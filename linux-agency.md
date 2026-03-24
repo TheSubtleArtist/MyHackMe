@@ -303,13 +303,45 @@ puts "#{encrypted}"
 
 `:> find / -name *flag* 2>/dev/null > /home/mission21/out`
 
+`:> cd /home/mission21`  
 
+`:> cat .bashrc` : encoded flag found
 
+`:> grep 'echo "' .bashrc | bash` : answer
 
+`:> exit `  
 
 ### What is the mission23 flag?
 
-What is the mission24 flag?
+`:> su mission22`  
+
+Moves into a python environment.
+
+```python
+from os import system; system('bash')
+```
+
+`:> cd /home/mission22/`
+
+`:> cat flag.txt`
+
+`:> exit` 
+
+`:> exit()`
+
+### What is the mission24 flag?
+
+`:> su mission24`
+
+`:> cd ../mission24`
+
+`:> cat message.txt`
+
+`:> cat /etc/hosts`
+
+`:> curl mission24.com`
+
+`:> exit`
 
 ### What is the mission25 flag?
 

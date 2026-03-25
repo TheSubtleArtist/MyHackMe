@@ -8,9 +8,9 @@ Agent 47, we are ICA, the Linux Agency. We will test your Linux Fundamentals. Le
 
 `:> cd /`  
 
-`:> grep -ir mission1{ > /home/agent47/mission1.txt`   
+`:> grep -ir mission1{ > /home/agent47/mission1.txt`
 
-`:> cat mission1.txt` 
+`:> cat mission1.txt`
 
 `:> exit`
 
@@ -22,7 +22,7 @@ Agent 47, we are ICA, the Linux Agency. We will test your Linux Fundamentals. Le
 
 `:> ls`
 
-`:> su mission2` 
+`:> su mission2`
 
 `:> cd /home/mission2`  
 
@@ -88,7 +88,7 @@ explanation: directory names were hidden from the screen but showed when the lis
 
 `:> exit`
 
-### What is the mission8 flag? 
+### What is the mission8 flag?
 
 `:> su mission8`  
 
@@ -118,7 +118,7 @@ explanation: directory names were hidden from the screen but showed when the lis
 
 `:> find . / -name *flag* 2>/dev/null`  
 
-`:> cat $(find . / -name *flag* 2>/dev/null)` 
+`:> cat $(find . / -name *flag* 2>/dev/null)`
 
 `:> exit`  
 
@@ -140,7 +140,7 @@ explanation: directory names were hidden from the screen but showed when the lis
 
 `:> cat flag.txt` : no permissions to read, but am the owner... HA! funny.  
 
-`:> chmod +r flag.txt` 
+`:> chmod +r flag.txt`
 
 `:> cat flag.txt`  
 
@@ -154,8 +154,8 @@ explanation: directory names were hidden from the screen but showed when the lis
 
 `:> cat flag.txt`  base64 encoded string
 
-`:> base64 -d flag.txt` 
- 
+`:> base64 -d flag.txt`
+
  `:> exit`
 
 ### What is the mission14 flag?
@@ -309,7 +309,7 @@ puts "#{encrypted}"
 
 `:> grep 'echo "' .bashrc | bash` : answer
 
-`:> exit `  
+`:> exit`  
 
 ### What is the mission23 flag?
 
@@ -325,7 +325,7 @@ from os import system; system('bash')
 
 `:> cat flag.txt`
 
-`:> exit` 
+`:> exit`
 
 `:> exit()`
 
@@ -345,11 +345,262 @@ from os import system; system('bash')
 
 ### What is the mission25 flag?
 
+`:> su mission24`
+
+`:> cd ../mission24`
+
+`:> ./bribe`
+
+```text
+There is a guy who is smuggling flags
+Bribe this guy to get the flag
+Put some money in his pocket to get the flag
+
+Words are not the price for your flag
+Give Me money Man!!!
+```
+
+`:> strings bribe > out && cat out`  
+
+```text
+/lib64/ld-linux-x86-64.so.2
+libc.so.6
+strncmp                 <- strncmp is always worth investigating
+puts
+__stack_chk_fail
+putchar
+strlen
+getenv                  <- trying to read and enviornment variable
+system
+__cxa_finalize
+__libc_start_main
+GLIBC_2.4
+GLIBC_2.2.5
+_ITM_deregisterTMCloneTable
+__gmon_start__
+_ITM_registerTMCloneTable
+.*00*,-qH
+v8ur!zpuH
+pt{{r {tH
+ tr%qqssH
+pp!qq"zqH
+AWAVI
+AUATL
+[]A\A]A^A_
+pocket                  <- possible variable name
+money                   <- possible variable name
+Here ya go!!!
+Don't tell police about the deal man ;)
+init
+There is a guy who is smuggling flags
+Bribe this guy to get the flag
+Put some money in his pocket to get the flag
+export init=abc
+Money
+MONEY
+Words are not the price for your flag
+Give Me money Man!!!
+;*3$"
+GCC: (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0
+crtstuff.c
+deregister_tm_clones
+__do_global_dtors_aux
+completed.7698
+__do_global_dtors_aux_fini_array_entry
+frame_dummy
+__frame_dummy_init_array_entry
+bribe.c
+__FRAME_END__
+__init_array_end
+_DYNAMIC
+__init_array_start
+__GNU_EH_FRAME_HDR
+_GLOBAL_OFFSET_TABLE_
+__libc_csu_fini
+getenv@@GLIBC_2.2.5
+putchar@@GLIBC_2.2.5
+strncmp@@GLIBC_2.2.5
+_ITM_deregisterTMCloneTable
+puts@@GLIBC_2.2.5
+_edata
+strlen@@GLIBC_2.2.5
+__stack_chk_fail@@GLIBC_2.4
+system@@GLIBC_2.2.5
+__libc_start_main@@GLIBC_2.2.5
+__data_start
+__gmon_start__
+__dso_handle
+_IO_stdin_used
+__libc_csu_init
+__bss_start
+main
+__TMC_END__
+_ITM_registerTMCloneTable
+__cxa_finalize@@GLIBC_2.2.5
+.symtab
+.strtab
+.shstrtab
+.interp
+.note.ABI-tag
+.note.gnu.build-id
+.gnu.hash
+.dynsym
+.dynstr
+.gnu.version
+.gnu.version_r
+.rela.dyn
+.rela.plt
+.init
+.plt.got
+.text
+.fini
+.rodata
+.eh_frame_hdr
+.eh_frame
+.init_array
+.fini_array
+.dynamic
+.data
+.bss
+.comment
+```
+
+`:> ltrace .bribe`
+
+```text
+getenv("pocket")                                                           = nil  <- trying to read and enviornment variable
+getenv("init")                                                             = nil  <- trying to read and enviornment variable
+puts("\n\nThere is a guy who is smugglin"...
+
+There is a guy who is smuggling flags
+)                              = 40
+puts("Bribe this guy to get the flag"Bribe this guy to get the flag
+)                                     = 31
+puts("Put some money in his pocket to "...Put some money in his pocket to get the flag
+)                                = 45
+system("export init=abc" <no return ...>
+--- SIGCHLD (Child exited) ---
+<... system resumed> )                                                     = 0
+puts("\nWords are not the price for you"...
+Words are not the price for your flag
+)                               = 39
+puts("Give Me money Man!!!\n"Give Me money Man!!!
+
+)                                             = 22
++++ exited (status 0) +++
+```
+
+`:> $pocket` : no valuable response  
+
+```bash
+:> export pocket=1000
+:> ltrace ./bribe
+```
+
+result:
+
+```text
+getenv("pocket")                                                           = "1000" < get the enviornmenet variable
+strncmp("1000", "money", 5)                                                = -60    < perform a string compare
+getenv("init")                                                             = "1"
+puts("\nWords are not the price for you"...
+Words are not the price for your flag
+)                               = 39
+puts("Give Me money Man!!!\n"Give Me money Man!!!
+
+)                                             = 22
++++ exited (status 0) +++
+```
+
+`:> export pocket=money && ./bribe` : solution
+
+`:> exit`  
+
 ### What is the mission26 flag?
+
+`:> su mission25`  
+
+`:> cd ../mission25`  
+
+`:> ls -alh`  
+
+```text
+bash: ls: No such file or directory  
+```
+
+`:> cat /home/mission25/.bashrc`  
+
+```text
+bash: cat: No such file or directory  
+```
+
+`:> compgen -c` : list available commands`
+
+`:> cd /home/mission25`  
+
+`:> echo *` : less pretty method for listing directory contents  
+
+`:> less flag.txt`  
+
+`:> exit`
 
 ### What is the mission27 flag?
 
+`:> su mission26`  
+
+`:> cd ../mission26 && ls -alh`  
+
+```text
+total 100K
+drwxr-x---  2 mission26 mission26 4.0K Jan 12  2021 .
+drwxr-xr-x 45 root      root      4.0K Jan 12  2021 ..
+lrwxrwxrwx  1 mission26 mission26    9 Jan 12  2021 .bash_history -> /dev/null
+-rw-r--r--  1 mission26 mission26 3.7K Jan 12  2021 .bashrc
+-r--------  1 mission26 mission26  84K Jan 12  2021 flag.jpg
+-rw-r--r--  1 mission26 mission26  807 Jan 12  2021 .profile
+```
+
+`:> strings flag.jpg | grep mission27`
+
+`:> exit`
+
+-mission27{444d29b932124a48e7dddc0595788f4d}
+
 ### What is the mission28 flag?
+
+`:> cd ../mission27 && ls -alh`  
+
+```text
+total 20K
+drwxr-x---  2 mission27 mission27 4.0K Jan 12  2021 .
+drwxr-xr-x 45 root      root      4.0K Jan 12  2021 ..
+lrwxrwxrwx  1 mission27 mission27    9 Jan 12  2021 .bash_history -> /dev/null
+-rw-r--r--  1 mission27 mission27 3.7K Jan 12  2021 .bashrc
+-rw-r--r--  1 mission27 mission27  136 Jan 12  2021 flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png.gz
+-rw-r--r--  1 mission27 mission27  807 Jan 12  2021 .profile
+mission27@linuxagency:~$ 
+```  
+
+`:> file flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png.gz`
+
+```text
+flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png.gz: 
+gzip compressed data, 
+was "flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png", 
+last modified: Mon Jan 11 06:42:10 2021, from Unix
+```
+
+`:> gunzip flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png.gz && ls`
+
+`:> file flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png`  
+
+```text
+flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png: GIF image data, version 87a, 27914 x 29545
+```
+
+`:> strings flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png`  
+
+`:> exit`
 
 ### What is the mission29 flag?
 

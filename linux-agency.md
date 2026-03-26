@@ -604,6 +604,32 @@ flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png: GIF image data
 
 ### What is the mission29 flag?
 
+`:> su mission28`
+
+Open a ruby interactive shell  
+
+```text
+irb(main):001:0> ls
+Traceback (most recent call last):
+        2: from /usr/bin/irb:11:in `<main>'
+        1: from (irb):1
+NameError (undefined local variable or method `ls' for main:Object)
+irb(main):002:0> 
+```
+
+`>>> exec '/bin/bash`
+
+Interactive bash shell spawns
+
+`:> cd /home/mission28`  
+
+`:> cat txt.galf` : contains the flag with characters in reverse order  
+
+`:> cat txt.galf | rev` : outputs the flag in the correct order.  
+
+
+
+
 ### What is the mission30 flag?
 
 ### What is viktor's Flag?

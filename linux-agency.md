@@ -628,11 +628,33 @@ Interactive bash shell spawns
 `:> cat txt.galf | rev` : outputs the flag in the correct order.  
 
 
-
-
 ### What is the mission30 flag?
 
+`:> su mission29`
+
+`:> cd ../mission29`
+
+`:> grep -ir mission30{`  
+
+Done
+
+`:> exit
+
 ### What is viktor's Flag?
+
+`:> su mission30`
+
+`:> cd ../mission30`  
+
+`:> ls -alh`
+
+`:> cd .git`  
+
+`:> grep -ir viktor`  
+
+Found  
+
+`:> exit`
 
 ## Task 4 Privilege Escalation
 
@@ -646,6 +668,20 @@ Answer the questions below
 su into viktor user using viktor's flag as password
 
 ### What is dalia's flag?
+
+`:> su viktor`
+
+`:> cd ../viktor`  
+
+`:> ls -alh`
+
+`:> ls -alh .gnupg`
+
+`:> ls -alh .gnupg/private-keys-v1.d` : Nothing useful  
+
+
+
+
 
 ### What is silvio's flag?
 

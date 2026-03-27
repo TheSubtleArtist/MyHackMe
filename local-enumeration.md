@@ -60,27 +60,26 @@ After that, connect to the machine using your id_rsa file.
 
 ### Query the System
 
-`:> cat /etc/os-release` : Display release information
+`:> cat /etc/os-release` : Display release information  
 `:> hostname` : Query the hostname  
 `:> uname -a`  : Query Kernel information  
 `:> cat /etc/passwd`  :  Identify system users  
-`:> cat /etc/passwd | column -t -s : `  :  Identify system users, display in a table with columns separated by a colon
-`:> cat /etc/shells` : Identify potentially useful shells on the system
-`:> cat /etc/crontab` : List cron jobs
+`:> cat /etc/passwd | column -t -s :`  :  Identify system users, display in a table with columns separated by a colon  
+`:> cat /etc/shells` : Identify potentially useful shells on the system  
+`:> cat /etc/crontab` : List cron jobs  
 `:> cat /proc/version` : Specifics about the kern verion and the GCC compilers use to build the kernel  
 `:> cat /etc/issue` : Contains the pre-login prompt and can be changed  
 `:> env` : Display environment variables  
-`:> id` : overview of user's privileges; providing another username as an argument can reveal priviileges of that user
+`:> id` : overview of user's privileges; providing another username as an argument can reveal priviileges of that user  
 `:> history` : information about the target system and limited information on potentially captured usernames and passwords  
-`:> df -h` : displays the amount of space available on the file system containing each file name argument, in human readable format
-`:> cat /var/log btmp` : show failed logins
+`:> df -h` : displays the amount of space available on the file system containing each file name argument, in human readable format  
+`:> cat /var/log btmp` : show failed logins  
 `:> cat /var/log/wtmp` show historiccal data of logins  
-`:> cat /var/log/auth.log | tail` : show the last 10 entries in the authentication logs, including privlege escalations
+`:> cat /var/log/auth.log | tail` : show the last 10 entries in the authentication logs, including privlege escalations  
 `:> cat /etc/timezone` : display the timezone  
-`:> who` : which users are active on which terminals
-`:> ls /etc/init.d` : list of services
-`:> cat /var/log/syslog*` : view messages about system activity
-
+`:> who` : which users are active on which terminals  
+`:> ls /etc/init.d` : list of services  
+`:> cat /var/log/syslog*` : view messages about system activity  
 
 ### Auto-Generated Bash Files
 
@@ -90,7 +89,7 @@ Use read permission on this file to enumerate system user's action and retrieve 
 
 `.bash_profile` and `.bashrc` contain shell commands run when `Bash` is invoked  
 
-May contain start-up settings that can potentially reveal information. For example a bash alias can be pointed towards an important file or process.   
+May contain start-up settings that can potentially reveal information. For example a bash alias can be pointed towards an important file or process.  
 
 When a bash shell is spawned, it runs the commands stored in the .bashrc file.  
 This file can be considered as a startup list of actions to be performed.  
@@ -150,10 +149,10 @@ It can help us to enumerate the network further.
 
 ### Identify exploitable processes  
 
-`:> ps` : view running processes for current shell
-`:> ps -A` : view all running processes
-`:> ps axjf` : view process tree
-`:> ps aux` : processes for all users (a); user launched processes (u); not attached to a terminal (x)
+`:> ps` : view running processes for current shell  
+`:> ps -A` : view all running processes  
+`:> ps axjf` : view process tree  
+`:> ps aux` : processes for all users (a); user launched processes (u); not attached to a terminal (x)  
 
 ## Find Command and Interesting files  
 
@@ -178,8 +177,8 @@ It can help us to enumerate the network further.
 `:> find / -perm /1000` : recursively search from the root directory and list objects with the sticky bit set  
 `:> find / -perm /2000` : recursively search from the root directory and list objects with the SGID bit set  
 `:> find / -perm /4000` : recursively search from the root directory and list objects with the SUID bit set  
-`:> investigator@10.82.165.240:~$ find / -type f -executable 2> /dev/null` : find executables
-`find / -type f -executable -not -path "/bin/*" -not -path "/sbin/*"` : find executables, exclude unlikely sources of good results
+`:> investigator@10.82.165.240:~$ find / -type f -executable 2> /dev/null` : find executables  
+`find / -type f -executable -not -path "/bin/*" -not -path "/sbin/*"` : find executables, exclude unlikely sources of good results  
 
 
 A [list](https://lauraliparulo.altervista.org/most-common-linux-file-extensions/) of file extensions for which you usually look.  

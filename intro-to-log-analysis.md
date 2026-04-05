@@ -154,14 +154,211 @@ example log entry:
 
 `10.10.113.45 - - [2023-08-05 18:17:25] "GET /../../../../../etc/passwd HTTP/1.1" 200 505`  
 
-## Automated vs. Manual Analysis
-
-Use of tools (e.g. XPLG; Solarwinds Loggly)
-
 ## Log Analysis Tools: Command Line
+
+### cat
+
+"concatenate"  
+
+`:> cat <filename>`
+`:> cat <filename 1> <filename2> <filenameN>`  
+
+### less
+
+view a file's data page by page  
+allows use of arrow, page up, and page down keys
+
+### tail
+
+view the end of a file  
+
+`:> tail -f <logfilename>` : follow the `<logfilename>` in real time  
+`:> tail -n XX` : dispaly the last XX number of lines from the file  
+
+### wc
+
+"word count"  
+default: output the line count, word count, and character count of the file  
+
+### cut
+
+extract specific columns from files based on specified delimters
+
+`:> cut -d ';' -f 1 <filename>` where
+
+`-d` is the field delimeter
+`-f` is the numnber of the field to be sent to stdout
+
+### sort
+
+arranges data in ascending or descending order, based on specified criteria  
+
+overwhelmingly used just prior to the `cut` command  
+
+### uniq
+
+identifies and removes adjacent duplicate lines from sorted input  
+
+### sed
+
+text processing tool  
+manipulate, extract, and transoform log data  
+does not alter the original file, alters only the output of the command
+`\` : escape character  
+`-i` : overwrite the file in place  
+`>` : redirect the output  
+
+### awk
+
+actual programming language that requires specific study  
+
+
+### grep
+
+text search tool  
+identify releavant log entries by matching specific criterial (keywords, patterns)  
+
+`:> grep -c` : count entries  
+`:> grep -n` : include line numbers  
+`:> grep -v` : invert the search; return lines NOT containing the pattern
+
+### Command Line Tools Questions 
+
+#### Use cut on the apache.log file to return only the URLs. What is the flag that is returned in one of the unique entries?
+
+#### In the apache.log file, how many total HTTP 200 responses were logged?
+
+#### In the apache.log file, which IP address generated the most traffic?
+
+#### What is the complete timestamp of the entry where 110.122.65.76 accessed /login.php?
 
 ## Log Analysis tools: Regular Expressions
 
+abbreviated as regex  
+define patterns for searching, matching, and manipulating text data  
+patterns are constructed using a combination of special characters that represent matching rules and are supported in many programming languages, text editors, and software.
+
+widely used to extract relevant information, filter data, identify patterns, and process logs before they are forwarded to a centralized system  
+
+### Regular Expressions for Grep  
+
+refer to the apache-ex2.log file within the ZIP file attached to this task  
+locate the task files on the AttackBox under /root/Rooms/introloganalysis/task7  
+
+This log file contains log entries from a blog site  
+The site is structured so that each blog post has its unique ID, fetched from the database dynamically through the post URL parameter.  
+If we are only interested in the specific blog posts with an ID between 10-19, we can run the following grep regular expression pattern on the log file:  
+
+`:> grep -E 'post=1[0-9]' apache-ex2.log`  
+
+`-E` option enables extended pattern matching, allowing the use of regular expressions instead of plain strings.  
+The pattern begins by matching the literal text `post=`.  
+It then specifies the digit `1` followed by any digit from `0–9` using `[0-9]`.  
+Together, `1[0-9]` matches any two-digit number starting with `1` (e.g., 10–19).  
+
+### Regular Expressions for Log Parsing
+
+Regular expressions are essential for log parsing, enabling the extraction of structured data from diverse log formats.  
+Engineers can design custom regex patterns to map specific log components to named fields in SIEM systems, making the data easier to query and analyze.
+
+### Regex Questions
+
+#### How would you modify the original grep pattern above to match blog posts with an ID between 20-29?
+
+#### What is the name of the filter plugin used in Logstash to parse unstructured log data?
+
 ## Log Analysis Tools: Cyber Chef
 
+CyberChef, developed by GCHQ, is a versatile data analysis tool known as the “Cyber Swiss Army Knife.” It offers over 300 operations for tasks such as encoding/decoding, encryption, hashing, and log parsing. Analysts use customizable “recipes” to process and analyze data efficiently, including extracting information from log files.  
+
+### Regex with CyberChef  
+
+Regular expressions can be used in CyberChef to extract specific data from logs, such as IP addresses from authentication attempts. Using the pattern `\b([0-9]{1,3}\.){3}[0-9]{1,3}\b`, analysts can identify IPv4 addresses, and the “List matches” output option filters results to display only the matched IPs, removing unnecessary log data.
+  
+### Uploading Fiels in Cyberchef
+
+Files and folders can be uploaded to CyberChef. This provides a convenient way of uploading log files to CyberChef. To do so, click on the box with an arrow pointing inside it. Additionally, CyberChef has operators that allow you to unzip compressed files, such as .tar.gz or .zip.  
+
+### Cyberchef Questions
+
+#### Locate the "loganalysis.zip" file under /root/Rooms/introloganalysis/task8 and extract the contents. Upload the log file named "access.log" to CyberChef. Use regex to list all of the IP addresses. What is the full IP address beginning in 212?
+
+#### Using the same log file from Question #2, a request was made that is encoded in base64. What is the decoded value?
+
+#### Using CyberChef, decode the file named "encodedflag.txt" and use regex to extract by MAC address. What is the extracted value?
+
 ## Log Anlaysis Tools: Yara and Sigma
+
+### Sigma
+
+open-source tool  
+describes log events in a structured format  
+used to identify entries in log files using pattern matching  
+
+YAML syntax for rules  
+
+```yaml
+title: Failed SSH Logins
+description: Searches sshd logs for failed SSH login attempts
+status: experimental
+author: CMNatic
+logsource: 
+    product: linux
+    service: sshd
+
+detection:
+    selection:
+        type: 'sshd'
+        a0|contains: 'Failed'
+        a1|contains: 'Illegal'
+    condition: selection
+falsepositives:
+    - Users forgetting or mistyping their credentials
+level: medium
+```
+
+Here’s your content converted into a structured Markdown table:
+
+```markdown
+| Key             | Value                                      | Description                                                                                                      |
+|-----------------|--------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| title           | Failed Logins                              | This title outlines the purpose of the Sigma rule.                                                               |
+| description     | Searches logs for failed login attempts    | This key provides a description that expands on the title.                                                       |
+| status          | experimental                               | This key explains the status of the rule. For example, "experimental" means that further testing is required.   |
+| author          | CMNatic                                    | The person who wrote the rule.                                                                                   |
+| logsource       | product: <br> service:                     | Where the log files that contain the data that we're looking for can be found.                                  |
+| detection       |                                            | This key lists what the Sigma rule is looking to find.                                                           |
+| a0\|contains    | a0\|contains: 'Failed'                     | In this case, look for all entries with "Failed".                                                                |
+| a1\|contains    | a1\|contains: 'Illegal'                    | In this case, look for all entries with "Illegal".                                                               |
+| falsepositives  | Users forgetting or mistyping credentials  | Lists cases where this entry may be present but doesn't necessarily indicate malicious behavior.                |
+```
+
+### Yara
+
+pattern-matchign tools  
+YAML formatted  
+identifies information based on bianry and textual patterns  
+useful for logs and malware  
+
+IPFinder uses regex to search for IPV4 rules  
+
+```YAML
+rule IPFinder {
+    meta:
+        author = "CMNatic"
+    strings:
+        $ip = /([0-9]{1,3}\.){3}[0-9]{1,3}/ wide ascii
+ 
+    condition:
+        $ip
+}
+```
+
+```markdown
+| Key        | Example                                             | Description                                                                                          |
+|------------|-----------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| rule       | IPFinder                                            | This key names the rule.                                                                             |
+| meta       | author                                              | This key contains metadata. For example, in this case, it is the name of the rule's author.         |
+| strings    | $ip = /([0-9]{1,3}\.){3}[0-9]{1,3}/ wide ascii      | This key contains the values that YARA should look for. In this case, it uses REGEX to find IPv4 addresses. |
+| condition  | $ip                                                 | If the variable $ip is detected, then the rule should trigger.                                       |
+```

@@ -1,5 +1,14 @@
 # Intro to Log Analysis
 
+- [Intro to Log Analysis](#intro-to-log-analysis)
+  - [Log Analysis Basics](#log-analysis-basics)
+  - [Investigation Theory](#investigation-theory)
+  - [Detection Engineering](#detection-engineering)
+  - [Log Analysis Tools: Command Line](#log-analysis-tools-command-line)
+  - [Log Analysis tools: Regular Expressions](#log-analysis-tools-regular-expressions)
+  - [Log Analysis Tools: Cyber Chef](#log-analysis-tools-cyber-chef)
+  - [Log Anlaysis Tools: Yara and Sigma](#log-anlaysis-tools-yara-and-sigma)
+
 ## Log Analysis Basics
 
 
@@ -226,11 +235,19 @@ identify releavant log entries by matching specific criterial (keywords, pattern
 
 #### Use cut on the apache.log file to return only the URLs. What is the flag that is returned in one of the unique entries?
 
+`:> cut -d ' ' -f 7 apache.log`  
+
 #### In the apache.log file, how many total HTTP 200 responses were logged?
+
+`:> cut -d ' ' -f 9 apache.log | grep 200 | wc -l`
 
 #### In the apache.log file, which IP address generated the most traffic?
 
+`:> cut -d ' ' -f 1 apache.log | sort | uniq -c`
+
 #### What is the complete timestamp of the entry where 110.122.65.76 accessed /login.php?
+
+`> grep 110.122.65.76 apache.log | grep /login.php`  
 
 ## Log Analysis tools: Regular Expressions
 
@@ -261,11 +278,35 @@ Together, `1[0-9]` matches any two-digit number starting with `1` (e.g., 10–19
 Regular expressions are essential for log parsing, enabling the extraction of structured data from diverse log formats.  
 Engineers can design custom regex patterns to map specific log components to named fields in SIEM systems, making the data easier to query and analyze.
 
+grep regex example: 
+
+`:> user@tryhackme$ grep -E 'post=1[0-9]' apache-ex2.log`
+
+```bash
+input {
+  ...
+}
+
+filter {
+  grok {
+    match => { "message" => "(?<ipv4_address>\b([0-9]{1,3}\.){3}[0-9]{1,3}\b)" }
+  }
+}
+
+output {
+  ...
+}
+```
+
 ### Regex Questions
 
 #### How would you modify the original grep pattern above to match blog posts with an ID between 20-29?
 
+post=2[0-9]
+
 #### What is the name of the filter plugin used in Logstash to parse unstructured log data?
+
+grok
 
 ## Log Analysis Tools: Cyber Chef
 
@@ -283,9 +324,22 @@ Files and folders can be uploaded to CyberChef. This provides a convenient way o
 
 #### Locate the "loganalysis.zip" file under /root/Rooms/introloganalysis/task8 and extract the contents. Upload the log file named "access.log" to CyberChef. Use regex to list all of the IP addresses. What is the full IP address beginning in 212?
 
+"Extract IP Addresses"  with sort and IPv4
+
+
 #### Using the same log file from Question #2, a request was made that is encoded in base64. What is the decoded value?
 
+Extractors > REGEX `(?<![A-Za-z0-9+/])[A-Za-z0-9+/]{8,}={0,2}(?![A-Za-z0-9+/])`
+
+`(?<![A-Za-z0-9+/])` — Negative lookbehind to ensure the match is not part of a larger Base64-like string
+`[A-Za-z0-9+/]{8,}` — Matches at least 8 Base64 characters (adjustable threshold to reduce false positives)
+`={0,2}` — Matches optional padding (= or ==)
+`(?![A-Za-z0-9+/])` — Negative lookahead to ensure the string ends cleanly
+
+
 #### Using CyberChef, decode the file named "encodedflag.txt" and use regex to extract by MAC address. What is the extracted value?
+
+From base64 > extract MAC addresses
 
 ## Log Anlaysis Tools: Yara and Sigma
 

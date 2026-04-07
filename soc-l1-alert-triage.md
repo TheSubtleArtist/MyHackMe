@@ -63,6 +63,19 @@ oldest alerts first
 
 ### Initial Actions
 
+1. assign alert to yourself
+2. move alert to `In Progress`
+3. familairze yourself with alert details
+
 ### Investigation
 
+4. Understand who is under threat (user, hostname, cloud, network, or website)  
+5. Note the action described in the laert (suspiciou login, malware, phishing, et al.)  
+6. Review Surrounding evnts, to identify suspiciioius actions before and after the alert  
+7. use threat intelligence platforms to verify findings / throughts.
+
 ### Final Actions
+
+8. Escalation
+9. Commenting
+10. Closing

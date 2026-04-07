@@ -43,4 +43,26 @@
 
 ## Alert Prioritization
 
+### 1. Filter the Alerts
+
+don't take the alert another anlyst has already reviewed, is being investigated
+take new, unseen and unresolved alerts  
+
+### 2. Sort by Severity
+
+Critical > High < Medium < low
+
+
+### 3. Sort byTime
+
+oldest alerts first
+
 ## Alert Triage
+
+[alert triage](assets/alert-triage-101.svg)
+
+### Initial Actions
+
+### Investigation
+
+### Final Actions

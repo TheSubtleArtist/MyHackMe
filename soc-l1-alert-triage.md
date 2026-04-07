@@ -19,9 +19,27 @@
 | ITSMSystem   | Jira, TheHive                | Some teams may have a custom ticket management (ITSM) setup using a dedicated solution |
 
 
-### Events to Alerts
+### L1 Role in Alert Triage
+
+| Role              | Responsibilities                                                                                  |
+|-------------------|--------------------------------------------------------------------------------------------------|
+| SOC L1 Analysts   | Review alerts, distinguish false positives from real threats, and escalate confirmed threats to L2 |
+| SOC L2 Analysts   | Investigate escalated alerts, perform deeper analysis, and carry out remediation actions         |
+| SOC Engineers     | Ensure alerts contain sufficient context and data for efficient triage and investigation         |
+| SOC Manager       | Monitor the speed and quality of alert triage to ensure real threats are not missed              |
 
 ## Alert Properties
+
+| № | Property           | Description                                                                 | Examples |
+|---|--------------------|-----------------------------------------------------------------------------|----------|
+| 1 | Alert Time         | Indicates when the alert was created; typically triggered shortly after the actual event | Alert Time: March 21, 15:35<br>Event Time: March 21, 15:32 |
+| 2 | Alert Name         | Summarizes the detected activity, usually based on the detection rule name | Unusual Login Location<br>Email Marked as Malware<br>Windows Bruteforce<br>Potential Data Exfiltration |
+| 3 | Alert Severity     | Indicates the urgency of the alert; initially set by detection engineers and adjustable by analysts | 🟢 Low / Informational<br>🟡 Medium / Moderate<br>🟠 High / Severe<br>🔴 Critical / Urgent |
+| 4 | Alert Status       | Shows the current state of the alert and whether it is being worked on or resolved | 🆕 New / Unassigned<br>🔄 In Progress / Pending<br>✅ Closed / Resolved<br>Custom statuses may apply |
+| 5 | Alert Verdict      | Also known as classification; determines whether the alert is a real threat or benign | 🔴 True Positive / Real Threat<br>🟢 False Positive / No Threat<br>Custom verdicts may apply |
+| 6 | Alert Assignee     | Identifies the analyst responsible for investigating the alert (also called alert owner) | Assigned analyst name<br>Self-assigned ownership<br>Responsible for handling the alert |
+| 7 | Alert Description  | Provides details about the alert, including detection logic, risk context, and triage guidance | Detection rule logic<br>Why the activity is suspicious<br>Optional triage instructions |
+| 8 | Alert Fields       | Contains key data and analyst notes related to the alert trigger | Affected Hostname<br>Executed Command Line<br>Additional contextual fields depending on alert |
 
 ## Alert Prioritization
 

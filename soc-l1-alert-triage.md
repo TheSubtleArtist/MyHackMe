@@ -59,7 +59,7 @@ oldest alerts first
 
 ## Alert Triage
 
-[alert triage](assets/alert-triage-101.png)
+![alert triage](assets/alert-triage-101.png)
 
 ### Initial Actions
 

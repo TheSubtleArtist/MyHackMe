@@ -120,8 +120,7 @@ Adversaries adapt by using low-and-slow approaches, encryption and encoding, and
 
 ## Detection: Data Exfiltration via ICMP
 
-```markdown id="icmp-exfil-summary"
-## ICMP is a network-layer protocol used for diagnostics and control (e.g., ping, time exceeded)
+### ICMP is a network-layer protocol used for diagnostics and control (e.g., ping, time exceeded)
 
 - **Protocol:** ICMP (Internet Control Message Protocol)
 - **Layer:** Network Layer (Layer 3)
@@ -130,7 +129,7 @@ Adversaries adapt by using low-and-slow approaches, encryption and encoding, and
   - Path analysis (`traceroute`)
   - Error reporting (destination unreachable, time exceeded)
 
-### Why ICMP is abused
+#### Why ICMP is abused
 
 | Characteristic | Security Impact |
 |---|---|
@@ -141,7 +140,7 @@ Adversaries adapt by using low-and-slow approaches, encryption and encoding, and
 
 ---
 
-### How attackers abuse ICMP
+#### How attackers abuse ICMP
 
 | Technique | Description | Notes |
 |---|---|---|
@@ -153,9 +152,9 @@ Adversaries adapt by using low-and-slow approaches, encryption and encoding, and
 
 ---
 
-## How adversaries use ICMP for exfiltration
+### How adversaries use ICMP for exfiltration
 
-### Common techniques
+#### Common techniques
 
 - **Data Encoding**
   - Base64 (most common)
@@ -174,7 +173,7 @@ Adversaries adapt by using low-and-slow approaches, encryption and encoding, and
 
 ---
 
-## Indicators that something may be malicious
+### Indicators that something may be malicious
 
 | Indicator | What it Suggests |
 |---|---|
@@ -187,9 +186,9 @@ Adversaries adapt by using low-and-slow approaches, encryption and encoding, and
 
 ---
 
-## Indicators of attack in Wireshark
+### Indicators of attack in Wireshark
 
-### Look for the following in a packet capture (PCAP) when inspecting in Wireshark:
+#### Look for the following in a packet capture (PCAP) when inspecting in Wireshark:
 
 | Indicator | Wireshark Field / Filter | What to Look For |
 |---|---|---|
@@ -202,7 +201,7 @@ Adversaries adapt by using low-and-slow approaches, encryption and encoding, and
 
 ---
 
-### Quick Analyst Checklist
+#### Quick Analyst Checklist
 
 - [ ] Identify **source host** generating ICMP traffic  
 - [ ] Validate **destination IP/domain reputation**  
@@ -211,5 +210,4 @@ Adversaries adapt by using low-and-slow approaches, encryption and encoding, and
 - [ ] Correlate with **endpoint activity (processes, file access)**  
 - [ ] Confirm whether ICMP usage aligns with **legitimate operational needs**
 
----
 

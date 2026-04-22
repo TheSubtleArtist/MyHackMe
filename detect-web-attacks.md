@@ -54,3 +54,37 @@ patterns reveal scanning, exploitation attempts, or other attacks
 Access logs do not capture full contents of a request.  
 Must combine access logs, application logs, and other logs to gain full visibility (SIEM)  
 
+## Network-Based Detection 
+
+### Network Traffic Analysis
+
+examine raw data exhcnaged between client /server  
+identify detailed attack behavior  
+reveals data behind requests, including http headers, POST bodies, cookies, uploads/downloads  
+
+### Attacks in  Network Traffic
+
+
+**Logged Sequence of Events**  
+
+1. Directory fuzz to identify available directories or forms
+2. Brute force login.php  
+3. SQL Injection  
+
+![network-traffice](assets/web-attacks-102.svg)
+
+**Packet Details**  
+
+![packet1](assets/web-attacks-103.svg)  
+
+Repeated POST attempts at login.php finally results in successful login with `admin:password123`  
+
+![packet2](assets/web-attacks-104.svg)  
+
+`GET` web request to `/search` interface with `' OR '1'='1` payload.
+
+### Investigation
+
+Logs reveal high level activities  
+Packet captures reveal the details  
+

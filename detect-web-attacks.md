@@ -1,47 +1,90 @@
 # Detecting Web Attacks
 
-## -Client-Side Attacks
+## Server-Side Attacks
 
-abuse of vulllnerabilities in browsers  
-social-engineering used to trick users into 'unsafe' actions  
-permits access to accounts and theft of sensitive information  
-
-- credentials stored in password vaults or browser extensions
-- use of iframes to steal data from active sessions  
-
-### SOC Limitations  
-
-No tools to see inside the user's browser  
-
-### Common Client-Side Attacks  
-
-#### Cross-Scripting (XSS)
-
-most common  
-malicious script run in a trusted website and executed in the browser  
-Used to steal cookies and session data  
-
-#### Cross-Site Request Forgery (CSRF)
-
-attacker forces browser to send unauthroized requests on behalf of the trusted user  
-
-could be used to initiate bank transfers  
-
-#### Clickjacking
-
-Attackers overlay invisible elements on top of legitimate content
-Users click on what they see and execute what is unseen  
-Nearly unlimited potential for malicious activity  
-
-## SErver-Side Attacks
-
-Exploit vulnerabilities within a web server, application code, or backend  
-server logic, misconfigurations, input handling,  
+explitation of vulnerabilities witin server, application code, or backend.  
+exploit flaws, vulnerabilities, server logic, misconfigurations, input handdling  
 
 
-## Log-Based Detection
+### Catching Server-Side Attacks
 
-## Network-Based Detection
+Logs from various network attached endpoints  
 
-## Web Application Firewall
+### Common Server-Side Attacks
+
+#### Brute-Force
+
+Repeated attempts to login with varied usernames/passwords  
+
+#### SQL Injection
+
+Attacking the backend database  
+database uses string concatenation rather than parameterized queries  
+
+#### Command Injection
+
+WEbsite receives a command and executes the command without sanitization.
+
+## Log-Based Detection  
+
+capures evidence in access and error logs.  
+patterns reveal scanning, exploitation attempts, or other attacks  
+
+**Access Log Format**  
+
+
+| Log Field                  | Example Indicator                                                      |
+|----------------------------|-------------------------------------------------------------------------|
+| **Client IP Address**       | A known malicious or outside of the expected geo range                   |
+| **Timestamp and Requested Page** | Requests made at unusual hours or repeated in a short period of time  |
+| **Status Code**             | Repeated 404 responses indicating a page could not be found            |
+| **Response Size**           | Significantly smaller or larger than normal response sizes             |
+| **Referrer**                | Referring pages that don't fit normal site navigation                   |
+| **User-Agent**              | Outdated browser versions or common attack tools (e.g. sqlmap, wpscan)  |  
+
+### Attacks in Logs
+
+1. use of gobustter to probe for available directories, where `200` represents a valid respons.  
+2. Attacker identifies the login page and employs hydra to bruture force the login using `POST` requests. Response code `302` is a redirection response; indicates a successful login to the resource which is at a differnet URL than the originaly requested URL.  
+3. Once access is gained, attacker uses SQL map to perform automated SQLi.  
+![web-logs](assets/web-attacks-101.svg)  
+
+### Log Limitations 
+
+Access logs do not capture full contents of a request.  
+Must combine access logs, application logs, and other logs to gain full visibility (SIEM)  
+
+## Network-Based Detection 
+
+### Network Traffic Analysis
+
+examine raw data exhcnaged between client /server  
+identify detailed attack behavior  
+reveals data behind requests, including http headers, POST bodies, cookies, uploads/downloads  
+
+### Attacks in  Network Traffic
+
+
+**Logged Sequence of Events**  
+
+1. Directory fuzz to identify available directories or forms
+2. Brute force login.php  
+3. SQL Injection  
+
+![network-traffice](assets/web-attacks-102.svg)
+
+**Packet Details**  
+
+![packet1](assets/web-attacks-103.svg)  
+
+Repeated POST attempts at login.php finally results in successful login with `admin:password123`  
+
+![packet2](assets/web-attacks-104.svg)  
+
+`GET` web request to `/search` interface with `' OR '1'='1` payload.
+
+### Investigation
+
+Logs reveal high level activities  
+Packet captures reveal the details  
 

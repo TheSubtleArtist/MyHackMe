@@ -64,6 +64,58 @@ Inserting malicious scripts as the "target"
 
 ![lnk-target](images/intro-initial-access-104.png)  
 
+LNK files leave littel execution trace.  
+Name and icon of LNK file does not match the command executed from the `Target` field.
+
+![lnk-event](images/intro-initial-access-106.png)  
+
 ### Detecting Malicious Download
 
+executeables are possible.  
+archives (.zip/.rar) far more likely  
+
+#### Sysmon Event chain for Double-Extension Attachment  
+
+```text
+# 1. Sysmon Event ID 1: Web browser is launched
+Image: C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
+ParentImage: C:\Windows\Explorer.EXE
+
+# 2. Sysmon Event ID 11: A file (usually archive) appears in Downloads
+Image: C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
+TargetFilename: C:\Users\User\Downloads\invoice.zip*
+
+# 3. Sysmon Event ID 11: Optionally, the user unarchives files to some folder
+Image: C:\Windows\Explorer.EXE (or C:\Program Files\7-Zip\7zG.exe)
+TargetFilename: C:\Users\User\Downloads\invoice.pdf.exe
+
+# 4. Sysmon Event ID 1: The user double-clicks the unarchived file
+Image: C:\Users\User\Downloads\invoice.pdf.exe
+ParentImage: C:\Windows\Explorer.EXE
+````  
+
+![sysmon-chain](images/intro-initial-access-105.svg)  
+
+
 ## Initial Access via USB
+
+### Risks of Removable Media
+
+[Camaro Dragon](https://research.checkpoint.com/2023/beyond-the-horizon-traveling-the-world-on-camaro-dragons-usb-flash-drives/) 
+
+Camaro Dragon’s HopperTick/WispRider toolset is a robust USB‑propagating malware family combining social engineering, DLL side‑loading of malicious payloads via legitimate binaries, AV bypasses, and strong anti‑analysis measures — enabling wide, often collateral, global spread via removable media. Defenses should focus on removable-media controls, detection of suspicious side‑loading/persistence patterns, and preventing execution of unknown executables from USB drives.  
+
+[Raspberry Robin](https://redcanary.com/blog/threat-intelligence/raspberry-robin/)  
+
+The Red Canary analysis of “Raspberry Robin” describes a worm-like malware campaign first observed in 2021 that primarily spreads through infected USB drives, where it disguises itself as a shortcut (.LNK) file mimicking a legitimate folder to trick users into execution; once triggered, it uses cmd.exe to run obfuscated commands and then leverages the legitimate Windows Installer utility (msiexec.exe) to contact attacker-controlled infrastructure—often compromised QNAP devices or TOR-based nodes—and download a malicious DLL payload, which is executed via trusted Windows binaries like fodhelper.exe and rundll32.exe to evade detection and potentially gain elevated privileges. The malware establishes persistence, performs command-and-control communication, and can deliver additional payloads (including malware linked to ransomware operations), making it a versatile initial access and staging mechanism, though its ultimate objectives are not always clear; its reliance on removable media, living-off-the-land techniques, and staged payload delivery allows it to bypass traditional defenses and act as a precursor to more severe compromises.
+
+### Detecting and Infected USB
+
+A majority of USB exploits are executed by users.  
+
+`.lnk` files.  
+`photos.exe` : seemingly normal files with executable extensions  
+double extensions  
+
+![usb](images/intro-initial-access-107.svg)  
+

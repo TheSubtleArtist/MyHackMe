@@ -22,7 +22,7 @@ Example MITRE Techniques:
 
  Example MITRE Techniques: 
 
-[T1566 / Phishing](https://attack.mitre.org/techniques/T1566/): Threat actors employ different techniques, tricking users into launching the malware themselves
+[T1566 / Phishing](https://attack.mitre.org/techniques/T1566/): Threat actors employ different techniques, tricking users into launching the malware themselves  
 [T1091 / Removable Media](https://attack.mitre.org/techniques/T1091/): Threat actors infect a USB device and hope that users will use the USB on multiple PCs
 
 ### Inital Access via RDP
@@ -292,4 +292,133 @@ Splitting malware and tools reduces potential detection by antivirus and other s
 Tracking network connectsion and/or DNS request from a suspicious process.  
 avoiding detection means using legitimate services (GitHub).  
 Detecting means correlation processes, connections, sources, destinations, and downloads to arrive at a determinatioin that something is normal or abnormal  
+
+## Command and Control (C2)
+
+[MITRE ATT&CK Command and Control](https://attack.mitre.org/tactics/TA0011/)  
+
+### Attacks without C2
+
+threat actors manually input all commands dirrectly into RDP.  
+Limited to active / live connections.
+
+![without-c2](images/c2-101.png)
+
+### Simple C2
+
+A process that connects back to threat actor  and waits for commands 24/7  
+or  
+The capability to download C2 malware and hide it on the target/victim device  
+
+- does not imediately connct back to threat actor
+- survives deletion of the original phising or ingress method  
+
+
+![simple-c2](images/C2-102.png)  
+
+## Persistence 
+
+![persistence-overview](images/persistence-101.svg)  
+
+### Persistence via RDP
+
+- Weak passwords permit recurring abuse of the same service, until password policy and rollover.
+- Threat actor creates a new users ([T1136](https://attack.mitre.org/techniques/T1136/)) and elevates the user to administrator ([T1098](https://attack.mitre.org/techniques/T1098/007/)) privileges  
+
+#### Manipulate users through GUI
+
+Launching `Computer Management` or command line `:> lusrmgr.msg`
+
+#### CMD and PowerShell User Manipulation  
+
+```powershell
+# 1. Two methods to create the "mr.backd00r" user
+CMD C:\> net user "mr.backd00r" "p@ssw0rd!" /add
+PS  C:\> New-LocalUser "mr.backd00r" -Password [...]
+
+# 2. Two methods to add the user to Administrators 
+CMD C:\> net localgroup Administrators "mr.backd00r" /add
+PS  C:\> Add-LocalGroupMember "Administrators" -Member "mr.backd00r"
+```
+
+### Detecting Backdoor Users
+
+Security Event Logs event ID: 4720
+
+- Who created the account
+- Is the time and source IP of the creator's login within 
+- Identify other suspicious events during the creator's sessions
+- New users quickly added to privileged user groups  (Event ID: 4732) 
+- Resetting passwords of dormant accounts (event ID: 4724)
+
+### Persistence TAsks and Services
+
+#### Services and Tasks
+
+Here’s your text reformatted into a clean, structured Markdown table:
+
+| Persistence Method                               | Attack Example                                                               | Event ID Logging                                                               |
+| ------------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Create a Windows Service (Runs after OS startup) | `sc create "BadService" binpath= "C:\malware.exe" start= auto`               | Launch of sc.exe: Sysmon / 1<br>Service creation: Security / 4697              |
+| Create a Scheduled Task (Run after OS startup)   | `schtasks /create /tn "BadTask" /tr "C:\malware.exe" /sc onstart /ru System` | Launch of schtasks.exe: Sysmon / 1<br>Scheduled task creation: Security / 4698 |
+
+#### Detecting Services
+
+Threat actors create own malicious services enabled at startup.
+
+1. Detect the launch of `sc.exe create` command (Sysmon event ID 1)  
+2. Detect service creation (Security event ID 4697 or event ID 7045)  
+3. Detect suspicious processes with a `services.exe` parent process  
+
+![detect-services](images/persistence-102.svg)
+
+#### Detecting Tasks
+
+Scheduled tasks that run with unusual frequency.  
+Easier to create and hide  
+
+Managed by `taskschd.msc` or "Task Scheduler" in the GUI  
+
+1. Detect launch of `schtasks.exe /create` (sysmon event ID 1)  
+2. Detect and analyze scheduled task creation (security event ID 4698)  
+3. Detect suspicious processes with a `svchost.exe [...] -s Schedule` parent  
+
+![detect-tasks](images/persistence-103.svg)  
+
+### Persistence: Run Keys at Startup
+
+Per-user persistence occurs when an event or program runs when the specified user logs in.  
+
+
+Here’s the reformatted Markdown table:
+
+| Persistence Method                                   | Attack Example                                                                                         | Event ID Logging                       |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------- |
+| Add malware to Startup Folder (Runs upon user login) | `copy C:\malware.exe "%AppData%\Microsoft\Windows\Start Menu\Programs\Startup\malware.exe"`            | New startup item: Sysmon Event ID 11   |
+| Add malware to "Run" keys (Runs upon user login)     | `reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v BadKey /t REG_SZ /d "C:\malware.exe"` | New registry value: Sysmon Event ID 13 |
+
+#### Detecting Startup  
+
+startup folder is intended for inexperienced suers to configure startup/login triggered programs.  
+startup folder is not a common choie for legitiamte programs, and is usually empty.  
+threat actors use startup folder for persistence [Lumma Stealer](https://www.trendmicro.com/pl_pl/research/25/a/lumma-stealers-github-based-delivery-via-mdr.html#:~:text=We%20also%20observed%20persistence%20being%20established%20through%20the%20Startup%20folder)
+
+Deteect file creation event (Sysmon Event ID 11) inside the startup folder. These events have "explorer.exe" as parent  
+
+![startup-persistence](images/persistence-104.svg)  
+
+#### Detect Run Keys  
+
+Adds "Run"  value in Windows registry and pths the path to the program there:
+
+```text
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run
+Or for all users: HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run
+```
+
+run keys can be viewed manually in Registry Editor (`regedit.exe`)  
+
+Identify registry changes events in logs (sysmon event ID 13) 
+
+![detect-run-keys](images/persistence-105.svg)  
 

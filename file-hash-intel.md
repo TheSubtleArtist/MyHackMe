@@ -104,7 +104,7 @@ Suitabel for fast executive summary
 Searching by file hash can confirm a feil is malicious  
 additional information inclue risk behavior and ATT&CK Techniques.  
 
-[hybrid-analsys](images/file-hash-intel-101.png)  
+[hybrid-analsys](assets/file-hash-intel-101.png)  
 
 #### Joe Sandbox
 

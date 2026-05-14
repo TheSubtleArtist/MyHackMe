@@ -386,11 +386,20 @@ We can now follow a simple playbook to make informed decisions when investigatin
 
 ## Challenge
 
+It’s 09:10 on a Monday. Over the weekend, Finance reported a burst of “account verification” emails that looked unusually polished. Your secure email gateway caught a subset; one clicked sample was redirected to santagift[.]shop.
+At the same time, your EDR shows workstations briefly beaconing to 170[.]130[.]202[.]134.  
+
 ### What is the RIR associated with 170[.]130[.]202[.]134?
+
+RDAP.ORG  
 
 ### What ASN is the IP connected with?
 
+bgp.tools  
+
 ### Identify the number of NS records for the domain santagift[.]shop.
+
+nslookup.io  
 
 ### Which NS is identified as the Start of Authority (SOA) for the domain?
 

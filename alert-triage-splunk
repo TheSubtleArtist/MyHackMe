@@ -82,18 +82,27 @@ Observations:
 - attacker gained access to tryhackme-2404  
 - True Positive  
 - Escalate to L2  
-- 
-![triage-3](assets/alert-triage-splunk-103.svg)    
+
+![triage-3](assets/alert-triage-splunk-103.svg)
 
 ### Initial Access Alert Questions
 
 #### How many failed login attempts were made on the user john.smith?
 
+`index="linux-alert" src_ip="10.10.242.248" "failed" AND "john.smith"`  
+
 #### What was the duration of the brute force attack in minutes?
+
+5 minutes
 
 #### What username was the attacker able to privilege escalate to?
 
-#### What is the name of the user account created by the attacker for persistence?
+`index="linux-alert" user="john.smith" uid=0`
+
+#### What is the name of the user account created by the attacker for persistence?  
+
+`index="linux-alert" "adduser" OR "useradd" USER=root`
+
 
 ## Persistence Alert
 
@@ -153,11 +162,25 @@ Result: True Positive
 
 #### What is the ProcessId of the process that created this malicious task?
 
+```spl
+index="win-alert" AssessmentTaskone 
+|  table ParentProcessID ProcessID CommandLine
+```
+
 #### What is the name of the parent process for the process that created this malicious task?
 
+```spl
+index="win-alert" AssessmentTaskone 
+|  table ParentProcessID ProcessID CommandLine
+```
 #### Which local group did the attacker enumerate during discovery?
 
+`index="win-alert" "cmd.exe" AND "oliver.thompson" CommandLine=*localgroup*`
+
 #### What is the name of the workstation from which the Threat Actor logged into this host?
+
+`index="win-alert" WIN-H015 TaskCategory=Logon OR TaskCategory="Special Logon" app="win:remote" 
+|  table Message`
 
 ## Web Shell Alert
 
@@ -246,7 +269,20 @@ Findings:
 #### What time did the brute-force activity using Hydra begin?
 Answer Format Example: 2025-01-15 12:30:45
 
+```spl
+index="web-alert" useragent=*hydra* 
+|  sort +_time
+```
+
 #### Which user agent did the attacker use when interacting with the web shell?
+
+```spl
+index="web-alert" theme-editor.php 
+| table useragent
+```
 
 #### What was the number of requests made by the attacker to the server via the web shell?
 
+`index="web-alert" b374k.php`
+
+Make sure only to count the requests to the correct .php, not all the requests involving the web shell.

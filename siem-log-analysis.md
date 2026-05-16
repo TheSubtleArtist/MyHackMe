@@ -30,13 +30,8 @@ Spote patterns or threats that may have started much earlier but weren't noticed
 ### Benefits Questions
 
 #### What is the process of linking data from multiple sources to identify relationships between individual events called?
- 
- Correlation
 
 #### What is the process of collecting and storing log data from multiple systems and sources into a single, unified location for easier analysis called?
-
-Centralization 
-
 
 ## Log Sources
 
@@ -127,7 +122,7 @@ Destination IP: `83.222.191.2
 The most commonly referenced logs  
 contains user authentication, account creation / modification / deletion, access to files and reigstyry keys, process execution, system restarts, log clearing, and chagnes to audit or security policies  
 
-investigating suspicious activity on a host   
+investigating suspicious activity on a host  
 
     ```splunk
     index=winenv EventCode=4720 OR EventCode=4722
@@ -163,11 +158,28 @@ Account used: `System`
 
 #### Which IP address was the connection established with?
 
+The malicious images was quick to find because it was in the temp file.
+```splunk
+index=* index=task4 EventCode=3 Image="C:\\Windows\\Temp\\SharePoInt.exe"
+```
+
 #### Which process initiated this suspicious connection?
+
+Same as previous question
 
 #### What is the MD5 hash of the malicious process from the previous question?
 
-#### What is the name of the scheduled task that was created on the system?
+Identify only the image and then look on the left  
+
+Easier to capture if you view the `raw` entry.
+
+```splunk
+index=task4 Image="C:\\Windows\\Temp\\SharePoInt.exe"
+```
+
+#### What is the name of the scheduled task that was created on the system?  
+
+`index=task4 "schtasks"`
 
 ## Linux Logs
 
@@ -226,18 +238,30 @@ suspicous port: 9999
 
 ### Linux Logs Scenario
 
-#### SOC Level 1 analyst receives and alert indicating possible persistence through creation of a new remote-ssh user on an ubuntu server.  
+ SOC Level 1 analyst receives and alert indicating possible persistence through creation of a new remote-ssh user on an ubuntu server.  
 
 #### What was the timestamp of the remote-ssh account creation?
-Answer Format Example: 2025-01-15 12:30:45
+Answer Format Example: 2025-01-15 12:30:45  
+
+`index=task5 useradd OR adduser`
 
 #### Which user successfully escalated their privileges to root prior to the action from the first question?
 
+`index=task5 *su* eventtype=su_root_session`
+
 #### From which IP address did the user from the previous question successfully log in to the system?
 
-#### How many failed login attempts occurred prior to this successful login?
+`index=task5 "jack-brown" action=success`
 
-#### Which port is the persistence mechanism configured to connect to?
+#### How many failed login attempts occurred prior to this successful login? 
+
+`index=task5 "jack-brown" action=failure`
+
+Not all failed attempts count.
+
+#### Which port is the persistence mechanism configured to connect to?  
+
+`index=task5 source=syslog process=crontab OR process=cron`
 
 ## Web Application Logs
 
@@ -309,7 +333,11 @@ Your task is to dive into the logs and determine exactly what happened.
 
 #### Which URI path had the highest number of requests?
 
+`index=task6 |  stats count by uri_path`
+
 #### Which IP address was the source of the activity?
+
+`index=task6 uri_path="/wp-login.php" |  stats count by clientip`
 
 #### How can this activity be classified?
 

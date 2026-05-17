@@ -36,17 +36,11 @@ Open "Event Viewer" using Windows Search; use `Win+R` and type `eventvwr` and pr
 
 ![events](images/windows-soc-logging-102.png)  
 
-### Logged Questions  
-
-#### Looking at the last screenshot, which event ID describes a successful login? (Answer format: LogSource / ID, e.g. Application / 8194)
-
-`Security/4624`
 
 ## Security Log: Authentication
 
-### Overview
-
-As a SOC analyst, you cannot know in advance which attack you will handle next or which logs you will need during triage. However, out of all Windows logs enabled by default, the **Security** event log usually provides the most value. Start with two of the most important Security events: **Successful Logon (4624)** and **Failed Logon (4625)**.
+Out of all Windows logs enabled by default, the **Security** event log usually provides the most value.  
+Two of the most important Security events: **Successful Logon (4624)** and **Failed Logon (4625)**.
 
 | Event ID | Purpose | Logging | Limitations |
 |---|---|---|---|
@@ -55,29 +49,29 @@ As a SOC analyst, you cannot know in advance which attack you will handle next o
 
 ### Structure of 4624
 
-A typical Windows server can generate tens of login events per minute, and every login event often contains many fields. For most L1/L2 cases, you can focus on a few core event fields. Additional field and logon type details are available in the [Event ID Encyclopedia](https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4624).
+Every login event often contains many fields
+Focus on a few core event fields.  
+Field and logon type details:  [Event ID Encyclopedia](https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4624).
 
 ![Structure of 4624](images/windows-soc-logging-101.png)
 
 ### Usage of 4624/4625
 
-Even experienced IT administrators often rely on security experts to distinguish suspicious events from normal ones. Treat the workbooks below as foundational SOC knowledge.
-
 #### Detect RDP Brute Force
 
-1. Open Security logs and filter for event ID **4625** (failed login attempts).
-2. Look for events with Logon Type **3** and **10**:
-   - **3**: Network logon. For most modern systems, RDP attempts may appear as type 3 because [Network Level Authentication (NLA)](https://superops.com/rmm/what-is-network-level-authentication) is enabled by default.
-   - **10**: RemoteInteractive/RDP logon. This is more likely on older or misconfigured systems where NLA is not used.
+1. Filter for event ID **4625** (failed login attempts).
+2. Identify events with Logon Type **3** and **10**:
+   - **3**: Network logon. RDP attempts may appear as type 3 because [Network Level Authentication (NLA)](https://superops.com/rmm/what-is-network-level-authentication) is enabled by default.
+   - **10**: RemoteInteractive/RDP logon. More likely on older or misconfigured systems where NLA is not used.
 3. Review every matching event. Key red flags include:
-   - Many attempted usernames, such as **admin**, **helpdesk**, or **cctv**. This can indicate password spraying.
-   - Many login failures against a single account, usually **Administrator**. This can indicate brute force.
+   - Many attempted usernames, such as **admin**, **helpdesk**, or **cctv** can indicate password spraying.
+   - Many login failures against a single account, usually **Administrator**, can indicate brute force.
    - A **Workstation Name** that does not match the corporate naming pattern, such as **kali** instead of **THM-PC-06**.
    - An unexpected source IP, such as a printer attempting to connect to a Windows Server.
 
 #### Analyse RDP Logons
 
-1. Open Security logs and filter for event ID **4624** (successful logins).
+1. Filter for event ID **4624** (successful logins).
 2. Look for Logon Type **10** (RDP logins).
    - If [NLA](https://superops.com/rmm/what-is-network-level-authentication) is enabled, every RDP logon event is usually preceded by another **4624** event with Logon Type **3**.
    - To identify the real **Workstation Name**, check the preceding Logon Type **3** event.
@@ -88,7 +82,6 @@ Even experienced IT administrators often rely on security experts to distinguish
 
 ## Security Log: User Management
 
-### Overview
 
 > - Hey Michael, is `svc_sysrestore` your account? I have never seen it in the user list before.
 > - No, but it is likely some Windows-related account; better not touch it to avoid problems later.
@@ -130,8 +123,6 @@ Many real breaches include user manipulation events. For example, [ransomware ac
    - Use the authentication workbooks above for further source and session analysis.
 
 ## Sysmon: Process Monitoring
-
-### Overview
 
 > - Sarah, have you run any files from the Internet recently?
 > - Of course not. Why? I never open untrusted files.
@@ -184,8 +175,6 @@ Because most endpoint attacks require some process to execute, process monitorin
 
 ## Sysmon: Files and Networks
 
-### Overview
-
 Sysmon provides more than process creation events. It can log file and registry changes, network connections, DNS queries, and other crucial activities. It can also be configured to log or exclude specific activity, unlike many default Windows logs. This document references [Florian Roth's Sysmon configuration](https://github.com/Neo23x0/sysmon-config/blob/master/sysmonconfig-export.xml), but teams should tune Sysmon to fit their own environments.
 
 | Event ID | Security Log Alternative | Event Purpose |
@@ -217,8 +206,6 @@ Process creation events often provide enough context to detect common breach sce
    - Created files or registry keys that are used for persistence.
 
 ## PowerShell: Logging Commands
-
-### Overview
 
 PowerShell is a powerful tool built into Windows, and attackers often abuse it because it is trusted and can support malware download, system discovery, data exfiltration, and advanced techniques such as process injection.
 

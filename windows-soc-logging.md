@@ -21,7 +21,7 @@ Logging supports:
 
 Windows logs are stored in binary at `C:\Windows\System32\winevt\Logs`  
 
-![log-entry](images/windows-soc-logging-101.png)  
+![log-entry](assets/windows-soc-logging-101.png)  
 
 Each EVTX file corresponde to a specfiic log category.
 
@@ -34,7 +34,7 @@ Open "Event Viewer" using Windows Search; use `Win+R` and type `eventvwr` and pr
 3. **Log Details**: Actual content of the log, in plaintext or XML format  
 4. **Filters Menu**: Use a variety of parameters to filter logs.  
 
-![events](images/windows-soc-logging-102.png)  
+![events](assets/windows-soc-logging-102.png)  
 
 
 ## Security Log: Authentication
@@ -53,7 +53,7 @@ Every login event often contains many fields
 Focus on a few core event fields.  
 Field and logon type details:  [Event ID Encyclopedia](https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4624).
 
-![Structure of 4624](images/windows-soc-logging-101.png)
+![Structure of 4624](assets/windows-soc-logging-101.png)
 
 ### Usage of 4624/4625
 
@@ -103,7 +103,7 @@ User management events have a similar structure and can be split into three part
 2. **Object**: The target of the action. This field can use different labels depending on the event ID, such as **New Account** or **Member**, but it represents the affected account, group, or object.
 3. **Details**: The specific change. Examples include the target group for **4732** and **4733**, or new user attributes such as full name and password expiration settings for **4720**.
 
-![Structure of User Management Events](images/windows-soc-logging-102.png)
+![Structure of User Management Events](assets/windows-soc-logging-102.png)
 
 ### Usage of User Management Events
 
@@ -145,7 +145,7 @@ If choosing between enabling the basic and noisy **4688** event ID or installing
 Applications & Services -> Microsoft -> Windows -> Sysmon -> Operational
 ```
 
-![Sysmon vs Security Log](images/windows-soc-logging-103.png)
+![Sysmon vs Security Log](assets/windows-soc-logging-103.png)
 
 ### Event ID 1 in Action
 
@@ -184,7 +184,7 @@ Sysmon provides more than process creation events. It can log file and registry 
 
 ### Structure of Sysmon Events
 
-![Structure of Sysmon Events](images/windows-soc-logging-104.png)
+![Structure of Sysmon Events](assets/windows-soc-logging-104.png)
 
 Although each Sysmon event ID has its own purpose, many fields follow a similar structure. Some critical fields, such as **Logon ID** or parent process information, may be missing from file, registry, network, or DNS events. Use the **ProcessId** field to find the corresponding event ID **1** (Process Creation) and recover the full process context.
 
@@ -238,7 +238,7 @@ C:\Users\<USER>\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleH
 
 The PowerShell history file is a plain text file automatically created by PowerShell. It records commands typed into a PowerShell window and updates when the user presses **Enter** to submit a command.
 
-![PowerShell History File](images/windows-soc-logging-105.png)
+![PowerShell History File](assets/windows-soc-logging-105.png)
 
 ### Key Notes
 

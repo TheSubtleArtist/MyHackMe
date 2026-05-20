@@ -42,7 +42,7 @@ Example MITRE Techniques:
 
 #### Logging Brute Force
 
-![Logging-brute-force](images/intro-initial-access-103.png)  
+![Logging-brute-force](assets/intro-initial-access-103.png)  
 
 ### Initial Access via Phishing
 
@@ -64,12 +64,12 @@ Windows hides known file extensions by defult; allows attackers to miss maliciou
 Common method: make scripts look trustworthy by hiding them behind LNK shortcuts.  
 Inserting malicious scripts as the "target"  
 
-![lnk-target](images/intro-initial-access-104.png)  
+![lnk-target](assets/intro-initial-access-104.png)  
 
 LNK files leave littel execution trace.  
 Name and icon of LNK file does not match the command executed from the `Target` field.
 
-![lnk-event](images/intro-initial-access-106.png)  
+![lnk-event](assets/intro-initial-access-106.png)  
 
 #### Detecting Malicious Download
 
@@ -96,7 +96,7 @@ Image: C:\Users\User\Downloads\invoice.pdf.exe
 ParentImage: C:\Windows\Explorer.EXE
 ```
 
-![sysmon-chain](images/intro-initial-access-105.svg)  
+![sysmon-chain](assets/intro-initial-access-105.svg)  
 
 ### Initial Access via USB
 
@@ -118,7 +118,7 @@ A majority of USB exploits are executed by users.
 `photos.exe` : seemingly normal files with executable extensions  
 double extensions  
 
-![usb](images/intro-initial-access-107.svg)  
+![usb](assets/intro-initial-access-107.svg)  
 
 ## Discovery
 
@@ -138,7 +138,7 @@ After the malicious attachment is run to gain initial access, basic discovery oc
 
 Meterpreter session:  
 
-![discovery](images/discovery-101.png)  
+![discovery](assets/discovery-101.png)  
 
 [DFIR Case Study](https://thedfirreport.com/2024/08/26/blacksuit-ransomware/#collection:~:text=The%20threat%20actor%20performed%20several%20discovery%20commands)
 
@@ -161,7 +161,7 @@ Enumerated as process creation events (Event ID 1)  or new rows in PowerShell hi
 
 Second, enumerate the process tree to identify parent-child relationships  
 
-![detect-discovery](images/discovery-102.svg)  
+![detect-discovery](assets/discovery-102.svg)  
 
 ### Collection
 
@@ -216,9 +216,9 @@ Collection Targets Depend on Motivation
 
 Commands detected used for unuusal purposes  
 
-![collection](images/collection-101.png)  
+![collection](assets/collection-101.png)  
 
-![data-stealers](images/collection-102.png)  
+![data-stealers](assets/collection-102.png)  
 
 #### Data Collection by Threat Actors
 
@@ -249,7 +249,7 @@ Commands detected used for unuusal purposes
   - Telegram data
   - Screenshots of the victim’s host
 
-![gremlin](images/gremlin-stealer.png)  
+![gremlin](assets/gremlin-stealer.png)  
 
 ##### Key Characteristics of Data Stealers
 
@@ -302,7 +302,7 @@ Detecting means correlation processes, connections, sources, destinations, and d
 threat actors manually input all commands dirrectly into RDP.  
 Limited to active / live connections.
 
-![without-c2](images/c2-101.png)
+![without-c2](assets/c2-101.png)
 
 ### Simple C2
 
@@ -314,11 +314,11 @@ The capability to download C2 malware and hide it on the target/victim device
 - survives deletion of the original phising or ingress method  
 
 
-![simple-c2](images/C2-102.png)  
+![simple-c2](assets/C2-102.png)  
 
 ## Persistence 
 
-![persistence-overview](images/persistence-101.svg)  
+![persistence-overview](assets/persistence-101.svg)  
 
 ### Persistence via RDP
 
@@ -370,7 +370,7 @@ Threat actors create own malicious services enabled at startup.
 2. Detect service creation (Security event ID 4697 or event ID 7045)  
 3. Detect suspicious processes with a `services.exe` parent process  
 
-![detect-services](images/persistence-102.svg)
+![detect-services](assets/persistence-102.svg)
 
 #### Detecting Tasks
 
@@ -383,7 +383,7 @@ Managed by `taskschd.msc` or "Task Scheduler" in the GUI
 2. Detect and analyze scheduled task creation (security event ID 4698)  
 3. Detect suspicious processes with a `svchost.exe [...] -s Schedule` parent  
 
-![detect-tasks](images/persistence-103.svg)  
+![detect-tasks](assets/persistence-103.svg)  
 
 ### Persistence: Run Keys at Startup
 
@@ -405,7 +405,7 @@ threat actors use startup folder for persistence [Lumma Stealer](https://www.tre
 
 Deteect file creation event (Sysmon Event ID 11) inside the startup folder. These events have "explorer.exe" as parent  
 
-![startup-persistence](images/persistence-104.svg)  
+![startup-persistence](assets/persistence-104.svg)  
 
 #### Detect Run Keys  
 
@@ -420,5 +420,5 @@ run keys can be viewed manually in Registry Editor (`regedit.exe`)
 
 Identify registry changes events in logs (sysmon event ID 13) 
 
-![detect-run-keys](images/persistence-105.svg)  
+![detect-run-keys](assets/persistence-105.svg)  
 

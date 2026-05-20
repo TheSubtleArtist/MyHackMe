@@ -1,5 +1,14 @@
 # Active Directory Basics
 
+## Learning Objectives 
+
+In this room, we will learn about Active Directory and will become familiar with the following topics
+
+    What Active Directory is
+    What an Active Directory Domain is
+    What components go into an Active Directory Domain
+    Forests and Domain Trust
+
 ## What Is Active Directory?
 
 Active Directory (AD) is a Microsoft directory service that organizes users, computers, servers, groups, and other network objects into a managed identity environment. At scale, AD is commonly structured as domains, trees, and forests, allowing organizations to centralize authentication, authorization, policy enforcement, and resource access.

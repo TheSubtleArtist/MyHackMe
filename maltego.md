@@ -24,7 +24,7 @@
   - Review the returned entities.
   - Run additional transforms to expand the graph.
 
-![Maltego entity and transform workflow](/assets/maltego-101.png)
+![Maltego entity and transform workflow](/images/maltego-101.png)
 
 ## Passive and Active Reconnaissance Considerations
 
@@ -42,11 +42,11 @@
   2. `Resolve to IP`
   3. `To IP Address (DNS)`
 
-![Maltego DNS name entity before IP resolution](/assets/maltego-102.png)
+![Maltego DNS name entity before IP resolution](/images/maltego-102.png)
 
 - After the transform runs, Maltego returns one or more IP address entities.
 
-![Maltego DNS to IP address transform result](/assets/maltego-103.png)
+![Maltego DNS to IP address transform result](/images/maltego-103.png)
 
 ## Example Workflow: IP Address to DNS Names
 
@@ -57,7 +57,7 @@
 - This transform can populate the graph with DNS names related to the selected IP address.
 - Additional transforms can enrich the graph further with data such as IP geolocation.
 
-![Maltego passive DNS transform results](/assets/maltego-104.png)
+![Maltego passive DNS transform results](/images/maltego-104.png)
 
 ## Visualizing WHOIS and DNS Information
 
@@ -71,7 +71,7 @@
   - Relationships between those entities.
 - Some WHOIS email results may be less useful when privacy protection is enabled, but the graph still demonstrates how Maltego structures and presents OSINT data.
 
-![Maltego WHOIS and DNS relationship graph](/assets/maltego-105.png)
+![Maltego WHOIS and DNS relationship graph](/images/maltego-105.png)
 
 ## Transform Hub and Additional Transforms
 
@@ -85,7 +85,7 @@
 - Maltego Community Edition and free transforms provide many options, but some transforms require a paid subscription.
 - Maltego requires activation, even when using Maltego Community Edition.
 
-![Maltego Transform Hub options](/assets/maltego-106.png)
+![Maltego Transform Hub options](/images/maltego-106.png)
 
 ## Review Questions
 
